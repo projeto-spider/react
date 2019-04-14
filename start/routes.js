@@ -19,6 +19,10 @@ Route.group(() => {
   // User Resource
   Route.resource('users', 'UserController').apiOnly()
 
+  // Project Resource
+  Route.resource('projects', 'ProjectController').apiOnly()
+    .middleware('auth')
+
   // Auth Routes
   Route.get('me', 'UserController.me')
     .middleware('auth')
