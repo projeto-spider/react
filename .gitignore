@@ -30,3 +30,6 @@ lib-cov
 
 # IDE
 .idea
+
+# Dev database files
+database/*.sqlite
