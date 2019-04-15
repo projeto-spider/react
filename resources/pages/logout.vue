@@ -10,7 +10,7 @@ export default {
 
   created () {
     this.logout()
-    this.$router.push('/')
+    this.$router.push('/projects')
   },
 
   methods: {

@@ -109,7 +109,7 @@ export default {
 
           this.login(credentials)
             .then(() => {
-              this.$router.push('/')
+              this.$router.push('/projects')
             })
             .catch(() => {
               this.$message.error('Invalid Credentials')

@@ -31,14 +31,24 @@
         </template>
 
         <template>
-          <a-menu-item
-            v-if="isLoggedIn"
-            key="logout"
-            style="float: right"
-            @click="$router.push('/logout')"
-          >
-            Logout
-          </a-menu-item>
+          <template v-if="isLoggedIn">
+            <a-menu-item
+              key="logout"
+              style="float: right"
+              @click="$router.push('/logout')"
+            >
+              Logout
+            </a-menu-item>
+
+            <a-menu-item
+
+              key="projects"
+              style="float: right"
+              @click="$router.push('/projects')"
+            >
+              Projects
+            </a-menu-item>
+          </template>
 
           <template v-else>
             <a-menu-item
