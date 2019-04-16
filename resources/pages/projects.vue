@@ -65,9 +65,7 @@ export default {
   middleware: 'authenticated',
 
   data: () => ({
-    projects: [
-      {id: 2, name: 'Olá mundo'}
-    ],
+    projects: [],
 
     editing: false
   }),
