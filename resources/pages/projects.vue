@@ -91,6 +91,7 @@ export default {
         .map(name => name.split(' ').pop())
         .map(numberString => Number(numberString))
         .filter(x => x)
+        .sort()
 
       const countDefaultLike = defaultLike.length
       const nextNumber = countDefaultLike
