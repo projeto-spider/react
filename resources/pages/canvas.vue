@@ -9,21 +9,21 @@
                 <td style="width: 33.33%">
                   <span class="ant-table-row-indent indent-level-0">
                     <strong>Problem</strong>
-                    <CanvasEntry v-model="canvas.problems" />
+                    <ListManager v-model="canvas.problems" />
                   </span>
                 </td>
 
                 <td style="width: 33.33%">
                   <span class="ant-table-row-indent indent-level-0">
                     <strong>Solution</strong>
-                    <CanvasEntry v-model="canvas.solutions" />
+                    <ListManager v-model="canvas.solutions" />
                   </span>
                 </td>
 
                 <td style="width: 33.33%">
                   <span class="ant-table-row-indent indent-level-0">
                     <strong>Personas</strong>
-                    <CanvasEntry v-model="canvas.personas" />
+                    <ListManager v-model="canvas.personas" />
                   </span>
                 </td>
               </tr>
@@ -31,21 +31,21 @@
                 <td style="width: 33.33%">
                   <span class="ant-table-row-indent indent-level-0">
                     <strong>Is is</strong>
-                    <CanvasEntry v-model="canvas.is" />
+                    <ListManager v-model="canvas.is" />
                   </span>
                 </td>
 
                 <td style="width: 33.33%">
                   <span class="ant-table-row-indent indent-level-0">
                     <strong>It isn't</strong>
-                    <CanvasEntry v-model="canvas.isnt" />
+                    <ListManager v-model="canvas.isnt" />
                   </span>
                 </td>
 
                 <td style="width: 33.33%">
                   <span class="ant-table-row-indent indent-level-0">
                     <strong>Constraints</strong>
-                    <CanvasEntry v-model="canvas.constraints" />
+                    <ListManager v-model="canvas.constraints" />
                   </span>
                 </td>
               </tr>
@@ -59,12 +59,12 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
-import CanvasEntry from '~/components/CanvasEntry.vue'
+import ListManager from '~/components/ListManager.vue'
 
 export default {
   name: 'CanvasPage',
 
-  components: { CanvasEntry },
+  components: { ListManager },
 
   data() {
     return {

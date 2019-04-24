@@ -60,7 +60,7 @@
 
 <script>
 export default {
-  name: 'CanvasEntry',
+  name: 'ListManager',
 
   props: {
     value: {
