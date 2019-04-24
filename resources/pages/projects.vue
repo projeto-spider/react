@@ -33,13 +33,19 @@
 
         <a slot="actions">Open</a>
 
-        <a-list-item-meta>
+        <a-list-item-meta
+          :description="editing !== project ? descriptionForProject(project) : null"
+        >
           <template slot="title">
             <form
               v-if="editing === project"
               @submit.prevent="updateProject"
+              class="project-form"
             >
               <a-input size="small" placeholder="Basic usage" v-model="project.name" />
+              <a-input size="small" placeholder="Client (optional)" v-model="project.clientName" />
+              <a-input size="small" placeholder="Description (optional)" v-model="project.description" />
+              <a-range-picker size="small" style="width: 100%" @change="onChangeDate" :defaultValue="[project.startDate && moment(project.startDate, 'YYYY-MM-DD'), project.endDate && moment(project.endDate, 'YYYY-MM-DD')]" />
             </form>
 
             <span v-else style="mouse: pointer" @click="openNameInput(project)">
@@ -59,12 +65,24 @@
 </template>
 
 <script>
+import moment from 'moment'
+
 export default {
   name: 'ProjectsPage',
 
   middleware: 'authenticated',
 
   data: () => ({
+    moment,
+
+    rangeConfig: {
+      rules: [{
+        type: 'array',
+        required: true,
+        message: 'Please select time!'
+      }]
+    },
+
     projects: [],
 
     editing: false
@@ -110,12 +128,15 @@ export default {
     },
 
     updateProject () {
-      this.$axios.$put(`/api/projects/${this.editing.id}`, { name: this.editing.name })
+      const { name, clientName, description, startDate, endDate } = this.editing
+      const payload = {name, clientName, description, startDate, endDate}
+
+      this.$axios.$put(`/api/projects/${this.editing.id}`, payload)
         .then(data => {
-          this.$message.success(`Project renamed to ${data.name}`)
+          this.$message.success(`Project ${data.name} updated`)
         })
         .catch(() => {
-          this.$message.error('Failed to update project name')
+          this.$message.error('Failed to update project')
         })
       this.editing = false
     },
@@ -134,7 +155,49 @@ export default {
         .catch(() => {
           this.$message.error('Failed to delete project')
         })
+    },
+
+    onChangeDate (_, [startDate, endDate]) {
+      if (!this.editing) {
+        return
+      }
+
+      this.editing.startDate = startDate
+      this.editing.endDate = endDate
+    },
+
+    descriptionForProject (project) {
+      const format = 'DD-MM-YYYY'
+
+      const formatedStartDate = project.startDate
+        ? moment(project.startDate).format(format)
+        : ''
+      const formatedEndDate = project.endDate
+        ? moment(project.endDate).format(format)
+        : ''
+
+      const hasBothDates = formatedStartDate && formatedEndDate
+      const bothDatesAreEqual = formatedStartDate === formatedEndDate
+
+      const date =
+        hasBothDates && bothDatesAreEqual ? `${formatedStartDate} ~ ?` :
+        hasBothDates ? `${formatedStartDate} ~ ${formatedEndDate}` :
+        formatedStartDate
+
+      return [
+        project.clientName,
+        project.description,
+        date
+      ]
+        .filter(x => x)
+        .join(' — ')
     }
   }
 }
 </script>
+
+<style>
+.project-form input {
+  margin-bottom: 5px;
+}
+</style>
