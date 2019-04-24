@@ -31,7 +31,7 @@
           <a href="#">Delete</a>
         </a-popconfirm>
 
-        <a slot="actions">Open</a>
+        <a slot="actions" @click="openProject(project)">Open</a>
 
         <a-list-item-meta
           :description="editing !== project ? descriptionForProject(project) : null"
@@ -66,6 +66,7 @@
 
 <script>
 import moment from 'moment'
+import { mapMutations } from 'vuex'
 
 export default {
   name: 'ProjectsPage',
@@ -93,6 +94,10 @@ export default {
   },
 
   methods: {
+    ...mapMutations('project', [
+      'selectProject'
+    ]),
+
     openNameInput (project) {
       if (this.editing) {
         this.updateProject()
@@ -164,6 +169,11 @@ export default {
 
       this.editing.startDate = startDate
       this.editing.endDate = endDate
+    },
+
+    openProject (project) {
+      this.selectProject(project)
+      this.$router.push('/canvas')
     },
 
     descriptionForProject (project) {

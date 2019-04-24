@@ -12,7 +12,7 @@
         mode="horizontal"
         :style="{ lineHeight: '64px', 'background-color': 'rgba(0, 0, 0, 0) !important' }"
       >
-        <template v-if="isLoggedIn">
+        <template v-if="isLoggedIn && isProjectSelected">
           <a-menu-item key="canvas">
             Canvas
           </a-menu-item>
@@ -96,6 +96,10 @@ export default {
   computed: {
     ...mapGetters('auth', [
       'isLoggedIn'
+    ]),
+
+    ...mapGetters('project', [
+      'isProjectSelected'
     ])
   },
 

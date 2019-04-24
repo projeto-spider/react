@@ -14,6 +14,13 @@ class ProjectSchema extends Schema {
       table.string('description').defaultTo('')
       table.date('startDate').defaultTo(this.fn.now())
       table.date('endDate').defaultTo(this.fn.now())
+      table.json('canvas').defaultTo(JSON.stringify({
+        problems: [],
+        solutions: [],
+        is: [],
+        isnt: [],
+        constraints: []
+      })).notNullable()
       table.timestamps()
     })
   }
