@@ -15,6 +15,10 @@ class Project extends Model {
   owner () {
     return this.belongsTo('App/Models/User', 'ownerId')
   }
+
+  personas () {
+    return this.hasMany('App/Models/Persona', 'id', 'projectId')
+  }
 }
 
 module.exports = Project

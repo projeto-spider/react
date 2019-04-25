@@ -23,7 +23,7 @@
                 <td style="width: 33.33%">
                   <span class="ant-table-row-indent indent-level-0">
                     <strong>Personas</strong>
-                    <ListManager v-model="canvas.personas" />
+                    <PersonaListManager />
                   </span>
                 </td>
               </tr>
@@ -60,15 +60,17 @@
 <script>
 import { mapGetters, mapActions } from 'vuex'
 import ListManager from '~/components/ListManager.vue'
+import PersonaListManager from '~/components/PersonaListManager.vue'
 
 export default {
   name: 'CanvasPage',
 
-  components: { ListManager },
+  components: { ListManager, PersonaListManager },
 
   data() {
     return {
-      canvas: false
+      canvas: false,
+      personas: []
     }
   },
 
@@ -84,6 +86,14 @@ export default {
     }
 
     this.readCanvasFromProject()
+
+    this.$axios.$get(`/api/projects/${this.currentProject.id}/personas`)
+      .then(personas => {
+        this.personas = personas
+      })
+      .catch(() => {
+        this.$message.error('Failed to load personas')
+      })
   },
 
   methods: {
