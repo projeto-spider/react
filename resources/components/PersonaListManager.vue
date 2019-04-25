@@ -62,19 +62,19 @@
                   <td style="width: 50%">
                     <span class="ant-table-row-indent indent-level-0">
                       <p>
-                        <strong>Name</strong>
+                        <strong data-v-step="personas-1">Name</strong>
                         <a-input v-model="editingPersona.name" :auto-focus="true" />
                       </p>
 
                       <p>
-                        <strong>Role</strong>
+                        <strong data-v-step="personas-2">Role</strong>
                         <a-input v-model="editingPersona.role" />
                       </p>
                     </span>
                   </td>
 
                   <td style="width: 50%">
-                    <span class="ant-table-row-indent indent-level-0">
+                    <span class="ant-table-row-indent indent-level-0" data-v-step="personas-3">
                       <strong>Profile / Behaviors</strong>
                       <ListManager v-model="editingPersona.data.profile" />
                     </span>
@@ -83,14 +83,14 @@
 
                 <tr class="ant-table-row ant-table-row-level-0">
                   <td style="width: 50%">
-                    <span class="ant-table-row-indent indent-level-0">
+                    <span class="ant-table-row-indent indent-level-0" data-v-step="personas-4">
                       <strong>Expectations</strong>
                       <ListManager v-model="editingPersona.data.expectations" />
                     </span>
                   </td>
 
                   <td style="width: 50%">
-                    <span class="ant-table-row-indent indent-level-0">
+                    <span class="ant-table-row-indent indent-level-0" data-v-step="personas-5">
                       <strong>Goals</strong>
                       <ListManager v-model="editingPersona.data.goals" />
                     </span>
@@ -100,8 +100,22 @@
             </table>
           </div>
         </div>
+
+        <v-tour name="personasTour" :steps="tour.steps"></v-tour>
       </div>
+
+      <template slot="footer">
+        <a-button
+          slot="extra"
+          type="primary"
+          @click="$tours.personasTour.start()"
+        >
+          <a-icon type="info-circle" /> Tutorial
+        </a-button>
+      </template>
     </a-modal>
+
+
   </div>
 </template>
 
@@ -110,6 +124,50 @@ import { mapGetters } from 'vuex'
 import ListManager from '~/components/ListManager.vue'
 import pDebounce from 'p-debounce'
 
+const tour = {
+  steps: [
+    {
+      target: '[data-v-step="personas-1"]',
+      content: `
+        Give a <strong>fake name</strong> for this person.<br>
+        <em>"John Doe"</em>, <em>"Jane Doe"</em>
+      `
+    },
+
+    {
+      target: '[data-v-step="personas-2"]',
+      content: `
+        What's their <strong>job</strong> in this app?<br>
+        <em>"Visitor"</em>, <em>"Client"</em>
+      `
+    },
+
+    {
+      target: '[data-v-step="personas-3"]',
+      content: `
+        Stabilish <strong>character</strong> for this person<br>
+        <em>"Client for 27 years"</em>, <em>"Uses her smartphone a lot"</em>
+      `
+    },
+
+    {
+      target: '[data-v-step="personas-4"]',
+      content: `
+        Define <strong>your aim</strong> for the app to impact in your client<br>
+        <em>"Solve common banking problems"</em>, <em>"No need to go to the bank for simple transactions"</em>
+      `
+    },
+
+    {
+      target: '[data-v-step="personas-5"]',
+      content: `
+        What's the <strong>endgame</strong> for the client<br>
+        <em>"Make transactions in their phone"</em>, <em>"Play a fun game"</em>
+      `
+    }
+  ]
+}
+
 export default {
   name: 'PersonaListManager',
 
@@ -117,6 +175,8 @@ export default {
 
   data () {
     return {
+      tour,
+
       personas: [],
 
       modalOpen: false,
@@ -203,3 +263,9 @@ export default {
   }
 }
 </script>
+
+<style>
+.v-step {
+  z-index: 100;
+}
+</style>

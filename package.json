@@ -32,6 +32,7 @@
     "p-debounce": "^2.1.0",
     "sqlite3": "^4.0.6",
     "standard": "^8.6.0",
+    "vue-tour": "^1.1.0",
     "vuex-persist": "^2.0.0",
     "youch": "^2.0.4"
   },

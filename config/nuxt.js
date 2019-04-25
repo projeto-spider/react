@@ -38,6 +38,7 @@ module.exports = {
   */
   plugins: [
     { src: '~/plugins/vuex-persist', ssr: false },
+    '~/plugins/tour',
     '~/plugins/antd'
   ],
   /*
