@@ -27,7 +27,7 @@
                   </span>
                 </td>
 
-                <td style="width: 33.33%" data-v-step="5">
+                <td style="width: 33.33%" data-v-step="3">
                   <span class="ant-table-row-indent indent-level-0">
                     <strong>Constraints</strong>
                     <ListManager v-model="canvas.constraints" />
@@ -35,14 +35,14 @@
                 </td>
               </tr>
               <tr class="ant-table-row ant-table-row-level-0">
-                <td style="width: 33.33%" data-v-step="3">
+                <td style="width: 33.33%" data-v-step="4">
                   <span class="ant-table-row-indent indent-level-0">
                     <strong>Is is</strong>
                     <ListManager v-model="canvas.is" />
                   </span>
                 </td>
 
-                <td style="width: 33.33%" data-v-step="4">
+                <td style="width: 33.33%" data-v-step="5">
                   <span class="ant-table-row-indent indent-level-0">
                     <strong>It isn't</strong>
                     <ListManager v-model="canvas.isnt" />
