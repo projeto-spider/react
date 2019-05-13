@@ -27,10 +27,10 @@
                   </span>
                 </td>
 
-                <td style="width: 33.33%" data-v-step="6">
+                <td style="width: 33.33%" data-v-step="5">
                   <span class="ant-table-row-indent indent-level-0">
-                    <strong>Personas</strong>
-                    <PersonaListManager />
+                    <strong>Constraints</strong>
+                    <ListManager v-model="canvas.constraints" />
                   </span>
                 </td>
               </tr>
@@ -49,10 +49,10 @@
                   </span>
                 </td>
 
-                <td style="width: 33.33%" data-v-step="5">
+                <td style="width: 33.33%" data-v-step="6">
                   <span class="ant-table-row-indent indent-level-0">
-                    <strong>Constraints</strong>
-                    <ListManager v-model="canvas.constraints" />
+                    <strong>Personas</strong>
+                    <PersonaListManager />
                   </span>
                 </td>
               </tr>
