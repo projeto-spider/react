@@ -12,6 +12,14 @@ class Project extends Model {
     return JSON.stringify(obj)
   }
 
+  getGoals (json) {
+    return JSON.parse(json)
+  }
+
+  setGoals (obj) {
+    return JSON.stringify(obj)
+  }
+
   owner () {
     return this.belongsTo('App/Models/User', 'ownerId')
   }

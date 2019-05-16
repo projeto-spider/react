@@ -5,7 +5,7 @@ const Schema = use('Schema')
 
 class ProjectSchema extends Schema {
   up () {
-    this.create('projects', (table) => {
+    this.create('projects', table => {
       table.increments()
       table.string('name').notNullable()
       table.integer('ownerId').unsigned()
@@ -14,13 +14,22 @@ class ProjectSchema extends Schema {
       table.string('description').defaultTo('')
       table.date('startDate').defaultTo(this.fn.now())
       table.date('endDate').defaultTo(this.fn.now())
-      table.json('canvas').defaultTo(JSON.stringify({
-        problems: [],
-        solutions: [],
-        is: [],
-        isnt: [],
-        constraints: []
-      })).notNullable()
+      table
+        .json('canvas')
+        .defaultTo(
+          JSON.stringify({
+            problems: [],
+            solutions: [],
+            is: [],
+            isnt: [],
+            constraints: []
+          })
+        )
+        .notNullable()
+      table
+        .json('goals')
+        .defaultTo(JSON.stringify([]))
+        .notNullable()
       table.timestamps()
     })
   }

@@ -8,68 +8,78 @@
       Create
     </a-button>
 
-    <div
-      v-for="(goal, i) in goals"
-      :key="i"
-      class="ant-card ant-card-bordered ant-card-hoverable"
-      style="max-width: 400px; margin: 15px auto"
+    <Draggable
+      v-model="goals"
+      @change="onChangeOrder"
     >
-      <div class="ant-card-body">
-        <div class="ant-card-meta">
-          <div class="ant-card-meta-detail">
-            <div class="ant-card-meta-description">
-              <a-textarea
-                placeholder="Conteúdo"
-                :autosize="{ minRows: 1, maxRows: 5 }"
-                v-model="goal.title"
-                @change="() => onChangeTitle(goal)"
-              />
+      <transition-group>
+        <div
+          v-for="goal in goals"
+          :key="goal.id"
+          class="ant-card ant-card-bordered ant-card-hoverable"
+          style="max-width: 400px; margin: 15px auto"
+        >
+          <div class="ant-card-body">
+            <div class="ant-card-meta">
+              <div class="ant-card-meta-detail">
+                <div class="ant-card-meta-description">
+                  <a-textarea
+                    placeholder="Conteúdo"
+                    :autosize="{ minRows: 1, maxRows: 5 }"
+                    v-model="goal.title"
+                    @change="() => onChangeTitle(goal)"
+                  />
+                </div>
+              </div>
             </div>
           </div>
+
+          <ul class="ant-card-actions">
+            <li style="width: 33.3333%;">
+              <span>
+                <a-select :defaultValue="goal.priority" style="width: 120px; text-aling: center" @change="value => onChangePriority(goal, value)">
+                  <a-select-option :value="0">Low</a-select-option>
+                  <a-select-option :value="1">Medium</a-select-option>
+                  <a-select-option :value="2">High</a-select-option>
+                </a-select>
+              </span>
+            </li>
+
+            <li style="width: 33.3333%;">
+              <span>
+                <a-select :defaultValue="goal.type" style="width: 120px; text-aling: center" @change="value => onChangeType(goal, value)">
+                  <a-select-option :value="0">Business</a-select-option>
+                  <a-select-option :value="1">Constrant</a-select-option>
+                </a-select>
+              </span>
+            </li>
+
+            <li style="width: 33.3333%;">
+              <a-popconfirm
+                title="Are you sure delete this entry?"
+                @confirm="deleteGoal(goal)"
+                okText="Yes"
+                cancelText="No"
+              >
+                <a-button type="danger">Danger</a-button>
+              </a-popconfirm>
+            </li>
+          </ul>
         </div>
-      </div>
-
-      <ul class="ant-card-actions">
-        <li style="width: 33.3333%;">
-          <span>
-            <a-select :defaultValue="goal.priority" style="width: 120px; text-aling: center" @change="value => onChangePriority(goal, value)">
-              <a-select-option :value="0">Low</a-select-option>
-              <a-select-option :value="1">Medium</a-select-option>
-              <a-select-option :value="2">High</a-select-option>
-            </a-select>
-          </span>
-        </li>
-
-        <li style="width: 33.3333%;">
-          <span>
-            <a-select :defaultValue="goal.type" style="width: 120px; text-aling: center" @change="value => onChangeType(goal, value)">
-              <a-select-option :value="0">Business</a-select-option>
-              <a-select-option :value="1">Constrant</a-select-option>
-            </a-select>
-          </span>
-        </li>
-
-        <li style="width: 33.3333%;">
-          <a-popconfirm
-            title="Are you sure delete this entry?"
-            @confirm="deleteGoal(goal)"
-            okText="Yes"
-            cancelText="No"
-          >
-            <a-button type="danger">Danger</a-button>
-          </a-popconfirm>
-        </li>
-      </ul>
-    </div>
+      </transition-group>
+    </Draggable>
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import pDebounce from 'p-debounce'
+import Draggable from 'vuedraggable'
 
 export default {
   name: 'GoalSketch',
+
+  components: { Draggable },
 
   data: () => ({
     goals: []
@@ -82,6 +92,10 @@ export default {
   },
 
   methods: {
+    ...mapActions('project', [
+      'updateProjectGoals'
+    ]),
+
     addGoal () {
       const defaultData = {
         title: ''
@@ -90,6 +104,7 @@ export default {
       this.$axios.$post(`/api/projects/${this.currentProject.id}/goals`, defaultData)
         .then(goal => {
           this.goals.unshift(goal)
+          this.onChangeOrder()
         })
         .catch(() => {
           this.$message.error('Failed to create goal')
@@ -117,6 +132,7 @@ export default {
           const index = this.goals.indexOf(goal)
           if (index !== -1) {
             this.goals.splice(index, 1)
+            this.onChangeOrder()
           }
         })
         .catch(() => {
@@ -136,6 +152,20 @@ export default {
     onChangeType (goal, value) {
       goal.type = value
       this.updateGoal(goal)
+    },
+
+    refreshGoals () {
+      return this.$axios.$get(`/api/projects/${this.currentProject.id}/goals`)
+        .then(goals => {
+          this.goals = goals
+        })
+        .catch(() => {
+          this.$message.error('Failed to load goals')
+        })
+    },
+
+    onChangeOrder () {
+      this.updateProjectGoals(this.goals.map(({id}) => id))
     }
   },
 
@@ -143,13 +173,12 @@ export default {
     if (!this.currentProject) {
       return this.$router.push('/projects')
     }
-
-    this.$axios.$get(`/api/projects/${this.currentProject.id}/goals`)
-      .then(goals => {
-        this.goals = goals
-      })
-      .catch(() => {
-        this.$message.error('Failed to load goals')
+    this.order = this.currentProject.goals
+    this.refreshGoals()
+      .then(() => {
+        this.goals = this.order
+          .map(id => this.goals.find(goal => goal.id === id))
+          .filter(x => x)
       })
   }
 }

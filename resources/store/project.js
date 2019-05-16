@@ -18,6 +18,10 @@ export const mutations = {
     Vue.set(state.selected, 'canvas', copy(canvas))
   },
 
+  updateGoals (state, goals) {
+    Vue.set(state.selected, 'goals', copy(goals))
+  },
+
   updatePersonas (state, personas) {
     state.personas = copy(personas)
   },
@@ -81,6 +85,13 @@ export const actions = {
     commit('updateCanvas', canvas)
 
     return this.$axios.$put(`/api/projects/${id}`, { canvas })
+  },
+
+  updateProjectGoals ({ state, commit }, goals) {
+    const { id } = state.selected
+    commit('updateGoals', goals)
+
+    return this.$axios.$put(`/api/projects/${id}`, { goals })
   }
 }
 
