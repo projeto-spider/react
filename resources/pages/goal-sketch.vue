@@ -24,7 +24,7 @@
               <div class="ant-card-meta-detail">
                 <div class="ant-card-meta-description">
                   <a-textarea
-                    placeholder="Conteúdo"
+                    placeholder="Write your goal"
                     :autosize="{ minRows: 1, maxRows: 5 }"
                     v-model="goal.title"
                     @change="() => onChangeTitle(goal)"
@@ -36,12 +36,19 @@
 
           <ul class="ant-card-actions">
             <li style="width: 33.3333%;">
-              <span>
-                <a-select :defaultValue="goal.priority" style="width: 120px; text-aling: center" @change="value => onChangePriority(goal, value)">
-                  <a-select-option :value="0">Low</a-select-option>
-                  <a-select-option :value="1">Medium</a-select-option>
-                  <a-select-option :value="2">High</a-select-option>
-                </a-select>
+              <span :class="{ 'invalid-order': itemsWithWrongPosition.includes(goal) }">
+                <a-tooltip>
+                  <template v-if="itemsWithWrongPosition.includes(goal)" slot='title'>
+                    <span>Wrong priority.</span>
+                    <br>
+                    <span>High > Medium > Low.</span>
+                  </template>
+                  <a-select :defaultValue="goal.priority" style="width: 120px; text-aling: center" @change="value => onChangePriority(goal, value)">
+                    <a-select-option :value="0">Low</a-select-option>
+                    <a-select-option :value="1">Medium</a-select-option>
+                    <a-select-option :value="2">High</a-select-option>
+                  </a-select>
+                </a-tooltip>
               </span>
             </li>
 
@@ -88,7 +95,17 @@ export default {
   computed: {
     ...mapGetters('project', [
       'currentProject'
-    ])
+    ]),
+
+    itemsWithWrongPosition () {
+      return this.goals.filter((goal, i, goals) => {
+        const before = goals.slice(0, i)
+        const after = goals.slice(i + 1)
+
+        return !before.every(other => goal.priority <= other.priority) ||
+          !after.every(other => goal.priority >= other.priority)
+      })
+    }
   },
 
   methods: {
@@ -176,6 +193,14 @@ export default {
     this.order = this.currentProject.goals
     this.refreshGoals()
       .then(() => {
+        const leftOutGoals = this.goals.filter(goal =>
+          !this.order.includes(goal.id)
+        )
+
+        for (let goal of leftOutGoals) {
+          this.deleteGoal(goal)
+        }
+
         this.goals = this.order
           .map(id => this.goals.find(goal => goal.id === id))
           .filter(x => x)
@@ -183,3 +208,10 @@ export default {
   }
 }
 </script>
+
+<style>
+.invalid-order .ant-select-selection {
+  border-color: red
+}
+</style>
+
