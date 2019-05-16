@@ -19,6 +19,10 @@ class Project extends Model {
   personas () {
     return this.hasMany('App/Models/Persona', 'id', 'projectId')
   }
+
+  goals () {
+    return this.hasMany('App/Models/Goal', 'id', 'projectId')
+  }
 }
 
 module.exports = Project

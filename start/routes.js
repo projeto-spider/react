@@ -20,15 +20,20 @@ Route.group(() => {
   Route.resource('users', 'UserController').apiOnly()
 
   // Project Resource
-  Route.resource('projects', 'ProjectController').apiOnly()
+  Route.resource('projects', 'ProjectController')
+    .apiOnly()
     .middleware('auth')
   // Project Personas Resource
-  Route.resource('projects.personas', 'PersonaController').apiOnly()
+  Route.resource('projects.personas', 'PersonaController')
+    .apiOnly()
+    .middleware('auth')
+  // Project Goals Resource
+  Route.resource('projects.goals', 'GoalController')
+    .apiOnly()
     .middleware('auth')
 
   // Auth Routes
-  Route.get('me', 'UserController.me')
-    .middleware('auth')
+  Route.get('me', 'UserController.me').middleware('auth')
   Route.post('login', 'UserController.login')
 })
   .formats(['json'])
