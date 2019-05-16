@@ -11,21 +11,22 @@
         :theme="isLoggedIn ? 'dark' : 'light'"
         mode="horizontal"
         :style="{ lineHeight: '64px', 'background-color': 'rgba(0, 0, 0, 0) !important' }"
+        @click="clickMenuItem"
       >
         <template v-if="isLoggedIn && isProjectSelected">
           <a-menu-item key="canvas">
             Canvas
           </a-menu-item>
 
-          <a-menu-item key="goal-sketch">
+          <a-menu-item key="goal-sketch" :disabled="currentStep < 2">
             Goal Sketch
           </a-menu-item>
 
-          <a-menu-item key="storyboard">
+          <a-menu-item key="storyboard" :disabled="currentStep < 100">
             Story Board
           </a-menu-item>
 
-          <a-menu-item key="overall-model">
+          <a-menu-item key="overall-model" :disabled="currentStep < 100">
             Overall Model
           </a-menu-item>
         </template>
@@ -74,6 +75,7 @@
     <a-layout-content style="padding: 0 50px">
       <div style="margin: 16px 0" />
       <nuxt />
+      <StepManager v-if="isProjectSelected"></StepManager>
     </a-layout-content>
 
     <a-layout-footer style="text-align: center">
@@ -84,8 +86,11 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import StepManager from '@/components/StepManager'
 
 export default {
+  components: { StepManager },
+
   data () {
     return {
       collapsed: false
@@ -98,11 +103,15 @@ export default {
     ]),
 
     ...mapGetters('project', [
-      'isProjectSelected'
+      'isProjectSelected',
+      'currentStep'
     ])
   },
 
   methods: {
+    clickMenuItem ({key}) {
+      this.$router.push(key)
+    }
   }
 }
 </script>

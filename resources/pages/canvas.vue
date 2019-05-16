@@ -51,8 +51,11 @@
 
                 <td style="width: 33.33%" data-v-step="6">
                   <span class="ant-table-row-indent indent-level-0">
-                    <strong>Personas</strong>
-                    <PersonaListManager />
+                    <strong>
+                      <span>Personas</span>
+                      <span v-if="!canvasReady" style="color: red">(Complete the other fields)</span>
+                    </strong>
+                    <PersonaListManager :disabled="currentStep < 1" />
                   </span>
                 </td>
               </tr>
@@ -128,7 +131,7 @@ export default {
 
   components: { ListManager, PersonaListManager },
 
-  data() {
+  data () {
     return {
       tour,
       canvas: false,
@@ -138,7 +141,9 @@ export default {
 
   computed: {
     ...mapGetters('project', [
-      'currentProject'
+      'currentProject',
+      'currentStep',
+      'canvasReady'
     ])
   },
 

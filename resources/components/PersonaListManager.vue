@@ -1,6 +1,6 @@
 <template>
   <div
-    class="ant-list ant-list-split ant-list-bordered ant-list-something-after-last-item"
+    class="ant-list ant-list-split ant-list-bordered ant-list-something-after-last-item persona-list"
     style="margin-top: 10px"
   >
     <div class="ant-spin-nested-loading">
@@ -42,6 +42,7 @@
       @click="addPersona()"
       type="dashed"
       block
+      :disabled="disabled"
     >
       Add
     </a-button>
@@ -114,13 +115,11 @@
         </a-button>
       </template>
     </a-modal>
-
-
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 import ListManager from '~/components/ListManager.vue'
 import pDebounce from 'p-debounce'
 
@@ -173,6 +172,13 @@ export default {
 
   components: { ListManager },
 
+  props: {
+    disabled: {
+      type: Boolean,
+      default: false
+    }
+  },
+
   data () {
     return {
       tour,
@@ -201,6 +207,10 @@ export default {
   },
 
   methods: {
+    ...mapMutations('project', [
+      'updatePersonas'
+    ]),
+
     closeModal () {
       this.modalOpen = false
       this.editingPersona = false
@@ -259,6 +269,14 @@ export default {
       handler: pDebounce(function editingPersonaWatcher () {
         this.updatePersona(this.editingPersona)
       }, 500)
+    },
+
+    personas: {
+      deep: true,
+
+      handler () {
+        this.updatePersonas(this.personas)
+      }
     }
   }
 }
