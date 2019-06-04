@@ -93,7 +93,13 @@
                   <td style="width: 50%">
                     <span class="ant-table-row-indent indent-level-0" data-v-step="personas-5">
                       <strong>Goals</strong>
-                      <ListManager v-model="editingPersona.data.goals" />
+
+                      <a-list
+                        bordered
+                        :dataSource="editingPersona.goals || []"
+                      >
+                        <a-list-item slot="renderItem" slot-scope="item">{{ item.title }}</a-list-item>
+                      </a-list>
                     </span>
                   </td>
                 </tr>
@@ -242,7 +248,10 @@ export default {
         return
       }
 
-      this.$axios.$put(`/api/projects/${this.currentProject.id}/personas/${persona.id}`, persona)
+      const payload = {...persona}
+      payload.goals = undefined
+
+      this.$axios.$put(`/api/projects/${this.currentProject.id}/personas/${persona.id}`, payload)
         .catch(() => {
           this.$message.error('Failed to update persona')
         })

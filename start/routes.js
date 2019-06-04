@@ -28,9 +28,21 @@ Route.group(() => {
     .apiOnly()
     .middleware('auth')
   // Project Goals Resource
-  Route.resource('projects.goals', 'GoalController')
+  Route.resource('projects.modules', 'ProjectModuleController')
     .apiOnly()
     .middleware('auth')
+  // Project Goals Resource
+  Route.resource('projects.modules.goals', 'GoalController')
+    .apiOnly()
+    .middleware('auth')
+  Route.post(
+    '/projects/:projects_id/modules/:modules_id/goals/:id/personas',
+    'GoalController.addPersona'
+  ).middleware('auth')
+  Route.delete(
+    '/projects/:projects_id/modules/:modules_id/goals/:goals_id/personas/:id',
+    'GoalController.removePersona'
+  ).middleware('auth')
 
   // Auth Routes
   Route.get('me', 'UserController.me').middleware('auth')

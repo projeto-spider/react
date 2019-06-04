@@ -1,18 +1,15 @@
 'use strict'
 
-const Persona = use('App/Models/Persona')
+const ProjectModule = use('App/Models/ProjectModule')
 
-class PersonaController {
+class ProjectModuleController {
   async index ({ auth, request }) {
     const project = await auth.user
       .projects()
       .where('id', request.params.projects_id)
       .first()
 
-    return await project
-      .personas()
-      .with('goals')
-      .fetch()
+    return await project.modules().fetch()
   }
 
   async show ({ auth, request, response }) {
@@ -27,19 +24,18 @@ class PersonaController {
       })
     }
 
-    const persona = await project
-      .personas()
-      .with('goals')
+    const mod = await project
+      .modules()
       .where('id', request.params.id)
       .first()
 
-    if (!persona) {
+    if (!mod) {
       return response.notFound({
-        message: 'Persona not found'
+        message: 'Module not found'
       })
     }
 
-    return persona
+    return mod
   }
 
   async store ({ auth, request, response }) {
@@ -56,9 +52,9 @@ class PersonaController {
 
     const data = request.all()
 
-    const { id } = await project.personas().create(data)
+    const { id } = await project.modules().create(data)
 
-    return await Persona.findOrFail(id)
+    return await ProjectModule.findOrFail(id)
   }
 
   async update ({ auth, request, response }) {
@@ -73,22 +69,22 @@ class PersonaController {
       })
     }
 
-    const persona = await project
-      .personas()
+    const mod = await project
+      .modules()
       .where('id', request.params.id)
       .first()
 
-    if (!persona) {
+    if (!mod) {
       return response.notFound({
-        message: 'Persona not found'
+        message: 'Module not found'
       })
     }
 
     const data = request.all()
-    persona.merge(data)
-    await persona.save()
+    mod.merge(data)
+    await mod.save()
 
-    return persona
+    return mod
   }
 
   async destroy ({ auth, request, response }) {
@@ -103,19 +99,19 @@ class PersonaController {
       })
     }
 
-    const persona = await project
-      .personas()
+    const mod = await project
+      .modules()
       .where('id', request.params.id)
       .first()
 
-    if (!persona) {
+    if (!mod) {
       return response.notFound({
-        message: 'Persona not found'
+        message: 'Module not found'
       })
     }
 
-    await persona.delete()
+    await mod.delete()
   }
 }
 
-module.exports = PersonaController
+module.exports = ProjectModuleController

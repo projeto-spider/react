@@ -7,8 +7,8 @@ class GoalsSchema extends Schema {
   up () {
     this.create('goals', table => {
       table.increments()
-      table.integer('projectId').unsigned()
-      table.foreign('projectId').references('projects.id')
+      table.integer('moduleId').unsigned()
+      table.foreign('moduleId').references('projects_modules.id')
       table.text('title').notNullable()
       table
         .integer('priority')

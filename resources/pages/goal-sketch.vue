@@ -1,101 +1,141 @@
 <template>
-  <div>
-    <a-button
-      type="primary"
-      style="margin: 15px auto; width: 400px; display: block"
-      @click="addGoal()"
-    >
-      Create
-    </a-button>
+  <a-layout>
+    <a-layout-sider style="background-color: unset" :width="480">
+      <ModuleList
+        v-if="currentProject"
+        :open-module-id="openModule && openModule.id"
+        @moduleOpen="onModuleOpen"
+        @moduleDeleted="onModuleDelete"
+      />
+    </a-layout-sider>
 
-    <Draggable
-      v-model="goals"
-      @change="onChangeOrder"
-    >
-      <transition-group>
-        <div
-          v-for="goal in goals"
-          :key="goal.id"
-          class="ant-card ant-card-bordered ant-card-hoverable"
-          style="max-width: 400px; margin: 15px auto"
-        >
-          <div class="ant-card-body">
-            <div class="ant-card-meta">
-              <div class="ant-card-meta-detail">
-                <div class="ant-card-meta-description">
-                  <a-textarea
-                    placeholder="Write your goal"
-                    :autosize="{ minRows: 1, maxRows: 5 }"
-                    v-model="goal.title"
-                    @change="() => onChangeTitle(goal)"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <ul class="ant-card-actions">
-            <li style="width: 33.3333%;">
-              <span :class="{ 'invalid-order': itemsWithWrongPosition.includes(goal) }">
-                <a-tooltip>
-                  <template v-if="itemsWithWrongPosition.includes(goal)" slot='title'>
-                    <span>Wrong priority.</span>
-                    <br>
-                    <span>High > Medium > Low.</span>
-                  </template>
-                  <a-select :defaultValue="goal.priority" style="width: 120px; text-aling: center" @change="value => onChangePriority(goal, value)">
-                    <a-select-option :value="0">Low</a-select-option>
-                    <a-select-option :value="1">Medium</a-select-option>
-                    <a-select-option :value="2">High</a-select-option>
-                  </a-select>
-                </a-tooltip>
-              </span>
-            </li>
-
-            <li style="width: 33.3333%;">
-              <span>
-                <a-select :defaultValue="goal.type" style="width: 120px; text-aling: center" @change="value => onChangeType(goal, value)">
-                  <a-select-option :value="0">Business</a-select-option>
-                  <a-select-option :value="1">Constrant</a-select-option>
-                </a-select>
-              </span>
-            </li>
-
-            <li style="width: 33.3333%;">
-              <a-popconfirm
-                title="Are you sure delete this entry?"
-                @confirm="deleteGoal(goal)"
-                okText="Yes"
-                cancelText="No"
-              >
-                <a-button type="danger">Danger</a-button>
-              </a-popconfirm>
-            </li>
-          </ul>
+    <a-layout>
+      <a-layout-content>
+        <div v-if="!openModule" style="text-align: center">
+          <h3>Open a module</h3>
         </div>
-      </transition-group>
-    </Draggable>
-  </div>
+        <div v-else>
+          <a-button
+            type="primary"
+            style="margin: 15px auto; width: 400px; display: block"
+            @click="addGoal()"
+          >
+            Create Goal
+          </a-button>
+
+          <Draggable
+            v-model="goals"
+            @change="onChangeOrder"
+          >
+            <transition-group name="goal-list">
+              <div
+                v-for="goal in goals"
+                :key="goal.id"
+                class="ant-card ant-card-bordered ant-card-hoverable"
+                style="max-width: 400px; margin: 15px auto"
+              >
+                <div class="ant-card-body">
+                  <div class="ant-card-meta">
+                    <div class="ant-card-meta-detail">
+                      <div class="ant-card-meta-description">
+                        <a-textarea
+                          placeholder="Write your goal"
+                          :autosize="{ minRows: 1, maxRows: 5 }"
+                          v-model="goal.title"
+                          @change="() => onChangeTitle(goal)"
+                        />
+
+                        <br><br>
+
+                        <a-select
+                          mode="multiple"
+                          placeholder="Personas"
+                          :defaultValue="goal.personas ? goal.personas.map(persona => persona.id) : []"
+                          style="width: 100%"
+                          @select="personaId => onSelectPersona(goal, personaId)"
+                          @deselect="personaId => onDeselectPersona(goal, personaId)"
+                        >
+                          <a-select-option v-for="persona in personas" :key="persona.id">
+                            {{ persona.name }}
+                          </a-select-option>
+                        </a-select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <ul class="ant-card-actions">
+                  <li style="width: 33.3333%;">
+                    <span :class="{ 'invalid-order': itemsWithWrongPosition.includes(goal) }">
+                      <a-tooltip>
+                        <template v-if="itemsWithWrongPosition.includes(goal)" slot='title'>
+                          <span>Wrong priority.</span>
+                          <br>
+                          <span>High > Medium > Low.</span>
+                        </template>
+                        <a-select :defaultValue="goal.priority" style="width: 120px; text-aling: center" @change="value => onChangePriority(goal, value)">
+                          <a-select-option :value="0">Low</a-select-option>
+                          <a-select-option :value="1">Medium</a-select-option>
+                          <a-select-option :value="2">High</a-select-option>
+                        </a-select>
+                      </a-tooltip>
+                    </span>
+                  </li>
+
+                  <li style="width: 33.3333%;">
+                    <span>
+                      <a-select :defaultValue="goal.type" style="width: 120px; text-aling: center" @change="value => onChangeType(goal, value)">
+                        <a-select-option :value="0">Business</a-select-option>
+                        <a-select-option :value="1">Constraint</a-select-option>
+                      </a-select>
+                    </span>
+                  </li>
+
+                  <li style="width: 33.3333%;">
+                    <a-popconfirm
+                      title="Are you sure delete this entry?"
+                      @confirm="deleteGoal(goal)"
+                      okText="Yes"
+                      cancelText="No"
+                    >
+                      <a-button type="danger">Delete</a-button>
+                    </a-popconfirm>
+                  </li>
+                </ul>
+              </div>
+            </transition-group>
+          </Draggable>
+        </div>
+      </a-layout-content>
+    </a-layout>
+  </a-layout>
+
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import pDebounce from 'p-debounce'
 import Draggable from 'vuedraggable'
+import ModuleList from '@/components/ModuleList'
 
 export default {
   name: 'GoalSketch',
 
-  components: { Draggable },
+  components: { Draggable, ModuleList },
 
   data: () => ({
-    goals: []
+    goals: [],
+    openModule: false
   }),
 
   computed: {
     ...mapGetters('project', [
       'currentProject'
     ]),
+
+    ...mapState('project', {
+      personas: state => state.personas ? state.personas : []
+    }),
 
     itemsWithWrongPosition () {
       return this.goals.filter((goal, i, goals) => {
@@ -105,20 +145,24 @@ export default {
         return !before.every(other => goal.priority <= other.priority) ||
           !after.every(other => goal.priority >= other.priority)
       })
+    },
+
+    baseUrl () {
+      if (!this.currentProject || !this.openModule) {
+        return false
+      }
+
+      return `/api/projects/${this.currentProject.id}/modules/${this.openModule.id}`
     }
   },
 
   methods: {
-    ...mapActions('project', [
-      'updateProjectGoals'
-    ]),
-
     addGoal () {
       const defaultData = {
         title: ''
       }
 
-      this.$axios.$post(`/api/projects/${this.currentProject.id}/goals`, defaultData)
+      this.$axios.$post(`${this.baseUrl}/goals`, defaultData)
         .then(goal => {
           this.goals.unshift(goal)
           this.onChangeOrder()
@@ -133,7 +177,7 @@ export default {
         return
       }
 
-      this.$axios.$put(`/api/projects/${this.currentProject.id}/goals/${goal.id}`, goal)
+      this.$axios.$put(`${this.baseUrl}/goals/${goal.id}`, goal)
         .catch(() => {
           this.$message.error('Failed to update goal')
         })
@@ -144,7 +188,7 @@ export default {
         return
       }
 
-      this.$axios.$delete(`/api/projects/${this.currentProject.id}/goals/${goal.id}`)
+      this.$axios.$delete(`${this.baseUrl}/goals/${goal.id}`)
         .then(() => {
           const index = this.goals.indexOf(goal)
           if (index !== -1) {
@@ -172,9 +216,23 @@ export default {
     },
 
     refreshGoals () {
-      return this.$axios.$get(`/api/projects/${this.currentProject.id}/goals`)
+      this.order = this.openModule.goals
+
+      return this.$axios.$get(`${this.baseUrl}/goals`)
         .then(goals => {
           this.goals = goals
+
+          const leftOutGoals = this.goals.filter(goal =>
+            !this.order.includes(goal.id)
+          )
+
+          for (let goal of leftOutGoals) {
+            this.deleteGoal(goal)
+          }
+
+          this.goals = this.order
+            .map(id => this.goals.find(goal => goal.id === id))
+            .filter(x => x)
         })
         .catch(() => {
           this.$message.error('Failed to load goals')
@@ -182,7 +240,37 @@ export default {
     },
 
     onChangeOrder () {
-      this.updateProjectGoals(this.goals.map(({id}) => id))
+      const goals = this.goals.map(({id}) => id)
+      return this.$axios.$put(this.baseUrl, { goals })
+        .then(mod => {
+          Object.assign(this.openModule, mod)
+        })
+    },
+
+    onModuleOpen (mod) {
+      this.order = []
+      this.openModule = mod
+      this.refreshGoals()
+    },
+
+    onModuleDelete (mod) {
+      if (this.openModule && this.openModule.id === mod.id) {
+        this.openModule = false
+      }
+    },
+
+    onSelectPersona (goal, personaId) {
+      return this.$axios.$post(`${this.baseUrl}/goals/${goal.id}/personas`, { personaId })
+        .catch(() => {
+          this.$message.error('Failed to add persona to goal')
+        })
+    },
+
+    onDeselectPersona (goal, personaId) {
+      return this.$axios.$delete(`${this.baseUrl}/goals/${goal.id}/personas/${personaId}`)
+        .catch(() => {
+          this.$message.error('Failed to delete persona goal')
+        })
     }
   },
 
@@ -190,21 +278,6 @@ export default {
     if (!this.currentProject) {
       return this.$router.push('/projects')
     }
-    this.order = this.currentProject.goals
-    this.refreshGoals()
-      .then(() => {
-        const leftOutGoals = this.goals.filter(goal =>
-          !this.order.includes(goal.id)
-        )
-
-        for (let goal of leftOutGoals) {
-          this.deleteGoal(goal)
-        }
-
-        this.goals = this.order
-          .map(id => this.goals.find(goal => goal.id === id))
-          .filter(x => x)
-      })
   }
 }
 </script>
