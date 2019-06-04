@@ -3,16 +3,7 @@
 const Goal = use('App/Models/Goal')
 
 class GoalController {
-  async index ({ auth, request }) {
-    const project = await auth.user
-      .projects()
-      .where('id', request.params.projects_id)
-      .first()
-
-    return await project.goals().fetch()
-  }
-
-  async show ({ auth, request, response }) {
+  async index({ auth, request, response }) {
     const project = await auth.user
       .projects()
       .where('id', request.params.projects_id)
@@ -24,7 +15,44 @@ class GoalController {
       })
     }
 
-    const goal = await project
+    const mod = await project
+      .modules()
+      .where('id', request.params.modules_id)
+      .first()
+
+    if (!mod) {
+      return response.notFound({
+        message: 'Module not found'
+      })
+    }
+
+    return await mod.goals().fetch()
+  }
+
+  async show({ auth, request, response }) {
+    const project = await auth.user
+      .projects()
+      .where('id', request.params.projects_id)
+      .first()
+
+    if (!project) {
+      return response.notFound({
+        message: 'Project not found'
+      })
+    }
+
+    const mod = await project
+      .modules()
+      .where('id', request.params.modules_id)
+      .first()
+
+    if (!mod) {
+      return response.notFound({
+        message: 'Module not found'
+      })
+    }
+
+    const goal = await mod
       .goals()
       .where('id', request.params.id)
       .first()
@@ -38,7 +66,7 @@ class GoalController {
     return goal
   }
 
-  async store ({ auth, request, response }) {
+  async store({ auth, request, response }) {
     const project = await auth.user
       .projects()
       .where('id', request.params.projects_id)
@@ -47,17 +75,28 @@ class GoalController {
     if (!project) {
       return response.notFound({
         message: 'Project not found'
+      })
+    }
+
+    const mod = await project
+      .modules()
+      .where('id', request.params.modules_id)
+      .first()
+
+    if (!mod) {
+      return response.notFound({
+        message: 'Module not found'
       })
     }
 
     const data = request.all()
 
-    const { id } = await project.goals().create(data)
+    const { id } = await mod.goals().create(data)
 
     return await Goal.findOrFail(id)
   }
 
-  async update ({ auth, request, response }) {
+  async update({ auth, request, response }) {
     const project = await auth.user
       .projects()
       .where('id', request.params.projects_id)
@@ -69,7 +108,18 @@ class GoalController {
       })
     }
 
-    const goal = await project
+    const mod = await project
+      .modules()
+      .where('id', request.params.modules_id)
+      .first()
+
+    if (!mod) {
+      return response.notFound({
+        message: 'Module not found'
+      })
+    }
+
+    const goal = await mod
       .goals()
       .where('id', request.params.id)
       .first()
@@ -87,7 +137,7 @@ class GoalController {
     return goal
   }
 
-  async destroy ({ auth, request, response }) {
+  async destroy({ auth, request, response }) {
     const project = await auth.user
       .projects()
       .where('id', request.params.projects_id)
@@ -99,7 +149,18 @@ class GoalController {
       })
     }
 
-    const goal = await project
+    const mod = await project
+      .modules()
+      .where('id', request.params.modules_id)
+      .first()
+
+    if (!mod) {
+      return response.notFound({
+        message: 'Module not found'
+      })
+    }
+
+    const goal = await mod
       .goals()
       .where('id', request.params.id)
       .first()
@@ -111,6 +172,84 @@ class GoalController {
     }
 
     await goal.delete()
+  }
+
+  async addPersona({ auth, request, response }) {
+    const project = await auth.user
+      .projects()
+      .where('id', request.params.projects_id)
+      .first()
+
+    if (!project) {
+      return response.notFound({
+        message: 'Project not found'
+      })
+    }
+
+    const mod = await project
+      .modules()
+      .where('id', request.params.modules_id)
+      .first()
+
+    if (!mod) {
+      return response.notFound({
+        message: 'Module not found'
+      })
+    }
+
+    const goal = await mod
+      .goals()
+      .where('id', request.params.id)
+      .first()
+
+    if (!goal) {
+      return response.notFound({
+        message: 'Goal not found'
+      })
+    }
+
+    const { personaId } = request.all()
+
+    return goal.personas().attach([personaId])
+  }
+
+  async removePersona({ auth, request, response }) {
+    const project = await auth.user
+      .projects()
+      .where('id', request.params.projects_id)
+      .first()
+
+    if (!project) {
+      return response.notFound({
+        message: 'Project not found'
+      })
+    }
+
+    const mod = await project
+      .modules()
+      .where('id', request.params.modules_id)
+      .first()
+
+    if (!mod) {
+      return response.notFound({
+        message: 'Module not found'
+      })
+    }
+
+    const goal = await mod
+      .goals()
+      .where('id', request.params.id)
+      .first()
+
+    if (!goal) {
+      return response.notFound({
+        message: 'Goal not found'
+      })
+    }
+
+    const { personaId } = request.all()
+
+    return goal.personas().detach([personaId])
   }
 }
 

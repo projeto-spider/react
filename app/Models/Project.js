@@ -12,14 +12,6 @@ class Project extends Model {
     return JSON.stringify(obj)
   }
 
-  getGoals (json) {
-    return JSON.parse(json)
-  }
-
-  setGoals (obj) {
-    return JSON.stringify(obj)
-  }
-
   owner () {
     return this.belongsTo('App/Models/User', 'ownerId')
   }
@@ -28,8 +20,8 @@ class Project extends Model {
     return this.hasMany('App/Models/Persona', 'id', 'projectId')
   }
 
-  goals () {
-    return this.hasMany('App/Models/Goal', 'id', 'projectId')
+  modules () {
+    return this.hasMany('App/Models/ProjectModule', 'id', 'projectId')
   }
 }
 

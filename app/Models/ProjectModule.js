@@ -3,12 +3,12 @@
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
 const Model = use('Model')
 
-class Persona extends Model {
-  getData (json) {
+class ProjectModule extends Model {
+  getGoals (json) {
     return JSON.parse(json)
   }
 
-  setData (obj) {
+  setGoals (obj) {
     return JSON.stringify(obj)
   }
 
@@ -17,12 +17,8 @@ class Persona extends Model {
   }
 
   goals () {
-    return this.belongsToMany(
-      'App/Models/Goal',
-      'personaId',
-      'goalId'
-    ).pivotTable('goal_personas')
+    return this.hasMany('App/Models/Goal', 'id', 'moduleId')
   }
 }
 
-module.exports = Persona
+module.exports = ProjectModule
