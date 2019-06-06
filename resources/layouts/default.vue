@@ -121,6 +121,10 @@ html, body {
   background-color: #f0f2f5 !important;
 }
 
+.full-width-modal-open {
+  overflow: hidden;
+}
+
 .ant-layout-header.ant-layout-header-auth {
   background: white;
   background-image: linear-gradient(#001529, #001529);

@@ -17,7 +17,7 @@
         <div v-else>
           <a-button
             type="primary"
-            style="margin: 15px auto; width: 400px; display: block"
+            style="margin: 0 auto 15px; width: 400px; display: block"
             @click="addGoal()"
           >
             Create Goal
@@ -102,14 +102,26 @@
                     </a-popconfirm>
                   </li>
                 </ul>
+
+                <a-button type="primary" shape="circle" icon="cluster" class="fab" @click="journeyGoal = goal"></a-button>
               </div>
             </transition-group>
           </Draggable>
         </div>
       </a-layout-content>
     </a-layout>
-  </a-layout>
 
+    <div v-if="journeyGoal" class="diagram-modal">
+      <a-button type="danger" shape="circle" icon="close" class="close-modal" @click="journeyGoal = false"></a-button>
+
+      <Diagram
+        :initial-nodes="journeyGoal.journey && journeyGoal.journey.nodes || []"
+        :initial-edges="journeyGoal.journey && journeyGoal.journey.edges || []"
+        @changeNetwork="onChangeJourney"
+      />
+      <template slot="footer">&nbsp;</template>
+    </div>
+  </a-layout>
 </template>
 
 <script>
@@ -117,15 +129,17 @@ import { mapGetters, mapState } from 'vuex'
 import pDebounce from 'p-debounce'
 import Draggable from 'vuedraggable'
 import ModuleList from '@/components/ModuleList'
+import Diagram from '@/components/Diagram'
 
 export default {
   name: 'GoalSketch',
 
-  components: { Draggable, ModuleList },
+  components: { Draggable, ModuleList, Diagram },
 
   data: () => ({
     goals: [],
-    openModule: false
+    openModule: false,
+    journeyGoal: false
   }),
 
   computed: {
@@ -177,7 +191,9 @@ export default {
         return
       }
 
-      this.$axios.$put(`${this.baseUrl}/goals/${goal.id}`, goal)
+      const payload = {...goal}
+      payload.personas = undefined
+      this.$axios.$put(`${this.baseUrl}/goals/${goal.id}`, payload)
         .catch(() => {
           this.$message.error('Failed to update goal')
         })
@@ -271,6 +287,22 @@ export default {
         .catch(() => {
           this.$message.error('Failed to delete persona goal')
         })
+    },
+
+    onChangeJourney (journey) {
+      if (!this.journeyGoal) {
+        return
+      }
+
+      const goal = this.journeyGoal
+
+      this.$axios.$put(`${this.baseUrl}/goals/${this.journeyGoal.id}`, { journey }, { progress: false })
+        .then(({ journey }) => {
+          goal.journey = journey
+        })
+        .catch(() => {
+          this.$message.error('Failed to update journey')
+        })
     }
   },
 
@@ -285,6 +317,27 @@ export default {
 <style>
 .invalid-order .ant-select-selection {
   border-color: red
+}
+
+.fab {
+  position: absolute;
+  top: -13px;
+  right: -16px;
+}
+
+.diagram-modal {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.close-modal {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 100;
 }
 </style>
 

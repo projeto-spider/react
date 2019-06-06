@@ -18,6 +18,15 @@ class GoalsSchema extends Schema {
         .integer('type')
         .notNullable()
         .defaultTo(0)
+      table
+        .json('journey')
+        .defaultTo(
+          JSON.stringify({
+            nodes: [],
+            edges: []
+          })
+        )
+        .notNullable()
       table.timestamps()
     })
   }

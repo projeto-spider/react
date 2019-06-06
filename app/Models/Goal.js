@@ -4,6 +4,14 @@
 const Model = use('Model')
 
 class Goal extends Model {
+  getJourney (json) {
+    return JSON.parse(json)
+  }
+
+  setJourney (obj) {
+    return JSON.stringify(obj)
+  }
+
   owner () {
     return this.belongsTo('App/Models/Goal', 'moduleId')
   }
