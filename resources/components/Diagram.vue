@@ -40,6 +40,7 @@
         :ref="`node:${node.id}`"
         :id="node.id"
         :initial-text="node.text"
+        :initial-type="node.type"
         :svg-width="width"
         :svg-height="height"
         :initial-x="node.x"
@@ -54,6 +55,7 @@
         @changeText="handleChangeText"
         @deleteNode="handleDeleteNode"
         @changeTouchPoint="handleChangeTouchPoint"
+        @changeType="handleChangeType"
         @click.native="handleStepClick()"
       />
     </svg>
@@ -214,6 +216,10 @@ export default {
       this.handleUpdatePosition(id)
     },
 
+    handleChangeType ({ id, type }) {
+      this.handleUpdatePosition(id)
+    },
+
     handleStepClick (stepId) {
       if (!this.nextEdgeFromId || !this.nextEdgeToId) {
         return
@@ -242,6 +248,7 @@ export default {
     handleDoubleRectClick (e) {
       const highestId = Math.max(...this.nodes.map(({ id }) => id))
       const id = this.nodes.length ? highestId + 1 : 1
+      const type = 'box'
       const width = 200
       const height = 100
 
@@ -251,6 +258,7 @@ export default {
 
       this.nodes.push({
         id,
+        type,
         x,
         y,
         width,
@@ -308,6 +316,7 @@ export default {
         id: node.id,
         x: node.x,
         y: node.y,
+        type: node.type,
         width: node.width,
         height: node.height,
         text: node.text,

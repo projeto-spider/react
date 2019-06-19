@@ -15,39 +15,51 @@
         @mousedown="mouseDownDragging"
         @dblclick="toggleContentEditable"
       >
-        <rect
-          x="0"
-          y="0"
-          :width="width"
-          :height="height"
-          rx="5"
-          ry="3"
-          fill="white"
-          stroke="#d9d9d9"
-        ></rect>
+        <template v-if="type === 'box'">
+          <rect
+            x="0"
+            y="0"
+            :width="width"
+            :height="height"
+            rx="5"
+            ry="3"
+            fill="white"
+            stroke="#d9d9d9"
+          ></rect>
 
-        <foreignObject ref="foreign" x="0" y="0" :width="width" :height="height">
-          <div
-            ref="textDiv"
-            xmlns="http://www.w3.org/1999/xhtml"
-            class="foreign-div ant-alert ant-alert-info ant-alert-no-icon ant-alert-with-description"
-          >
-            <span ref="editableSpan" :contenteditable="contentEditable" class="node-text ant-alert-description" v-html="text"></span>
-          </div>
-        </foreignObject>
+          <foreignObject ref="foreign" x="0" y="0" :width="width" :height="height">
+            <div
+              ref="textDiv"
+              xmlns="http://www.w3.org/1999/xhtml"
+              class="foreign-div ant-alert ant-alert-info ant-alert-no-icon ant-alert-with-description"
+            >
+              <span ref="editableSpan" :contenteditable="contentEditable" class="node-text ant-alert-description" v-html="text"></span>
+            </div>
+          </foreignObject>
 
-        <ellipse
-          v-show="touchPoint"
-          :x="width - 12"
-          :y="height - 12"
-          :cx="width - 12"
-          :cy="height - 12"
-          width="6"
-          height="6"
-          rx="6"
-          ry="6"
-          fill="red"
-        ></ellipse>
+          <ellipse
+            v-show="touchPoint"
+            :x="width - 12"
+            :y="height - 12"
+            :cx="width - 12"
+            :cy="height - 12"
+            width="6"
+            height="6"
+            rx="6"
+            ry="6"
+            fill="red"
+          ></ellipse>
+        </template>
+
+        <template v-else-if="type === 'and' || type === 'or'">
+          <polygon
+            :points="`${width / 2},0 0,${height / 2} ${width / 2},${height} ${width},${height / 2}`"
+            style="fill:#f6ffed;stroke:#b7eb8f;stroke-width:1"
+          />
+          <text x="50%" :y="(height / 2) + (type === 'and' ? 16 : 0)" fill="#52c41a" style="font-size: 64px;" dominant-baseline="middle" text-anchor="middle">
+            {{ type === 'and' ? '*' : '+'}}
+          </text>
+        </template>
       </svg>
     </g>
 
@@ -56,7 +68,7 @@
         <g>
           <svg
             style="cursor: pointer"
-            :x="0"
+            :x="0 + (type !== 'box' ? 16 : 0)"
             @mousedown="askToDelete"
           >
             <IconTrash style="fill: rgb(140, 140, 140)"/>
@@ -64,7 +76,7 @@
 
           <svg
             style="cursor: pointer"
-            :x="32"
+            :x="32 + (type !== 'box' ? 16 : 0)"
             @click="startLinkMode"
           >
             <IconArrow style="fill: rgb(140, 140, 140)"/>
@@ -74,6 +86,7 @@
             style="cursor: pointer"
             :x="64"
             @click="toggleTouchPoint"
+            v-if="type === 'box'"
           >
             <IconChecked v-if="touchPoint" style="fill: rgb(140, 140, 140)"/>
             <IconUnchecked v-else style="fill: rgb(140, 140, 140)"/>
@@ -81,61 +94,94 @@
         </g>
       </svg>
 
-      <ellipse
-        :x="x"
-        :y="y"
-        :cx="x"
-        :cy="y"
-        width="6"
-        height="6"
-        rx="6"
-        ry="6"
-        fill="#c6bde4"
-        style="cursor: nw-resize"
-        @mousedown="startResize({ fixBottom: true, fixRight: true })"
-      ></ellipse>
+      <svg :x="x + (width / 2) - 44" :y="y + height + 15" :width="width">
+        <g>
+          <svg
+            style="cursor: pointer"
+            :x="0"
+            @click="changeType('box')"
+          >
+            <IconChecked v-if="type === 'box'" style="fill: rgb(140, 140, 140)"/>
+            <IconUnchecked v-else style="fill: rgb(140, 140, 140)"/>
+          </svg>
 
-      <ellipse
-        :x="x"
-        :y="y"
-        :cx="x + width"
-        :cy="y"
-        width="6"
-        height="6"
-        rx="6"
-        ry="6"
-        fill="#c6bde4"
-        style="cursor: ne-resize"
-        @mousedown="startResize({ fixBottom: true, fixLeft: true })"
-      ></ellipse>
+          <svg
+            style="cursor: pointer"
+            :x="32"
+            @click="changeType('and')"
+          >
+            <IconChecked v-if="type === 'and'" style="fill: rgb(140, 140, 140)"/>
+            <IconUnchecked v-else style="fill: rgb(140, 140, 140)"/>
+          </svg>
 
-      <ellipse
-        :x="x"
-        :y="y"
-        :cx="x"
-        :cy="y + height"
-        width="6"
-        height="6"
-        rx="6"
-        ry="6"
-        fill="#c6bde4"
-        style="cursor: sw-resize"
-        @mousedown="startResize({ fixTop: true, fixRight: true })"
-      ></ellipse>
+          <svg
+            style="cursor: pointer"
+            :x="64"
+            @click="changeType('or')"
+          >
+            <IconChecked v-if="type === 'or'" style="fill: rgb(140, 140, 140)"/>
+            <IconUnchecked v-else style="fill: rgb(140, 140, 140)"/>
+          </svg>
+        </g>
+      </svg>
 
-      <ellipse
-        :x="x"
-        :y="y"
-        :cx="x + width"
-        :cy="y + height"
-        width="6"
-        height="6"
-        rx="6"
-        ry="6"
-        fill="#c6bde4"
-        style="cursor: se-resize"
-        @mousedown="startResize({ fixTop: true, fixLeft: true })"
-      ></ellipse>
+      <template v-if="type === 'box'">
+        <ellipse
+          :x="x"
+          :y="y"
+          :cx="x"
+          :cy="y"
+          width="6"
+          height="6"
+          rx="6"
+          ry="6"
+          fill="#c6bde4"
+          style="cursor: nw-resize"
+          @mousedown="startResize({ fixBottom: true, fixRight: true })"
+        ></ellipse>
+
+        <ellipse
+          :x="x"
+          :y="y"
+          :cx="x + width"
+          :cy="y"
+          width="6"
+          height="6"
+          rx="6"
+          ry="6"
+          fill="#c6bde4"
+          style="cursor: ne-resize"
+          @mousedown="startResize({ fixBottom: true, fixLeft: true })"
+        ></ellipse>
+
+        <ellipse
+          :x="x"
+          :y="y"
+          :cx="x"
+          :cy="y + height"
+          width="6"
+          height="6"
+          rx="6"
+          ry="6"
+          fill="#c6bde4"
+          style="cursor: sw-resize"
+          @mousedown="startResize({ fixTop: true, fixRight: true })"
+        ></ellipse>
+
+        <ellipse
+          :x="x"
+          :y="y"
+          :cx="x + width"
+          :cy="y + height"
+          width="6"
+          height="6"
+          rx="6"
+          ry="6"
+          fill="#c6bde4"
+          style="cursor: se-resize"
+          @mousedown="startResize({ fixTop: true, fixLeft: true })"
+        ></ellipse>
+      </template>
     </g>
   </svg>
 </template>
@@ -150,6 +196,10 @@ import IconChecked from '@/components/icons/checked'
 
 const MIN_WIDTH = 100
 const MIN_HEIGHT = 50
+const INITIAL_WIDTH = 200
+const INITIAL_HEIGHT = 100
+const DIAMOND_WIDTH = 100
+const DIAMOND_HEIGHT = 100
 
 export default {
   name: 'Step',
@@ -167,6 +217,11 @@ export default {
     id: {
       type: Number,
       required: true
+    },
+
+    initialType: {
+      type: String,
+      default: 'and'
     },
 
     svgWidth: {
@@ -228,10 +283,11 @@ export default {
 
   data: () => ({
     text: '',
+    type: 'box',
     x: 0,
     y: 0,
-    width: 200,
-    height: 100,
+    width: INITIAL_WIDTH,
+    height: INITIAL_HEIGHT,
     touchPoint: false,
 
     dragging: false,
@@ -259,10 +315,11 @@ export default {
 
   created () {
     this.text = this.initialText
+    this.type = this.initialType
     this.x = this.initialX
     this.y = this.initialY
-    this.width = Math.max(MIN_WIDTH, this.initialWidth)
-    this.height = Math.max(MIN_HEIGHT, this.initialHeight)
+    this.width = this.type !== 'box' ? DIAMOND_WIDTH : Math.max(MIN_WIDTH, this.initialWidth)
+    this.height = this.type !== 'box' ? DIAMOND_HEIGHT : Math.max(MIN_HEIGHT, this.initialHeight)
     this.touchPoint = this.initialTouchPoint
     this.contentEditable = this.isNew
     this.showControls = this.isNew
@@ -396,6 +453,10 @@ export default {
       e.preventDefault()
       e.stopPropagation()
 
+      if (this.type !== 'box') {
+        return
+      }
+
       if (this.contentEditable) {
         if (this.$refs.editableSpan) {
           this.text = this.$refs.editableSpan.textContent
@@ -428,7 +489,8 @@ export default {
         width: this.width,
         height: this.height,
         text: this.text,
-        touchPoint: this.touchPoint
+        touchPoint: this.touchPoint,
+        type: this.type
       }
     },
 
@@ -465,6 +527,38 @@ export default {
           this.$emit('deleteNode', this.id)
         },
         onCancel () {}
+      })
+    },
+
+    changeType (type) {
+      if (type === this.type) {
+        return
+      }
+
+      this.type = type
+
+      this.text = ''
+
+      if (type === 'box') {
+        this.width = INITIAL_WIDTH
+        this.height = INITIAL_HEIGHT
+      } else {
+        this.contentEditable = false
+        this.width = DIAMOND_WIDTH
+        this.height = DIAMOND_HEIGHT
+      }
+
+      this.$emit('resize', {
+        id: this.id,
+        x: this.x,
+        y: this.y,
+        width: this.width,
+        height: this.height
+      })
+
+      this.$emit('changeType', {
+        id: this.id,
+        type
       })
     }
   }
