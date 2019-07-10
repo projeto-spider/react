@@ -56,8 +56,8 @@
             :points="`${width / 2},0 0,${height / 2} ${width / 2},${height} ${width},${height / 2}`"
             style="fill:#f6ffed;stroke:#b7eb8f;stroke-width:1"
           />
-          <text x="50%" :y="(height / 2) + (type === 'and' ? 16 : 0)" fill="#52c41a" style="font-size: 64px;" dominant-baseline="middle" text-anchor="middle">
-            {{ type === 'and' ? '*' : '+'}}
+          <text x="50%" :y="(height / 2) + 6" fill="#52c41a" style="font-size: 64px;" dominant-baseline="middle" text-anchor="middle">
+            {{ type === 'and' ? '×' : '+'}}
           </text>
         </template>
       </svg>
@@ -97,12 +97,11 @@
       <svg :x="x + (width / 2) - 44" :y="y + height + 15" :width="width">
         <g>
           <svg
-            style="cursor: pointer"
+            style="cursor: pointer;"
             :x="0"
             @click="changeType('box')"
           >
-            <IconChecked v-if="type === 'box'" style="fill: rgb(140, 140, 140)"/>
-            <IconUnchecked v-else style="fill: rgb(140, 140, 140)"/>
+            <IconLetter :style="`fill: ${type === 'box' ? '#1890ff' : 'rgb(140, 140, 140)'}`" />
           </svg>
 
           <svg
@@ -110,8 +109,7 @@
             :x="32"
             @click="changeType('and')"
           >
-            <IconChecked v-if="type === 'and'" style="fill: rgb(140, 140, 140)"/>
-            <IconUnchecked v-else style="fill: rgb(140, 140, 140)"/>
+            <IconCross :style="`fill: ${type === 'and' ? '#1890ff' : 'rgb(140, 140, 140)'}`" />
           </svg>
 
           <svg
@@ -119,8 +117,7 @@
             :x="64"
             @click="changeType('or')"
           >
-            <IconChecked v-if="type === 'or'" style="fill: rgb(140, 140, 140)"/>
-            <IconUnchecked v-else style="fill: rgb(140, 140, 140)"/>
+            <IconAdd :style="`fill: ${type === 'or' ? '#1890ff' : 'rgb(140, 140, 140)'}`" />
           </svg>
         </g>
       </svg>
@@ -193,6 +190,8 @@ import IconArrow from '@/components/icons/arrow'
 import IconTrash from '@/components/icons/trash'
 import IconUnchecked from '@/components/icons/unchecked'
 import IconChecked from '@/components/icons/checked'
+import IconLetter from '@/components/icons/letter'
+import IconAdd from '@/components/icons/add'
 
 const MIN_WIDTH = 100
 const MIN_HEIGHT = 50
@@ -210,7 +209,9 @@ export default {
     IconArrow,
     IconTrash,
     IconUnchecked,
-    IconChecked
+    IconChecked,
+    IconLetter,
+    IconAdd
   },
 
   props: {
