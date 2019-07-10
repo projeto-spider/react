@@ -46,5 +46,13 @@ module.exports = {
   /*
    ** Plugin settings
    */
-  modules: ['@nuxtjs/axios']
+  modules: ['@nuxtjs/axios', '@nuxtjs/apollo'],
+  apollo: {
+    clientConfigs: {
+      default: {
+        httpEndpoint: 'http://localhost:4000',
+        wsEndpoint: 'ws://localhost:4000' // optional
+      }
+    }
+  }
 }
