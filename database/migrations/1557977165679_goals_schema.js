@@ -27,6 +27,10 @@ class GoalsSchema extends Schema {
           })
         )
         .notNullable()
+      table
+        .json('stories')
+        .defaultTo(JSON.stringify([]))
+        .notNullable()
       table.timestamps()
     })
   }

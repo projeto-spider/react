@@ -2,7 +2,7 @@
   <div>
     <p>
       <a-button type="primary" block @click="createModule">
-        New Module
+        Create Module
       </a-button>
     </p>
 

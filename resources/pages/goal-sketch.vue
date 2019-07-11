@@ -1,6 +1,6 @@
 <template>
   <a-layout>
-    <a-layout-sider style="background-color: unset" :width="480">
+    <a-layout-sider style="background-color: unset" :width="360">
       <ModuleList
         v-if="currentProject"
         :open-module-id="openModule && openModule.id"
@@ -11,103 +11,135 @@
 
     <a-layout>
       <a-layout-content>
-        <div v-if="!openModule" style="text-align: center">
-          <h3>Open a module</h3>
-        </div>
-        <div v-else>
-          <a-button
-            type="primary"
-            style="margin: 0 auto 15px; width: 400px; display: block"
-            @click="addGoal()"
-          >
-            Create Goal
-          </a-button>
-
-          <Draggable
-            v-model="goals"
-            @change="onChangeOrder"
-          >
-            <transition-group name="goal-list">
-              <div
-                v-for="goal in goals"
-                :key="goal.id"
-                class="ant-card ant-card-bordered ant-card-hoverable"
-                style="max-width: 400px; margin: 15px auto"
+        <a-row>
+          <a-col :span="openModule ? 12 : 24">
+            <div v-if="!openModule" style="text-align: center">
+              <h3>Open a module</h3>
+            </div>
+            <div v-else>
+              <a-button
+                type="primary"
+                style="margin: 0 auto 15px; width: 400px; display: block"
+                @click="addGoal()"
               >
-                <div class="ant-card-body">
-                  <div class="ant-card-meta">
-                    <div class="ant-card-meta-detail">
-                      <div class="ant-card-meta-description">
-                        <a-textarea
-                          placeholder="Write your goal"
-                          :autosize="{ minRows: 1, maxRows: 5 }"
-                          v-model="goal.title"
-                          @change="() => onChangeTitle(goal)"
-                        />
+                Create Goal
+              </a-button>
 
-                        <br><br>
+              <Draggable
+                v-model="goals"
+                @change="onChangeOrder"
+              >
+                <transition-group name="goal-list">
+                  <div
+                    v-for="goal in goals"
+                    :key="goal.id"
+                    class="ant-card ant-card-bordered ant-card-hoverable"
+                    style="max-width: 400px; margin: 15px auto"
+                  >
+                    <div class="ant-card-body">
+                      <div class="ant-card-meta">
+                        <div class="ant-card-meta-detail">
+                          <div class="ant-card-meta-description">
+                            <a-textarea
+                              placeholder="Write your goal"
+                              :autosize="{ minRows: 1, maxRows: 5 }"
+                              v-model="goal.title"
+                              @change="() => onChangeTitle(goal)"
+                            />
 
-                        <a-select
-                          mode="multiple"
-                          placeholder="Personas"
-                          :defaultValue="goal.personas ? goal.personas.map(persona => persona.id) : []"
-                          style="width: 100%"
-                          @select="personaId => onSelectPersona(goal, personaId)"
-                          @deselect="personaId => onDeselectPersona(goal, personaId)"
-                        >
-                          <a-select-option v-for="persona in personas" :key="persona.id">
-                            {{ persona.name }}
-                          </a-select-option>
-                        </a-select>
+                            <br><br>
+
+                            <a-select
+                              mode="multiple"
+                              placeholder="Personas"
+                              :defaultValue="goal.personas ? goal.personas.map(persona => persona.id) : []"
+                              style="width: 100%"
+                              @select="personaId => onSelectPersona(goal, personaId)"
+                              @deselect="personaId => onDeselectPersona(goal, personaId)"
+                            >
+                              <a-select-option v-for="persona in personas" :key="persona.id">
+                                {{ persona.name }}
+                              </a-select-option>
+                            </a-select>
+                          </div>
+                        </div>
                       </div>
                     </div>
+
+                    <ul class="ant-card-actions">
+                      <li style="width: 33.3333%;">
+                        <span :class="{ 'invalid-order': itemsWithWrongPosition.includes(goal) }">
+                          <a-tooltip>
+                            <template v-if="itemsWithWrongPosition.includes(goal)" slot='title'>
+                              <span>Wrong priority.</span>
+                              <br>
+                              <span>High > Medium > Low.</span>
+                            </template>
+                            <a-select :defaultValue="goal.priority" style="width: 120px; text-aling: center" @change="value => onChangePriority(goal, value)">
+                              <a-select-option :value="0">Low</a-select-option>
+                              <a-select-option :value="1">Medium</a-select-option>
+                              <a-select-option :value="2">High</a-select-option>
+                            </a-select>
+                          </a-tooltip>
+                        </span>
+                      </li>
+
+                      <li style="width: 33.3333%;">
+                        <span>
+                          <a-select :defaultValue="goal.type" style="width: 120px; text-aling: center" @change="value => onChangeType(goal, value)">
+                            <a-select-option :value="0">Business</a-select-option>
+                            <a-select-option :value="1">Constraint</a-select-option>
+                          </a-select>
+                        </span>
+                      </li>
+
+                      <li style="width: 33.3333%;">
+                        <a-popconfirm
+                          title="Are you sure delete this entry?"
+                          @confirm="deleteGoal(goal)"
+                          okText="Yes"
+                          cancelText="No"
+                        >
+                          <a-button type="danger">Delete</a-button>
+                        </a-popconfirm>
+                      </li>
+                    </ul>
+
+                    <div class="fab-group">
+                      <a-button
+                        type="primary"
+                        shape="circle"
+                        icon="cluster"
+                        @click="journeyGoal = goal"
+                      />
+
+                      <a-button
+                        type="primary"
+                        shape="circle"
+                        icon="ordered-list"
+                        @click="doOpenGoal(goal)"
+                      />
+                    </div>
                   </div>
-                </div>
+                </transition-group>
+              </Draggable>
+            </div>
+          </a-col>
 
-                <ul class="ant-card-actions">
-                  <li style="width: 33.3333%;">
-                    <span :class="{ 'invalid-order': itemsWithWrongPosition.includes(goal) }">
-                      <a-tooltip>
-                        <template v-if="itemsWithWrongPosition.includes(goal)" slot='title'>
-                          <span>Wrong priority.</span>
-                          <br>
-                          <span>High > Medium > Low.</span>
-                        </template>
-                        <a-select :defaultValue="goal.priority" style="width: 120px; text-aling: center" @change="value => onChangePriority(goal, value)">
-                          <a-select-option :value="0">Low</a-select-option>
-                          <a-select-option :value="1">Medium</a-select-option>
-                          <a-select-option :value="2">High</a-select-option>
-                        </a-select>
-                      </a-tooltip>
-                    </span>
-                  </li>
-
-                  <li style="width: 33.3333%;">
-                    <span>
-                      <a-select :defaultValue="goal.type" style="width: 120px; text-aling: center" @change="value => onChangeType(goal, value)">
-                        <a-select-option :value="0">Business</a-select-option>
-                        <a-select-option :value="1">Constraint</a-select-option>
-                      </a-select>
-                    </span>
-                  </li>
-
-                  <li style="width: 33.3333%;">
-                    <a-popconfirm
-                      title="Are you sure delete this entry?"
-                      @confirm="deleteGoal(goal)"
-                      okText="Yes"
-                      cancelText="No"
-                    >
-                      <a-button type="danger">Delete</a-button>
-                    </a-popconfirm>
-                  </li>
-                </ul>
-
-                <a-button type="primary" shape="circle" icon="cluster" class="fab" @click="journeyGoal = goal"></a-button>
-              </div>
-            </transition-group>
-          </Draggable>
-        </div>
+          <a-col v-if="openModule" :span="12">
+            <div v-if="!openGoal" style="text-align: center">
+              <h3>Open a goal</h3>
+            </div>
+            <div v-else>
+              <Backlog
+                ref="backlog"
+                :goal="openGoal"
+                @addStory="addStory"
+                @changedOrder="stories => openGoal.stories = stories"
+              />
+            </div>
+          </a-col>
+        </a-row>
       </a-layout-content>
     </a-layout>
 
@@ -130,15 +162,18 @@ import pDebounce from 'p-debounce'
 import Draggable from 'vuedraggable'
 import ModuleList from '@/components/ModuleList'
 import Diagram from '@/components/Diagram'
+import Backlog from '@/components/Backlog'
+import { setTimeout } from 'timers'
 
 export default {
   name: 'GoalSketch',
 
-  components: { Draggable, ModuleList, Diagram },
+  components: { Draggable, ModuleList, Diagram, Backlog },
 
   data: () => ({
     goals: [],
     openModule: false,
+    openGoal: false,
     journeyGoal: false
   }),
 
@@ -266,6 +301,7 @@ export default {
     onModuleOpen (mod) {
       this.order = []
       this.openModule = mod
+      this.openGoal = false
       this.refreshGoals()
     },
 
@@ -303,6 +339,12 @@ export default {
         .catch(() => {
           this.$message.error('Failed to update journey')
         })
+    },
+
+    doOpenGoal (goal) {
+      this.openGoal = false
+
+      setTimeout(() => this.openGoal = goal, 1)
     }
   },
 
@@ -319,10 +361,15 @@ export default {
   border-color: red
 }
 
-.fab {
+.fab-group {
   position: absolute;
   top: -13px;
   right: -16px;
+}
+
+.fab-group .ant-btn {
+  display: block;
+  margin-bottom: 3px;
 }
 
 .diagram-modal {

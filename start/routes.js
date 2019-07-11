@@ -35,6 +35,10 @@ Route.group(() => {
   Route.resource('projects.modules.goals', 'GoalController')
     .apiOnly()
     .middleware('auth')
+  // Project Goals Stories Resource
+  Route.resource('projects.modules.goals.stories', 'StoryController')
+    .apiOnly()
+    .middleware('auth')
   Route.post(
     '/projects/:projects_id/modules/:modules_id/goals/:id/personas',
     'GoalController.addPersona'

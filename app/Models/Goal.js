@@ -12,8 +12,16 @@ class Goal extends Model {
     return JSON.stringify(obj)
   }
 
+  getStories (json) {
+    return JSON.parse(json)
+  }
+
+  setStories (obj) {
+    return JSON.stringify(obj)
+  }
+
   owner () {
-    return this.belongsTo('App/Models/Goal', 'moduleId')
+    return this.belongsTo('App/Models/ProjectModule', 'moduleId')
   }
 
   personas () {
@@ -22,6 +30,10 @@ class Goal extends Model {
       'goalId',
       'personaId'
     ).pivotTable('goal_personas')
+  }
+
+  stories () {
+    return this.hasMany('App/Models/Story', 'id', 'goalId')
   }
 }
 
