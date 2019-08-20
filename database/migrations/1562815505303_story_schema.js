@@ -14,6 +14,9 @@ class StorySchema extends Schema {
         .notNullable()
         .defaultTo('')
       table
+        .string('priority')
+        .notNullable()
+        .defaultTo('')
         .json('businessRules')
         .defaultTo(JSON.stringify([]))
         .notNullable()

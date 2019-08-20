@@ -17,6 +17,7 @@
           v-for="(story, index) in stories"
           :key="story.id"
           :story="story"
+          :wrong-position="storiesWithWrongPosition.includes(story)"
           @update="updated => updateStory(updated)"
           @breakdown="() => addStory(index + 1)"
           @delete="deleteStory(story)"
@@ -65,6 +66,29 @@ export default {
 
     baseUrl () {
       return `${this.baseGoalUrl}/stories`
+    },
+
+    storiesWithWrongPosition () {
+      const scale = this.currentProject.scale || []
+
+      return this.stories.filter((story, i, stories) => {
+        if (!scale.includes(story.priority)) {
+          return false
+        }
+
+        const priority = scale.indexOf(story.priority)
+
+        const priorities = stories.map(story => scale.indexOf(story.priority))
+        const before = priorities
+          .slice(0, i)
+          .filter(x => x !== -1)
+        const after = priorities
+          .slice(i + 1)
+          .filter(x => x !== -1)
+
+        return !before.every(otherPriority => priority <= otherPriority) ||
+          !after.every(otherPriority => priority >= otherPriority)
+      })
     }
   },
 
@@ -112,7 +136,11 @@ export default {
       const url = `${this.baseUrl}/${story.id}`
       this.$axios.$put(url, story)
         .then(updated => {
-          // TODO
+          const original = this.stories.find(some => some.id === story.id)
+
+          if (original) {
+            Object.assign(original, updated)
+          }
         })
         .catch(() => {
           this.$message.error('Failed to update story')

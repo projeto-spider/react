@@ -33,6 +33,23 @@
           />
         </a-popconfirm>
       </a-button-group>
+
+      <div style="float: right">
+        <a-select
+          style="min-width: 64px; text-aling: center; margin-right: 3px"
+          :class="{ 'invalid-order': wrongPosition }"
+          size="small"
+          :defaultValue="model.priority"
+          v-model="model.priority"
+          @change="update"
+        >
+          <a-select-option
+            v-for="(item, i) in currentProject ? currentProject.scale : []"
+            :key="i"
+            :value="item"
+          >{{ item }}</a-select-option>
+        </a-select>
+      </div>
     </template>
 
     <template slot="description">
@@ -74,6 +91,7 @@ THEN < expectation >`"
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import StringArrayModel from '@/components/StringArrayModel'
 import pDebounce from 'p-debounce'
 
@@ -88,6 +106,11 @@ export default {
     story: {
       type: Object,
       required: true
+    },
+
+    wrongPosition: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -95,6 +118,12 @@ export default {
     showDetails: false,
     model: {}
   }),
+
+  computed: {
+    ...mapGetters('project', [
+      'currentProject'
+    ])
+  },
 
   created () {
     this.model = JSON.parse(JSON.stringify(this.story))
@@ -118,5 +147,9 @@ export default {
   resize: none;
   border: none;
   background-color: rgba(0, 0, 0, 0);
+}
+
+.invalid-order .ant-select-selection {
+  border-color: red
 }
 </style>

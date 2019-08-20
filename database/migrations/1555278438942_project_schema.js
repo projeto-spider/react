@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 /** @type {import('@adonisjs/lucid/src/Schema')} */
 const Schema = use('Schema')
@@ -24,6 +24,24 @@ class ProjectSchema extends Schema {
             isnt: [],
             constraints: []
           })
+        )
+        .notNullable()
+      table
+        .json('scale')
+        .defaultTo(
+          JSON.stringify([
+            '?',
+            '1/2',
+            '0',
+            '1',
+            '2',
+            '3',
+            '5',
+            '8',
+            '13',
+            '21',
+            '...'
+          ])
         )
         .notNullable()
       table.timestamps()
