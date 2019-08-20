@@ -1,6 +1,6 @@
 <template>
   <a-alert
-    type="warning"
+    :type="story.isSystem ? 'info': 'warning'"
     class="user-story"
   >
     <template slot="message">
@@ -18,6 +18,14 @@
           size="small"
           icon="scissor"
           @click="$emit('breakdown', story)"
+        />
+        <a-button
+          size="small"
+          :icon="story.isSystem ? 'laptop' : 'user'"
+          @click="
+            model.isSystem = !model.isSystem,
+            update()
+          "
         />
         <a-popconfirm
           title="Are you sure delete this story?"

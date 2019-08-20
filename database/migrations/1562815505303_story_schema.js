@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 /** @type {import('@adonisjs/lucid/src/Schema')} */
 const Schema = use('Schema')
@@ -17,6 +17,11 @@ class StorySchema extends Schema {
         .string('priority')
         .notNullable()
         .defaultTo('')
+      table
+        .boolean('isSystem')
+        .notNullable()
+        .defaultTo(false)
+      table
         .json('businessRules')
         .defaultTo(JSON.stringify([]))
         .notNullable()
