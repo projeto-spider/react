@@ -1,7 +1,7 @@
 <template>
   <div>
     <p>
-      <a-button type="primary" block @click="createModule">
+      <a-button v-if="!readOnly" type="primary" block @click="createModule">
         Create Module
       </a-button>
     </p>
@@ -17,7 +17,7 @@
           class="module-item"
           :class="{ 'module-item-selected': mod.id === openModuleId }"
         >
-          <template>
+          <template v-if="!readOnly">
             <a slot="actions"
               v-if="editing !== mod"
               @click="openNameInput(mod)"
@@ -34,6 +34,7 @@
           </template>
 
           <a-popconfirm
+            v-if="!readOnly"
             slot="actions"
             title="Are you sure delete this module?"
             @confirm="deleteModule(mod)"
@@ -80,6 +81,11 @@ export default {
   props: {
     openModuleId: {
       type: [Number, Boolean],
+      default: false
+    },
+
+    readOnly: {
+      type: Boolean,
       default: false
     }
   },

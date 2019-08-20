@@ -14,12 +14,14 @@
           @click="showDetails = !showDetails"
         />
         <a-button
+          v-if="!readOnly"
           v-show="model.title.length > 0"
           size="small"
           icon="scissor"
           @click="$emit('breakdown', story)"
         />
         <a-button
+          v-if="!readOnly"
           size="small"
           :icon="story.isSystem ? 'laptop' : 'user'"
           @click="
@@ -28,6 +30,7 @@
           "
         />
         <a-popconfirm
+          v-if="!readOnly"
           title="Are you sure delete this story?"
           okText="Yes"
           cancelText="No"
@@ -49,6 +52,7 @@
           size="small"
           :defaultValue="model.priority"
           v-model="model.priority"
+          :disabled="readOnly"
           @change="update"
         >
           <a-select-option
@@ -62,6 +66,7 @@
 
     <template slot="description">
       <a-textarea
+        :disabled="readOnly"
         placeholder="As a < type of user >, I want < some goal > so that < some reason >."
         :autosize="{ minSize: 2 }"
         class="user-story-text-area"
@@ -77,6 +82,7 @@
             add-text="Add Business Rule"
             placeholder="Only do < action > when < condition >"
             className="user-story-text-area"
+            :disabled="readOnly"
             @input="update"
           />
         </p>
@@ -90,6 +96,7 @@
 WHEN < condition >
 THEN < expectation >`"
             className="user-story-text-area"
+            :disabled="readOnly"
             @input="update"
           />
         </p>
@@ -117,6 +124,11 @@ export default {
     },
 
     wrongPosition: {
+      type: Boolean,
+      default: false
+    },
+
+    readOnly: {
       type: Boolean,
       default: false
     }

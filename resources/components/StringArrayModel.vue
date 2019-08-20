@@ -5,6 +5,7 @@
       :key="index"
     >
       <a-icon
+        v-if="!disabled"
         class="dynamic-delete-button"
         type="minus-circle-o"
         :disabled="items.length === 1"
@@ -16,10 +17,12 @@
         style="width: 90%; margin-right: 8px; margin-bottom: 5px;"
         :class="className"
         v-model="items[index]"
+        :disabled="disabled"
       />
     </div>
 
     <a-button
+      v-if="!disabled"
       type="dashed"
       style="width: 100%"
       @click="() => items.push('')"
@@ -55,6 +58,11 @@ export default {
       type: String,
       required: false,
       default: ''
+    },
+
+    disabled: {
+      type: Boolean,
+      default: false
     }
   },
 

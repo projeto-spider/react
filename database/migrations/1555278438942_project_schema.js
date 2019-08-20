@@ -32,14 +32,14 @@ class ProjectSchema extends Schema {
           JSON.stringify([
             '?',
             '1/2',
-            '0',
             '1',
             '2',
             '3',
             '5',
             '8',
             '13',
-            '21',
+            '40',
+            '100',
             '...'
           ])
         )

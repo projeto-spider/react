@@ -42,10 +42,51 @@
               @submit.prevent="updateProject"
               class="project-form"
             >
-              <a-input size="small" placeholder="Basic usage" v-model="project.name" />
+              <a-input size="small" placeholder="Project name" v-model="project.name" />
               <a-input size="small" placeholder="Client (optional)" v-model="project.clientName" />
               <a-input size="small" placeholder="Description (optional)" v-model="project.description" />
               <a-range-picker size="small" style="width: 100%" @change="onChangeDate" :defaultValue="[project.startDate && moment(project.startDate, 'YYYY-MM-DD'), project.endDate && moment(project.endDate, 'YYYY-MM-DD')]" />
+
+              <h4>User Story Priority Scale</h4>
+
+              <p>
+                <strong>Presets</strong>
+                <a-button-group>
+                  <a-button type="primary" @click="project.scale = presets.fibonacci.concat()">
+                    Use Fibonacci
+                  </a-button>
+                  <a-button type="primary" @click="project.scale = presets.modFibonacci.concat()">
+                    Use Modified Fibonacci
+                  </a-button>
+                </a-button-group>
+              </p>
+
+              <div class="ant-list ant-list-split ant-list-bordered ant-list-something-after-last-item" style="margin-top: 3px;">
+                <draggable
+                  :list="project.scale || []"
+                  class="list-group"
+                  ghost-class="ghost"
+                >
+                  <div
+                    class="ant-list-item"
+                    v-for="(item, i) in project.scale || []"
+                    :key="i"
+                  >
+                    <a-input
+                      size="small"
+                      v-model="project.scale[i]"
+                    >
+                      <a-icon slot="suffix" type="close-circle" @click="() => project.scale.splice(i, 1)" style="margin-top: -6px; cursor: pointer" />
+                    </a-input>
+                  </div>
+                </draggable>
+
+                <div class="list-group">
+                  <a-button type="primary" block @click="project.scale.push('')">
+                    New
+                  </a-button>
+                </div>
+              </div>
             </form>
 
             <span v-else style="mouse: pointer" @click="openNameInput(project)">
@@ -67,11 +108,16 @@
 <script>
 import moment from 'moment'
 import { mapMutations } from 'vuex'
+import Draggable from 'vuedraggable'
 
 export default {
   name: 'ProjectsPage',
 
   middleware: 'authenticated',
+
+  components: {
+    Draggable
+  },
 
   data: () => ({
     moment,
@@ -85,6 +131,39 @@ export default {
     },
 
     projects: [],
+
+    presets: {
+      fibonacci: [
+        '?',
+        '0',
+        '1',
+        '2',
+        '3',
+        '5',
+        '8',
+        '13',
+        '21',
+        '34',
+        '55',
+        '89',
+        '144',
+        '...'
+      ],
+
+      modFibonacci: [
+        '?',
+        '1/2',
+        '1',
+        '2',
+        '3',
+        '5',
+        '8',
+        '13',
+        '40',
+        '100',
+        '...'
+      ]
+    },
 
     editing: false
   }),
@@ -133,8 +212,8 @@ export default {
     },
 
     updateProject () {
-      const { name, clientName, description, startDate, endDate } = this.editing
-      const payload = {name, clientName, description, startDate, endDate}
+      const { name, clientName, description, startDate, endDate, scale } = this.editing
+      const payload = {name, clientName, description, startDate, endDate, scale}
 
       this.$axios.$put(`/api/projects/${this.editing.id}`, payload)
         .then(data => {
@@ -190,9 +269,9 @@ export default {
       const bothDatesAreEqual = formatedStartDate === formatedEndDate
 
       const date =
-        hasBothDates && bothDatesAreEqual ? `${formatedStartDate} ~ ?` :
-        hasBothDates ? `${formatedStartDate} ~ ${formatedEndDate}` :
-        formatedStartDate
+        hasBothDates && bothDatesAreEqual ? `${formatedStartDate} ~ ?`
+        : hasBothDates ? `${formatedStartDate} ~ ${formatedEndDate}`
+        : formatedStartDate
 
       return [
         project.clientName,

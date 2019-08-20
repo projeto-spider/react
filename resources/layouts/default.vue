@@ -22,6 +22,10 @@
             Goal Sketch
           </a-menu-item>
 
+          <a-menu-item key="backlog-page" :disabled="currentStep < 2">
+            Backlog
+          </a-menu-item>
+
           <a-menu-item key="storyboard" :disabled="currentStep < 100">
             Story Board
           </a-menu-item>

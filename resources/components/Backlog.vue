@@ -1,6 +1,7 @@
 <template>
   <div>
     <a-button
+      v-if="!readOnly"
       type="primary"
       style="margin: 0 auto 15px; width: 400px; display: block"
       @click="addStory"
@@ -11,6 +12,7 @@
     <Draggable
       v-model="stories"
       @change="onChangeOrder"
+      :disabled="readOnly"
     >
       <transition-group name="goal-list">
         <UserStory
@@ -18,6 +20,7 @@
           :key="story.id"
           :story="story"
           :wrong-position="storiesWithWrongPosition.includes(story)"
+          :read-only="readOnly"
           @update="updated => updateStory(updated)"
           @breakdown="() => addStory(index + 1)"
           @delete="deleteStory(story)"
@@ -44,6 +47,11 @@ export default {
     goal: {
       type: Object,
       required: true
+    },
+
+    readOnly: {
+      type: Boolean,
+      default: false
     }
   },
 
