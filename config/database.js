@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 const Env = use('Env')
 const Helpers = use('Helpers')
@@ -31,7 +31,8 @@ module.exports = {
     connection: {
       filename: Helpers.databasePath('development.sqlite')
     },
-    useNullAsDefault: true
+    useNullAsDefault: true,
+    debug: true
   },
 
   /*

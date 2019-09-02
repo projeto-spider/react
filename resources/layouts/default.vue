@@ -26,12 +26,12 @@
             Backlog
           </a-menu-item>
 
-          <a-menu-item key="storyboard" :disabled="currentStep < 100">
-            Story Board
+          <a-menu-item key="overall-model" :disabled="currentStep < 2">
+            Overall Model
           </a-menu-item>
 
-          <a-menu-item key="overall-model" :disabled="currentStep < 100">
-            Overall Model
+          <a-menu-item key="storyboard" :disabled="currentStep < 100">
+            Story Board
           </a-menu-item>
         </template>
 

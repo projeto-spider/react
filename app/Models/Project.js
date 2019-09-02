@@ -31,6 +31,10 @@ class Project extends Model {
   modules () {
     return this.hasMany('App/Models/ProjectModule', 'id', 'projectId')
   }
+
+  crcCards () {
+    return this.hasMany('App/Models/CrcCard', 'id', 'projectId')
+  }
 }
 
 module.exports = Project

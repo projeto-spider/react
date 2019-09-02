@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 /*
 |--------------------------------------------------------------------------
@@ -29,6 +29,10 @@ Route.group(() => {
     .middleware('auth')
   // Project Goals Resource
   Route.resource('projects.modules', 'ProjectModuleController')
+    .apiOnly()
+    .middleware('auth')
+  // Project CRC Cards Resource
+  Route.resource('projects.crc-cards', 'CrcCardController')
     .apiOnly()
     .middleware('auth')
   // Project Goals Resource
