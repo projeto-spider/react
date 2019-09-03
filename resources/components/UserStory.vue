@@ -146,7 +146,13 @@ export default {
   },
 
   created () {
-    this.model = JSON.parse(JSON.stringify(this.story))
+    const model = JSON.parse(JSON.stringify(this.story))
+
+    if (this.currentProject && this.currentProject.scale && !this.currentProject.scale.includes(model.priority)) {
+      model.priority = ''
+    }
+
+    this.model = model
   },
 
   methods: {

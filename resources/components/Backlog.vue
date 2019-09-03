@@ -126,6 +126,7 @@ export default {
     addStory (index = 0) {
       const defaultData = {
         title: '',
+        priority: '',
         businessRules: [],
         acceptanceScenarios: []
       }

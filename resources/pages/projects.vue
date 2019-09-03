@@ -107,7 +107,7 @@
 
 <script>
 import moment from 'moment'
-import { mapMutations } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 import Draggable from 'vuedraggable'
 
 export default {
@@ -172,6 +172,12 @@ export default {
     this.projects = await this.$axios.$get('/api/projects')
   },
 
+  computed: {
+    ...mapGetters('project', [
+      'currentProject'
+    ])
+  },
+
   methods: {
     ...mapMutations('project', [
       'selectProject'
@@ -202,7 +208,7 @@ export default {
 
       const name = `${defaultName} ${nextNumber}`
 
-      this.$axios.$post('/api/projects', { name })
+      this.$axios.$post('/api/projects', { name, scale: this.presets.fibonacci })
         .then(project => {
           this.projects.push(project)
         })
@@ -212,12 +218,19 @@ export default {
     },
 
     updateProject () {
-      const { name, clientName, description, startDate, endDate, scale } = this.editing
+      const editing = this.editing
+      const { name, clientName, description, startDate, endDate, scale } = editing
       const payload = {name, clientName, description, startDate, endDate, scale}
 
-      this.$axios.$put(`/api/projects/${this.editing.id}`, payload)
+      this.$axios.$put(`/api/projects/${editing.id}`, payload)
         .then(data => {
           this.$message.success(`Project ${data.name} updated`)
+
+          Object.assign(editing, data)
+
+          if (this.currentProject.id === editing.id) {
+            this.selectProject(editing)
+          }
         })
         .catch(() => {
           this.$message.error('Failed to update project')
