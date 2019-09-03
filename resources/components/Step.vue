@@ -60,6 +60,14 @@
             {{ type === 'and' ? '×' : '+'}}
           </text>
         </template>
+
+        <template v-else-if="type === 'start'">
+          <circle cx="50" cy="50" r="20" stroke="black" stroke-width="2" fill="white" />
+        </template>
+
+        <template v-else-if="type === 'end'">
+          <circle cx="50" cy="50" r="20" stroke="black" stroke-width="10" fill="white" />
+        </template>
       </svg>
     </g>
 
@@ -118,6 +126,24 @@
             @click="changeType('or')"
           >
             <IconAdd :style="`fill: ${type === 'or' ? '#1890ff' : 'rgb(140, 140, 140)'}`" />
+          </svg>
+
+          <svg
+            style="cursor: pointer"
+            :x="16"
+            :y="32"
+            @click="changeType('start')"
+          >
+            <IconAdd :style="`fill: ${type === 'start' ? '#1890ff' : 'rgb(140, 140, 140)'}`" />
+          </svg>
+
+          <svg
+            style="cursor: pointer"
+            :x="48"
+            :y="32"
+            @click="changeType('end')"
+          >
+            <IconAdd :style="`fill: ${type === 'end' ? '#1890ff' : 'rgb(140, 140, 140)'}`" />
           </svg>
         </g>
       </svg>
