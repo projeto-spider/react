@@ -30,6 +30,10 @@
             Overall Model
           </a-menu-item>
 
+          <a-menu-item key="interfaces" :disabled="currentStep < 2">
+            Interfaces
+          </a-menu-item>
+
           <a-menu-item key="storyboard" :disabled="currentStep < 100">
             Story Board
           </a-menu-item>

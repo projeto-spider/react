@@ -35,6 +35,10 @@ Route.group(() => {
   Route.resource('projects.crc-cards', 'CrcCardController')
     .apiOnly()
     .middleware('auth')
+  // Project Interfaces Resource
+  Route.resource('projects.interfaces', 'InterfaceController')
+    .apiOnly()
+    .middleware('auth')
   // Project Goals Resource
   Route.resource('projects.modules.goals', 'GoalController')
     .apiOnly()
