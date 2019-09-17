@@ -20,6 +20,14 @@ class Project extends Model {
     return JSON.stringify(obj)
   }
 
+  getInspection (json) {
+    return JSON.parse(json)
+  }
+
+  setInspection (obj) {
+    return JSON.stringify(obj)
+  }
+
   owner () {
     return this.belongsTo('App/Models/User', 'ownerId')
   }

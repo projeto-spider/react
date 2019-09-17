@@ -34,8 +34,8 @@
             Interfaces
           </a-menu-item>
 
-          <a-menu-item key="storyboard" :disabled="currentStep < 100">
-            Story Board
+          <a-menu-item key="inspection" :disabled="currentStep < 2">
+            Inspection
           </a-menu-item>
         </template>
 

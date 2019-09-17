@@ -44,6 +44,10 @@ class ProjectSchema extends Schema {
           ])
         )
         .notNullable()
+      table
+        .json('inspection')
+        .defaultTo(JSON.stringify([]))
+        .notNullable()
       table.timestamps()
     })
   }
