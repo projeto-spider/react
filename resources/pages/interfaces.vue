@@ -15,7 +15,7 @@
         <a-row>
           <a-col :span="24">
             <div v-if="!openInterface" style="text-align: center">
-              <h3>Open a Class</h3>
+              <h3>Open an Interface</h3>
             </div>
 
             <div v-else>
