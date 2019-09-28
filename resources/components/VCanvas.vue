@@ -128,7 +128,8 @@ export default {
     canvas: {
       deep: true,
       handler () {
-        this.canvasChanged()
+        // this.canvasChanged()
+        this.$emit('canvasChanged', this.canvas)
       }
     }
   }
