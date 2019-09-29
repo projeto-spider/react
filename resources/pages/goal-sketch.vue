@@ -1,11 +1,15 @@
 <template>
   <a-layout>
     <a-layout-sider style="background-color: unset" :width="360">
-      <ModuleList
+      <VSiderListCrud
         v-if="currentProject"
-        :open-module-id="openModule && openModule.id"
-        @moduleOpen="onModuleOpen"
-        @moduleDeleted="onModuleDelete"
+        item-label="Module"
+        :items="modules"
+        :open-item-id="openModule && openModule.id"
+        @open="onModuleOpen"
+        @create="onCreateModule"
+        @update="onUpdateModule"
+        @delete="onDeleteModule"
       />
     </a-layout-sider>
 
@@ -160,7 +164,7 @@
 import { mapGetters, mapState } from 'vuex'
 import pDebounce from 'p-debounce'
 import Draggable from 'vuedraggable'
-import ModuleList from '@/components/ModuleList'
+import VSiderListCrud from '@/components/VSiderListCrud'
 import Diagram from '@/components/Diagram'
 import Backlog from '@/components/Backlog'
 import { setTimeout } from 'timers'
@@ -168,9 +172,10 @@ import { setTimeout } from 'timers'
 export default {
   name: 'GoalSketch',
 
-  components: { Draggable, ModuleList, Diagram, Backlog },
+  components: { Draggable, VSiderListCrud, Diagram, Backlog },
 
   data: () => ({
+    modules: [],
     goals: [],
     openModule: false,
     openGoal: false,
@@ -205,7 +210,93 @@ export default {
     }
   },
 
+  created () {
+    if (!this.currentProject) {
+      return this.$router.push('/projects')
+    }
+
+    const { id } = this.currentProject
+    const url = `/api/projects/${id}/modules/`
+
+    this.$axios.$get(url)
+      .then(modules => {
+        this.modules = modules
+      })
+      .catch(() => {
+        this.$message.error('Failed to load modules')
+      })
+  },
+
   methods: {
+    onModuleOpen (mod) {
+      this.order = []
+      this.openModule = mod
+      this.openGoal = false
+      this.refreshGoals()
+    },
+
+    onCreateModule () {
+      const defaultName = 'Module'
+      const defaultLike = this.modules
+        .map(project => project.title)
+        .filter(title => title.indexOf(defaultName) === 0)
+        .map(title => title.split(' ').pop())
+        .map(numberString => Number(numberString))
+        .filter(x => x)
+        .sort()
+
+      const countDefaultLike = defaultLike.length
+      const nextNumber = countDefaultLike
+        ? defaultLike.pop() + 1
+        : 1
+
+      const title = `${defaultName} ${nextNumber}`
+
+      const { id } = this.currentProject
+      const url = `/api/projects/${id}/modules/`
+      this.$axios.$post(url, { title })
+        .then(mod => {
+          this.modules.push(mod)
+        })
+        .catch(() => {
+          this.$message.error('Failed to create module')
+        })
+    },
+
+    onUpdateModule (mod, title) {
+      const payload = { title }
+
+      const { id } = this.currentProject
+      const url = `/api/projects/${id}/modules/${mod.id}`
+
+      this.$axios.$put(url, payload)
+        .then(data => {
+          this.$message.success(`Module ${data.title} updated`)
+        })
+        .catch(() => {
+          this.$message.error('Failed to update module')
+        })
+    },
+
+    onDeleteModule(mod) {
+      const { id } = this.currentProject
+      const url = `/api/projects/${id}/modules/${mod.id}`
+
+      this.$axios.$delete(url)
+        .then(() => {
+          if (this.openModule && this.openModule.id === mod.id) {
+            this.openModule = false
+          }
+
+          this.$message.warn(`Deleted ${mod.title}`)
+          const index = this.modules.indexOf(mod)
+          this.modules.splice(index, 1)
+        })
+        .catch(() => {
+          this.$message.error('Failed to delete module')
+        })
+    },
+
     addGoal () {
       const defaultData = {
         title: ''
@@ -298,19 +389,6 @@ export default {
         })
     },
 
-    onModuleOpen (mod) {
-      this.order = []
-      this.openModule = mod
-      this.openGoal = false
-      this.refreshGoals()
-    },
-
-    onModuleDelete (mod) {
-      if (this.openModule && this.openModule.id === mod.id) {
-        this.openModule = false
-      }
-    },
-
     onSelectPersona (goal, personaId) {
       return this.$axios.$post(`${this.baseUrl}/goals/${goal.id}/personas`, { personaId })
         .catch(() => {
@@ -345,12 +423,6 @@ export default {
       this.openGoal = false
 
       setTimeout(() => this.openGoal = goal, 1)
-    }
-  },
-
-  created () {
-    if (!this.currentProject) {
-      return this.$router.push('/projects')
     }
   }
 }

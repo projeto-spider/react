@@ -1,7 +1,7 @@
 <template>
   <a-layout>
     <a-layout-sider style="background-color: unset" :width="360">
-      <ModuleList
+      <VSiderListCrud
         v-if="currentProject"
         :open-module-id="openModule && openModule.id"
         :read-only="true"
@@ -235,7 +235,7 @@
 import { mapGetters, mapState } from 'vuex'
 import pDebounce from 'p-debounce'
 import Draggable from 'vuedraggable'
-import ModuleList from '@/components/ModuleList'
+import VSiderListCrud from '@/components/VSiderListCrud'
 import Diagram from '@/components/Diagram'
 import Backlog from '@/components/Backlog'
 import { setTimeout } from 'timers'
@@ -243,7 +243,7 @@ import { setTimeout } from 'timers'
 export default {
   name: 'GoalSketch',
 
-  components: { Draggable, ModuleList, Diagram, Backlog },
+  components: { Draggable, VSiderListCrud, Diagram, Backlog },
 
   data: () => ({
     goals: [],
