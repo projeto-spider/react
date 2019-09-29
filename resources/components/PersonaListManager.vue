@@ -5,7 +5,7 @@
   >
     <div class="ant-spin-nested-loading">
       <div class="ant-spin-container">
-        <div v-for="(persona, i) in personas" :key="i" class="ant-list-item">
+        <div v-for="(persona, i) in model" :key="i" class="ant-list-item">
           <div class="ant-list-item-content ant-list-item-content-single">
             <div style="display: flex; width: 100%;">
               <div>{{ persona.name }}</div>
@@ -108,7 +108,7 @@
           </div>
         </div>
 
-        <v-tour name="personasTour" :steps="tour.steps"></v-tour>
+        <v-tour name="personasTour" :steps="$options.tour.steps"></v-tour>
       </div>
 
       <template slot="footer">
@@ -128,53 +128,13 @@
 import { mapGetters, mapMutations } from 'vuex'
 import ListManager from '~/components/ListManager.vue'
 import pDebounce from 'p-debounce'
-
-const tour = {
-  steps: [
-    {
-      target: '[data-v-step="personas-1"]',
-      content: `
-        Give a <strong>fake name</strong> for this person.<br>
-        <em>"John Doe"</em>, <em>"Jane Doe"</em>
-      `
-    },
-
-    {
-      target: '[data-v-step="personas-2"]',
-      content: `
-        What's their <strong>job</strong> in this app?<br>
-        <em>"Visitor"</em>, <em>"Client"</em>
-      `
-    },
-
-    {
-      target: '[data-v-step="personas-3"]',
-      content: `
-        Stabilish <strong>character</strong> for this person<br>
-        <em>"Client for 27 years"</em>, <em>"Uses her smartphone a lot"</em>
-      `
-    },
-
-    {
-      target: '[data-v-step="personas-4"]',
-      content: `
-        Define <strong>your aim</strong> for the app to impact in your client<br>
-        <em>"Solve common banking problems"</em>, <em>"No need to go to the bank for simple transactions"</em>
-      `
-    },
-
-    {
-      target: '[data-v-step="personas-5"]',
-      content: `
-        What's the <strong>endgame</strong> for the client<br>
-        <em>"Make transactions in their phone"</em>, <em>"Play a fun game"</em>
-      `
-    }
-  ]
-}
+import clone from 'deep-clone'
+import tour from '~/assets/tours/persona'
 
 export default {
   name: 'PersonaListManager',
+
+  tour,
 
   components: { ListManager },
 
@@ -182,41 +142,31 @@ export default {
     disabled: {
       type: Boolean,
       default: false
-    }
+    },
+    personas: [Promise, Array],
+    personaAddedHandler: Function,
+    personaEditedHandler: Function,
+    personaDeletedHandler: Function,
   },
 
   data () {
     return {
-      tour,
-
-      personas: [],
-
+      model: [],
       modalOpen: false,
       editingPersona: false
     }
   },
 
-  computed: {
-    ...mapGetters('project', [
-      'currentProject'
-    ])
-  },
+  async created () {
+    const personas = Promise.resolve(this.personas)
+      .then(result =>
+        Array.isArray(result) ? clone(result) : []
+      )
 
-  created () {
-    this.$axios.$get(`/api/projects/${this.currentProject.id}/personas`)
-      .then(personas => {
-        this.personas = personas
-      })
-      .catch(() => {
-        this.$message.error('Failed to load personas')
-      })
+    this.model = await personas
   },
 
   methods: {
-    ...mapMutations('project', [
-      'updatePersonas'
-    ]),
-
     closeModal () {
       this.modalOpen = false
       this.editingPersona = false
@@ -228,9 +178,9 @@ export default {
         role: 'Persona Role'
       }
 
-      this.$axios.$post(`/api/projects/${this.currentProject.id}/personas`, defaultData)
+      this.personaAddedHandler(defaultData)
         .then(persona => {
-          this.personas.push(persona)
+          this.model.push(persona)
           this.openPersona(persona)
         })
         .catch(() => {
@@ -251,18 +201,18 @@ export default {
       const payload = {...persona}
       payload.goals = undefined
 
-      this.$axios.$put(`/api/projects/${this.currentProject.id}/personas/${persona.id}`, payload)
+      this.personaEditedHandler(persona, payload)
         .catch(() => {
           this.$message.error('Failed to update persona')
         })
     },
 
     deletePersona (persona) {
-      this.$axios.$delete(`/api/projects/${this.currentProject.id}/personas/${persona.id}`)
+      this.personaDeletedHandler(persona)
         .then(() => {
-          const index = this.personas.indexOf(persona)
+          const index = this.model.indexOf(persona)
           if (index !== -1) {
-            this.personas.splice(index, 1)
+            this.model.splice(index, 1)
           }
         })
         .catch(() => {
@@ -280,11 +230,11 @@ export default {
       }, 500)
     },
 
-    personas: {
+    model: {
       deep: true,
 
       handler () {
-        this.updatePersonas(this.personas)
+        this.$emit('personasChanged', this.model)
       }
     }
   }

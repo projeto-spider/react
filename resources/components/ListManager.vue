@@ -72,7 +72,6 @@ export default {
   data () {
     return {
       items: Array.isArray(this.value) ? this.value.concat() : [],
-
       showButton: true,
       editingText: '',
       editing: false
