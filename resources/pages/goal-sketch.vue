@@ -20,113 +20,22 @@
             <div v-if="!openModule" style="text-align: center">
               <h3>Open a module</h3>
             </div>
+
             <div v-else>
-              <a-button
-                type="primary"
-                style="margin: 0 auto 15px; width: 400px; display: block"
-                @click="addGoal()"
-              >
-                Create Goal
-              </a-button>
-
-              <Draggable
-                v-model="goals"
-                @change="onChangeOrder"
-              >
-                <transition-group name="goal-list">
-                  <div
-                    v-for="goal in goals"
-                    :key="goal.id"
-                    class="ant-card ant-card-bordered ant-card-hoverable"
-                    style="max-width: 400px; margin: 15px auto"
-                  >
-                    <div class="ant-card-body">
-                      <div class="ant-card-meta">
-                        <div class="ant-card-meta-detail">
-                          <div class="ant-card-meta-description">
-                            <a-textarea
-                              placeholder="Write your goal"
-                              :autosize="{ minRows: 1, maxRows: 5 }"
-                              v-model="goal.title"
-                              @change="() => onChangeTitle(goal)"
-                            />
-
-                            <br><br>
-
-                            <a-select
-                              mode="multiple"
-                              placeholder="Personas"
-                              :defaultValue="goal.personas ? goal.personas.map(persona => persona.id) : []"
-                              style="width: 100%"
-                              @select="personaId => onSelectPersona(goal, personaId)"
-                              @deselect="personaId => onDeselectPersona(goal, personaId)"
-                            >
-                              <a-select-option v-for="persona in personas" :key="persona.id">
-                                {{ persona.name }}
-                              </a-select-option>
-                            </a-select>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <ul class="ant-card-actions">
-                      <li style="width: 33.3333%;">
-                        <span :class="{ 'invalid-order': itemsWithWrongPosition.includes(goal) }">
-                          <a-tooltip>
-                            <template v-if="itemsWithWrongPosition.includes(goal)" slot='title'>
-                              <span>Wrong priority.</span>
-                              <br>
-                              <span>High > Medium > Low.</span>
-                            </template>
-                            <a-select :defaultValue="goal.priority" style="width: 120px; text-aling: center" @change="value => onChangePriority(goal, value)">
-                              <a-select-option :value="0">Low</a-select-option>
-                              <a-select-option :value="1">Medium</a-select-option>
-                              <a-select-option :value="2">High</a-select-option>
-                            </a-select>
-                          </a-tooltip>
-                        </span>
-                      </li>
-
-                      <li style="width: 33.3333%;">
-                        <span>
-                          <a-select :defaultValue="goal.type" style="width: 120px; text-aling: center" @change="value => onChangeType(goal, value)">
-                            <a-select-option :value="0">Business</a-select-option>
-                            <a-select-option :value="1">Constraint</a-select-option>
-                          </a-select>
-                        </span>
-                      </li>
-
-                      <li style="width: 33.3333%;">
-                        <a-popconfirm
-                          title="Are you sure delete this entry?"
-                          @confirm="deleteGoal(goal)"
-                          okText="Yes"
-                          cancelText="No"
-                        >
-                          <a-button type="danger">Delete</a-button>
-                        </a-popconfirm>
-                      </li>
-                    </ul>
-
-                    <div class="fab-group">
-                      <a-button
-                        type="primary"
-                        shape="circle"
-                        icon="cluster"
-                        @click="journeyGoal = goal"
-                      />
-
-                      <a-button
-                        type="primary"
-                        shape="circle"
-                        icon="ordered-list"
-                        @click="doOpenGoal(goal)"
-                      />
-                    </div>
-                  </div>
-                </transition-group>
-              </Draggable>
+              <VGoals
+                :goals="goals"
+                :personas="personas"
+                @create="onCreateGoal"
+                @changeTitle="onChangeGoalTitle"
+                @changePriority="onChangeGoalPriority"
+                @changeType="onGoalChangeType"
+                @delete="onDeleteGoal"
+                @open="onOpenGoal"
+                @changeOrder="onChangeGoalsOrder"
+                @personaSelected="onGoalPersonaSelected"
+                @personaDeselected="onGoalPersonaDeselected"
+                @openJourney="onOpenJourney"
+              />
             </div>
           </a-col>
 
@@ -165,6 +74,7 @@ import { mapGetters, mapState } from 'vuex'
 import pDebounce from 'p-debounce'
 import Draggable from 'vuedraggable'
 import VSiderListCrud from '@/components/VSiderListCrud'
+import VGoals from '@/components/VGoals'
 import Diagram from '@/components/Diagram'
 import Backlog from '@/components/Backlog'
 import { setTimeout } from 'timers'
@@ -172,7 +82,7 @@ import { setTimeout } from 'timers'
 export default {
   name: 'GoalSketch',
 
-  components: { Draggable, VSiderListCrud, Diagram, Backlog },
+  components: { Draggable, VSiderListCrud, VGoals, Diagram, Backlog },
 
   data: () => ({
     modules: [],
@@ -228,6 +138,8 @@ export default {
   },
 
   methods: {
+    // Modules
+
     onModuleOpen (mod) {
       this.order = []
       this.openModule = mod
@@ -297,7 +209,9 @@ export default {
         })
     },
 
-    addGoal () {
+    // Goals
+
+    onCreateGoal() {
       const defaultData = {
         title: ''
       }
@@ -305,10 +219,56 @@ export default {
       this.$axios.$post(`${this.baseUrl}/goals`, defaultData)
         .then(goal => {
           this.goals.unshift(goal)
-          this.onChangeOrder()
+          this.updateGoalsOrder()
+        })
+        .catch(err => {
+          this.$message.error('Failed to create goal')
+        })
+    },
+
+    onChangeGoalTitle: pDebounce(function onChangeGoalTitle (goal) {
+      this.updateGoal(goal)
+    }, 500),
+
+    onChangeGoalPriority (goal, value) {
+      goal.priority = value
+      this.updateGoal(goal)
+    },
+
+    onGoalChangeType (goal, value) {
+      goal.type = value
+      this.updateGoal(goal)
+    },
+
+    onDeleteGoal(goal) {
+      if (!goal || !goal.id) {
+        return
+      }
+
+      this.$axios.$delete(`${this.baseUrl}/goals/${goal.id}`)
+        .then(() => {
+          const index = this.goals.indexOf(goal)
+          if (index !== -1) {
+            this.goals.splice(index, 1)
+            this.updateGoalsOrder()
+          }
         })
         .catch(() => {
-          this.$message.error('Failed to create goal')
+          this.$message.error('Failed to delete goal')
+        })
+    },
+
+    onGoalPersonaSelected (goal, personaId) {
+      return this.$axios.$post(`${this.baseUrl}/goals/${goal.id}/personas`, { personaId })
+        .catch(() => {
+          this.$message.error('Failed to add persona to goal')
+        })
+    },
+
+    onGoalPersonaDeselected (goal, personaId) {
+      return this.$axios.$delete(`${this.baseUrl}/goals/${goal.id}/personas/${personaId}`)
+        .catch(() => {
+          this.$message.error('Failed to delete persona goal')
         })
     },
 
@@ -325,36 +285,10 @@ export default {
         })
     },
 
-    deleteGoal (goal) {
-      if (!goal || !goal.id) {
-        return
-      }
+    onOpenGoal (goal) {
+      this.openGoal = false
 
-      this.$axios.$delete(`${this.baseUrl}/goals/${goal.id}`)
-        .then(() => {
-          const index = this.goals.indexOf(goal)
-          if (index !== -1) {
-            this.goals.splice(index, 1)
-            this.onChangeOrder()
-          }
-        })
-        .catch(() => {
-          this.$message.error('Failed to delete goal')
-        })
-    },
-
-    onChangeTitle: pDebounce(function onChangeTitle (goal, value) {
-      this.updateGoal(goal)
-    }, 500),
-
-    onChangePriority (goal, value) {
-      goal.priority = value
-      this.updateGoal(goal)
-    },
-
-    onChangeType (goal, value) {
-      goal.type = value
-      this.updateGoal(goal)
+      setTimeout(() => this.openGoal = goal, 1)
     },
 
     refreshGoals () {
@@ -381,26 +315,23 @@ export default {
         })
     },
 
-    onChangeOrder () {
-      const goals = this.goals.map(({id}) => id)
-      return this.$axios.$put(this.baseUrl, { goals })
+    updateGoalsOrder () {
+      const order = this.goals.map(({id}) => id)
+      return this.onChangeGoalsOrder(order)
+    },
+
+    onChangeGoalsOrder (order) {
+      return this.$axios.$put(this.baseUrl, { goals: order })
         .then(mod => {
           Object.assign(this.openModule, mod)
         })
-    },
-
-    onSelectPersona (goal, personaId) {
-      return this.$axios.$post(`${this.baseUrl}/goals/${goal.id}/personas`, { personaId })
         .catch(() => {
-          this.$message.error('Failed to add persona to goal')
+          this.$message.error('Failed to save goals order')
         })
     },
 
-    onDeselectPersona (goal, personaId) {
-      return this.$axios.$delete(`${this.baseUrl}/goals/${goal.id}/personas/${personaId}`)
-        .catch(() => {
-          this.$message.error('Failed to delete persona goal')
-        })
+    onOpenJourney (goal) {
+      this.journeyGoal = goal
     },
 
     onChangeJourney (journey) {
@@ -417,12 +348,6 @@ export default {
         .catch(() => {
           this.$message.error('Failed to update journey')
         })
-    },
-
-    doOpenGoal (goal) {
-      this.openGoal = false
-
-      setTimeout(() => this.openGoal = goal, 1)
     }
   }
 }
