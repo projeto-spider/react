@@ -362,6 +362,7 @@ export default {
   position: absolute;
   top: -13px;
   right: -16px;
+  z-index: 100;
 }
 
 .fab-group .ant-btn {
