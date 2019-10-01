@@ -80,7 +80,6 @@ import pDebounce from 'p-debounce'
 import Draggable from 'vuedraggable'
 import CrcCardList from '@/components/CrcCardList'
 import Diagram from '@/components/Diagram'
-import Backlog from '@/components/Backlog'
 import { setTimeout } from 'timers'
 
 const defaultModel = () => ({
@@ -93,7 +92,7 @@ const defaultModel = () => ({
 export default {
   name: 'OverallModel',
 
-  components: { Draggable, CrcCardList, Diagram, Backlog },
+  components: { Draggable, CrcCardList, Diagram },
 
   data: () => ({
     modules: [],

@@ -44,11 +44,14 @@
               <h3>Open a goal</h3>
             </div>
             <div v-else>
-              <Backlog
-                ref="backlog"
+              <VBacklog
                 :goal="openGoal"
-                @addStory="addStory"
-                @changedOrder="stories => openGoal.stories = stories"
+                :stories="stories"
+                :scale="currentProject.scale"
+                @create="onCreateStory"
+                @update="onUpdateStory"
+                @delete="onDeleteStory"
+                @changeOrder="onChangeStoriesOrder"
               />
             </div>
           </a-col>
@@ -76,17 +79,18 @@ import Draggable from 'vuedraggable'
 import VSiderListCrud from '@/components/VSiderListCrud'
 import VGoals from '@/components/VGoals'
 import Diagram from '@/components/Diagram'
-import Backlog from '@/components/Backlog'
+import VBacklog from '@/components/VBacklog'
 import { setTimeout } from 'timers'
 
 export default {
   name: 'GoalSketch',
 
-  components: { Draggable, VSiderListCrud, VGoals, Diagram, Backlog },
+  components: { Draggable, VSiderListCrud, VGoals, VBacklog, Diagram },
 
   data: () => ({
     modules: [],
     goals: [],
+    stories: [],
     openModule: false,
     openGoal: false,
     journeyGoal: false
@@ -117,7 +121,24 @@ export default {
       }
 
       return `/api/projects/${this.currentProject.id}/modules/${this.openModule.id}`
-    }
+    },
+
+    baseGoalUrl () {
+      if (!this.baseUrl || !this.openGoal) {
+        return false
+      }
+
+      const {id} = this.openGoal
+      return `${this.baseUrl}/goals/${id}`
+    },
+
+    baseUrlStories () {
+      if (!this.baseGoalUrl) {
+        return false
+      }
+
+      return `${this.baseGoalUrl}/stories`
+    },
   },
 
   created () {
@@ -288,7 +309,10 @@ export default {
     onOpenGoal (goal) {
       this.openGoal = false
 
-      setTimeout(() => this.openGoal = goal, 1)
+      setTimeout(() => {
+        this.openGoal = goal
+        this.refreshStories()
+      }, 1)
     },
 
     refreshGoals () {
@@ -347,6 +371,87 @@ export default {
         })
         .catch(() => {
           this.$message.error('Failed to update journey')
+        })
+    },
+
+    // Backlog
+
+    refreshStories() {
+      const goal = this.openGoal
+      const order = goal.stories
+
+      this.$axios.$get(this.baseUrlStories)
+        .then(stories => {
+          const leftOutStories = this.stories.filter(story =>
+            !order.includes(story.id)
+          )
+
+          for (let story of leftOutStories) {
+            this.deleteStory(story)
+          }
+
+          this.stories = order
+            .map(id => stories.find(story => story.id === id))
+            .filter(x => x)
+        })
+    },
+
+    onCreateStory (index = 0) {
+      const defaultData = {
+        title: '',
+        priority: '',
+        businessRules: [],
+        acceptanceScenarios: []
+      }
+
+      this.$axios.$post(this.baseUrlStories, defaultData)
+        .then(story => {
+          this.stories.splice(index, 0, story)
+          this.onChangeStoriesOrder()
+        })
+        .catch(() => {
+          this.$message.error('Failed to create story')
+        })
+
+    },
+
+    onUpdateStory (story) {
+      const url = `${this.baseUrlStories}/${story.id}`
+      this.$axios.$put(url, story)
+        .then(updated => {
+          const original = this.stories.find(some => some.id === story.id)
+
+          if (original) {
+            Object.assign(original, updated)
+          }
+        })
+        .catch(() => {
+          this.$message.error('Failed to update story')
+        })
+    },
+
+    onDeleteStory (story) {
+      const url = `${this.baseUrlStories}/${story.id}`
+      this.$axios.$delete(url)
+        .then(() => {
+          const index = this.stories.findIndex(({id}) => id === story.id)
+
+          if (index === -1) {
+            return
+          }
+
+          this.stories.splice(index, 1)
+          this.onChangeStoriesOrder()
+        })
+        .catch(() => {
+          this.$message.error('Failed to delete story')
+        })
+    },
+
+    onChangeStoriesOrder(order = this.stories.map(story => story.id)) {
+      return this.$axios.$put(this.baseGoalUrl, { stories: order })
+        .then(goal => {
+          // TODO
         })
     }
   }

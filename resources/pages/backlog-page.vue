@@ -207,7 +207,7 @@
                 </div>
               </div>
 
-              <Backlog
+              <VBacklog
                 style="padding: 0 5px"
                 :goal="goal"
                 :read-only="true"
@@ -237,13 +237,13 @@ import pDebounce from 'p-debounce'
 import Draggable from 'vuedraggable'
 import VSiderListCrud from '@/components/VSiderListCrud'
 import Diagram from '@/components/Diagram'
-import Backlog from '@/components/Backlog'
+import VBacklog from '@/components/VBacklog'
 import { setTimeout } from 'timers'
 
 export default {
   name: 'GoalSketch',
 
-  components: { Draggable, VSiderListCrud, Diagram, Backlog },
+  components: { Draggable, VSiderListCrud, VBacklog, Diagram },
 
   data: () => ({
     goals: [],
