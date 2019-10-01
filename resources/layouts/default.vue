@@ -80,7 +80,7 @@
       </a-menu>
     </a-layout-header>
 
-    <a-layout-content style="padding: 0 50px">
+    <a-layout-content style="padding: 0 10px">
       <div style="margin: 16px 0" />
       <nuxt />
       <StepManager v-if="isProjectSelected"></StepManager>
