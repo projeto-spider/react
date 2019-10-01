@@ -17,7 +17,7 @@
           class="list-item"
           :class="{ 'list-item-selected': item.id === openItemId }"
         >
-          <template v-if="!readOnly">
+          <template v-if="!readOnly && !disableEdit">
             <a slot="actions"
               v-if="editing !== item"
               @click="openNameInput(item)"
@@ -95,6 +95,11 @@ export default {
     },
 
     readOnly: {
+      type: Boolean,
+      default: false
+    },
+
+    disableEdit: {
       type: Boolean,
       default: false
     }
