@@ -134,7 +134,7 @@
             :y="32"
             @click="changeType('start')"
           >
-            <IconAdd :style="`fill: ${type === 'start' ? '#1890ff' : 'rgb(140, 140, 140)'}`" />
+            <IconStart :style="`fill: ${type === 'start' ? '#1890ff' : 'rgb(140, 140, 140)'}`" />
           </svg>
 
           <svg
@@ -143,7 +143,7 @@
             :y="32"
             @click="changeType('end')"
           >
-            <IconAdd :style="`fill: ${type === 'end' ? '#1890ff' : 'rgb(140, 140, 140)'}`" />
+            <IconEnd :style="`fill: ${type === 'end' ? '#1890ff' : 'rgb(140, 140, 140)'}`" />
           </svg>
         </g>
       </svg>
@@ -218,6 +218,8 @@ import IconUnchecked from '@/components/icons/unchecked'
 import IconChecked from '@/components/icons/checked'
 import IconLetter from '@/components/icons/letter'
 import IconAdd from '@/components/icons/add'
+import IconStart from '@/components/icons/start'
+import IconEnd from '@/components/icons/end'
 
 const MIN_WIDTH = 100
 const MIN_HEIGHT = 50
@@ -237,7 +239,9 @@ export default {
     IconUnchecked,
     IconChecked,
     IconLetter,
-    IconAdd
+    IconAdd,
+    IconStart,
+    IconEnd
   },
 
   props: {
