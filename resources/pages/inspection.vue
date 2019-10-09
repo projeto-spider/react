@@ -163,7 +163,8 @@ export default {
     }
 
     try {
-      this.inspection = JSON.parse(JSON.stringify(this.currentProject.inspection))
+      const parsed = JSON.parse(JSON.stringify(this.currentProject.inspection))
+      this.inspection = Array.isArray(parsed) ? parsed : []
     } catch (err) {
       this.inspection = []
     }
@@ -256,6 +257,10 @@ export default {
     },
 
     inspectionFor (key, criterion) {
+      if (!this.inspection) {
+        this.inspection = []
+      }
+
       const item = this.inspection.find(item => key === item.key)
 
       if (item) {
