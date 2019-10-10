@@ -45,6 +45,19 @@ class ProjectSchema extends Schema {
         )
         .notNullable()
       table
+        .json('criteria')
+        .defaultTo(
+          JSON.stringify([
+            'Independent',
+            'Negotiable',
+            'Valuable',
+            'Estimable',
+            'Small',
+            'Testable'
+          ])
+        )
+        .notNullable()
+      table
         .json('inspection')
         .defaultTo(JSON.stringify([]))
         .notNullable()

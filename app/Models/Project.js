@@ -16,6 +16,14 @@ class Project extends Model {
     return JSON.parse(json)
   }
 
+  setCriteria (obj) {
+    return JSON.stringify(obj)
+  }
+
+  getCriteria (json) {
+    return JSON.parse(json)
+  }
+
   setCanvas (obj) {
     return JSON.stringify(obj)
   }

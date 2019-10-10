@@ -106,7 +106,7 @@ export default {
         `Canvas :: It isn't`,
         'Canvas :: Personas'
       ]
-      const criteria = [
+      const criteria = this.currentProject.criteria || [
         'Independent',
         'Negotiable',
         'Valuable',

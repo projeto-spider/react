@@ -87,6 +87,44 @@
                   </a-button>
                 </div>
               </div>
+
+              <h4>Inspection Criteria</h4>
+
+              <p>
+                <strong>Presets</strong>
+                <a-button-group>
+                  <a-button type="primary" @click="project.criteria = presets.invest.concat()">
+                    Use I.N.V.E.S.T.
+                  </a-button>
+                </a-button-group>
+              </p>
+
+              <div class="ant-list ant-list-split ant-list-bordered ant-list-something-after-last-item" style="margin-top: 3px;">
+                <draggable
+                  :list="project.criteria || []"
+                  class="list-group"
+                  ghost-class="ghost"
+                >
+                  <div
+                    class="ant-list-item"
+                    v-for="(item, i) in project.criteria || []"
+                    :key="i"
+                  >
+                    <a-input
+                      size="small"
+                      v-model="project.criteria[i]"
+                    >
+                      <a-icon slot="suffix" type="close-circle" @click="() => project.criteria.splice(i, 1)" style="margin-top: -6px; cursor: pointer" />
+                    </a-input>
+                  </div>
+                </draggable>
+
+                <div class="list-group">
+                  <a-button type="primary" block @click="project.criteria.push('')">
+                    New
+                  </a-button>
+                </div>
+              </div>
             </form>
 
             <span v-else style="mouse: pointer" @click="openNameInput(project)">
@@ -162,6 +200,15 @@ export default {
         '40',
         '100',
         '...'
+      ],
+
+      invest: [
+        'Independent',
+        'Negotiable',
+        'Valuable',
+        'Estimable',
+        'Small',
+        'Testable'
       ]
     },
 
@@ -208,7 +255,7 @@ export default {
 
       const name = `${defaultName} ${nextNumber}`
 
-      this.$axios.$post('/api/projects', { name, scale: this.presets.fibonacci })
+      this.$axios.$post('/api/projects', { name, scale: this.presets.fibonacci, criteria: this.presets.invest })
         .then(project => {
           this.projects.push(project)
         })
@@ -219,8 +266,8 @@ export default {
 
     updateProject () {
       const editing = this.editing
-      const { name, clientName, description, startDate, endDate, scale } = editing
-      const payload = {name, clientName, description, startDate, endDate, scale}
+      const { name, clientName, description, startDate, endDate, scale, criteria } = editing
+      const payload = {name, clientName, description, startDate, endDate, scale, criteria}
 
       this.$axios.$put(`/api/projects/${editing.id}`, payload)
         .then(data => {
