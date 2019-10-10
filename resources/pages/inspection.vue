@@ -56,6 +56,13 @@
 
                 Assignee
                 <a-input disabled placeholder="TODO" />
+
+                Status
+                <a-select v-model="criterion.progress" style="width: 100%">
+                  <a-select-option :value="0">To Do</a-select-option>
+                  <a-select-option :value="1">Doing</a-select-option>
+                  <a-select-option :value="2">Done</a-select-option>
+                </a-select>
               </a-col>
             </a-row>
           </div>
@@ -279,7 +286,8 @@ export default {
         title: criterion,
         status: true,
         description: '',
-        solution: ''
+        solution: '',
+        progress: 0
       }
 
       this.inspection.push(newItem)
