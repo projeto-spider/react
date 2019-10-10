@@ -1,45 +1,46 @@
 <template>
   <div>
-    <a-collapse>
-      <a-collapse-panel
+    <div class="ant-collapse">
+      <div
         v-for="(item, i) in items"
+        role="tablist"
+        class="ant-collapse-item"
+        :class="{ 'ant-collapse-item-active': openTabs[i] }"
         :key="i"
         :header="item.title"
       >
-        <a-row
-          v-for="(criterion, j) in item.criteria"
-          :key="j"
+        <div
+          role="button"
+          tabindex="0"
+          aria-expanded="true"
+          class="ant-collapse-header ant-collapse-header-multi-names"
+          @click.prevent="$set(openTabs, i, !openTabs[i])"
         >
-          <a-col :span="12">
-            <a-switch :defaultChecked="criterion.status" @change='status => criterion.status = status'/>
-            {{ criterion.title }}
-          </a-col>
+          <i class="arrow anticon anticon-right"><svg viewBox="64 64 896 896" data-icon="right" width="1em" height="1em" fill="currentColor" aria-hidden="true" focusable="false" class=""><path d="M765.7 486.8L314.9 134.7A7.97 7.97 0 0 0 302 141v77.3c0 4.9 2.3 9.6 6.1 12.6l360 281.1-360 281.1c-3.9 3-6.1 7.7-6.1 12.6V883c0 6.7 7.7 10.4 12.9 6.3l450.8-352.1a31.96 31.96 0 0 0 0-50.4z"></path></svg></i>
 
-          <a-col v-if="!criterion.status" :span="12">
-            Description
-            <a-input v-model="criterion.description" />
-
-            Solution
-            <a-input v-model="criterion.solution" />
-
-            Assignee
-            <a-input disabled placeholder="TODO" />
-          </a-col>
-        </a-row>
-
-        <a-collapse v-if="item.subItems">
-          <a-collapse-panel
-            v-for="(subItem, k) in item.subItems"
-            :key="k"
-            :header="subItem.title"
+          <span
+            v-for="(title, i) in item.title.split(' :: ')"
+            :key="i"
           >
+            {{ title || 'Untitled' }}
+          </span>
+        </div>
+
+        <div class="ant-collapse-content ant-collapse-content-active" v-if="openTabs[i]">
+          <div class="ant-collapse-content-box">
             <a-row
-              v-for="(criterion, l) in subItem.criteria"
-              :key="l"
+              v-for="(criterion, j) in item.criteria"
+              :key="j"
             >
               <a-col :span="12">
                 <a-switch :defaultChecked="criterion.status" @change='status => criterion.status = status'/>
-                {{ criterion.title }}
+
+                <span
+                  v-for="(part, i) in criterion.title.split(' :: ')"
+                  :key="i"
+                >
+                  {{ part }}
+                </span>
               </a-col>
 
               <a-col v-if="!criterion.status" :span="12">
@@ -53,10 +54,10 @@
                 <a-input disabled placeholder="TODO" />
               </a-col>
             </a-row>
-          </a-collapse-panel>
-        </a-collapse>
-      </a-collapse-panel>
-    </a-collapse>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -69,6 +70,7 @@ export default {
 
   data: () => ({
     activeKey: [],
+    openTabs: {},
 
     modules: [],
     crcCards: [],
@@ -303,3 +305,17 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.ant-collapse-header-multi-names > span {
+}
+
+.ant-collapse-header-multi-names span:not(:last-child):after {
+  content: ' :: ';
+  display: inline;
+}
+
+.ant-collapse-header-multi-names span:last-child {
+  font-weight: bold
+}
+</style>
