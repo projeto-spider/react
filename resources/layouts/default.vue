@@ -37,6 +37,10 @@
           <a-menu-item key="inspection" :disabled="currentStep < 2">
             Inspection
           </a-menu-item>
+
+          <a-menu-item key="inspection-backlog" :disabled="currentStep < 2">
+            Inspection Backlog
+          </a-menu-item>
         </template>
 
         <template>

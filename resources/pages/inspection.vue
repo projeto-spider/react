@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="!readOnly">
     <div class="ant-collapse">
       <div
         v-for="(item, i) in items"
@@ -70,14 +70,49 @@
       </div>
     </div>
   </div>
+
+  <div v-else>
+    <a-row>
+      <a-col :span="8">
+        <h2>To Do</h2>
+        <VInspectionBacklogItems
+          :items="readOnlyItems.filter(({criterion}) => criterion.progress === 0)"
+        />
+      </a-col>
+
+      <a-col :span="8">
+        <h2>Doing</h2>
+        <VInspectionBacklogItems
+          :items="readOnlyItems.filter(({criterion}) => criterion.progress === 1)"
+        />
+      </a-col>
+
+      <a-col :span="8">
+        <h2>Done</h2>
+        <VInspectionBacklogItems
+          :items="readOnlyItems.filter(({criterion}) => criterion.progress === 2)"
+        />
+      </a-col>
+    </a-row>
+  </div>
 </template>
 
 <script>
 import pDebounce from 'p-debounce'
 import { mapGetters, mapMutations } from 'vuex'
+import VInspectionBacklogItems from '@/components/VInspectionBacklogItems'
 
 export default {
   name: 'Inspection',
+
+  components: { VInspectionBacklogItems },
+
+  props: {
+    readOnly: {
+      type: Boolean,
+      default: false
+    }
+  },
 
   data: () => ({
     activeKey: [],
@@ -168,6 +203,23 @@ export default {
         .concat(backlogItems)
         .concat(overallModelItems)
         .concat(interfaceItems)
+    },
+
+    readOnlyItems () {
+      if (!this.readOnly) {
+        return []
+      }
+
+      return this.items
+        .map(item =>
+          item.criteria
+            .filter(criterion => criterion.status === false)
+            .map(criterion => ({
+              item,
+              criterion
+            }))
+        )
+        .reduce((acc, x) => acc.concat(x), [])
     }
   },
 
