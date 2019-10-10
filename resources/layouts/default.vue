@@ -13,32 +13,32 @@
         :style="{ lineHeight: '64px', 'background-color': 'rgba(0, 0, 0, 0) !important' }"
         @click="clickMenuItem"
       >
-        <template v-if="isLoggedIn && isProjectSelected">
+        <template v-if="showMenu">
           <a-menu-item key="canvas">
             Canvas
           </a-menu-item>
 
-          <a-menu-item key="goal-sketch" :disabled="currentStep < 2">
+          <a-menu-item key="goal-sketch" :disabled="!insideFake && currentStep < 2">
             Goal Sketch
           </a-menu-item>
 
-          <a-menu-item key="backlog-page" :disabled="currentStep < 2">
+          <a-menu-item key="backlog-page" :disabled="!insideFake && currentStep < 2">
             Backlog
           </a-menu-item>
 
-          <a-menu-item key="overall-model" :disabled="currentStep < 2">
+          <a-menu-item key="overall-model" :disabled="!insideFake && currentStep < 2">
             Overall Model
           </a-menu-item>
 
-          <a-menu-item key="interfaces" :disabled="currentStep < 2">
+          <a-menu-item key="interfaces" :disabled="insideFake && currentStep < 2">
             Interfaces
           </a-menu-item>
 
-          <a-menu-item key="inspection" :disabled="currentStep < 2">
+          <a-menu-item key="inspection" :disabled="!insideFake && currentStep < 2">
             Inspection
           </a-menu-item>
 
-          <a-menu-item key="inspection-backlog" :disabled="currentStep < 2">
+          <a-menu-item key="inspection-backlog" :disabled="!insideFake && currentStep < 2">
             Inspection Backlog
           </a-menu-item>
         </template>
@@ -48,16 +48,15 @@
             <a-menu-item
               key="logout"
               style="float: right"
-              @click="$router.push('/logout')"
+              @click="$router.push({ name: 'logout' })"
             >
               Logout
             </a-menu-item>
 
             <a-menu-item
-
               key="projects"
               style="float: right"
-              @click="$router.push('/projects')"
+              @click="$router.push({ name: 'projects' })"
             >
               Projects
             </a-menu-item>
@@ -67,7 +66,7 @@
             <a-menu-item
               key="register"
               style="float: right"
-              @click="$router.push('/register')"
+              @click="$router.push({ name: 'register' })"
             >
               Register
             </a-menu-item>
@@ -75,7 +74,7 @@
             <a-menu-item
               key="login"
               style="float: right"
-              @click="$router.push('/login')"
+              @click="$router.push({ name: 'login' })"
             >
               Login
             </a-menu-item>
@@ -117,11 +116,29 @@ export default {
     ...mapGetters('project', [
       'isProjectSelected',
       'currentStep'
-    ])
+    ]),
+
+    insideFake () {
+      return this.$route.fullPath.includes('/fake')
+    },
+
+    showMenu () {
+      if (this.insideFake) {
+        return true
+      }
+
+      return this.isLoggedIn && this.isProjectSelected
+    }
   },
 
   methods: {
     clickMenuItem ({key}) {
+      const special = ['login', 'register', 'projects', 'logout']
+
+      if (special.includes(key) && this.insideFake) {
+        return this.$router.push(`../${key}`)
+      }
+
       this.$router.push(key)
     }
   }

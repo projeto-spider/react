@@ -1,6 +1,8 @@
 <template>
   <section class="container">
-    Hello World
+    <nuxt-link to="/fake/canvas">
+      Fake Project
+    </nuxt-link>
   </section>
 </template>
 

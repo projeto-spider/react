@@ -21,6 +21,7 @@
           :story="story"
           :wrong-position="storiesWithWrongPosition.includes(story)"
           :read-only="readOnly"
+          :scale="scale"
           @update="updated => $emit('update', updated)"
           @breakdown="$emit('create', index + 1)"
           @delete="$emit('delete', story)"

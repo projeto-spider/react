@@ -56,7 +56,7 @@
           @change="update"
         >
           <a-select-option
-            v-for="(item, i) in currentProject ? currentProject.scale : []"
+            v-for="(item, i) in scale"
             :key="i"
             :value="item"
           >{{ item }}</a-select-option>
@@ -106,7 +106,6 @@ THEN < expectation >`"
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
 import StringArrayModel from '@/components/StringArrayModel'
 import pDebounce from 'p-debounce'
 
@@ -131,6 +130,11 @@ export default {
     readOnly: {
       type: Boolean,
       default: false
+    },
+
+    scale: {
+      type: Array,
+      default: () => []
     }
   },
 
@@ -139,16 +143,10 @@ export default {
     model: {}
   }),
 
-  computed: {
-    ...mapGetters('project', [
-      'currentProject'
-    ])
-  },
-
   created () {
     const model = JSON.parse(JSON.stringify(this.story))
 
-    if (this.currentProject && this.currentProject.scale && !this.currentProject.scale.includes(model.priority)) {
+    if (!this.scale.includes(model.priority)) {
       model.priority = ''
     }
 
