@@ -34,6 +34,15 @@
               class="foreign-div ant-alert ant-alert-info ant-alert-no-icon ant-alert-with-description"
             >
               <span ref="editableSpan" :contenteditable="contentEditable" class="node-text ant-alert-description" v-html="text"></span>
+
+              <div
+                v-if="touchPoint"
+                class="foreign-div-form"
+              >
+                <a-input size="small" placeholder="File name" v-model="filename" @change="$emit('updatedForm', id)" />
+                <a-input size="small" placeholder="File location" v-model="folder" @change="$emit('updatedForm', id)" />
+                <a-input size="small" placeholder="Tool (optional)" v-model="tool" @change="$emit('updatedForm', id)" />
+              </div>
             </div>
           </foreignObject>
 
@@ -221,8 +230,8 @@ import IconAdd from '@/components/icons/add'
 import IconStart from '@/components/icons/start'
 import IconEnd from '@/components/icons/end'
 
-const MIN_WIDTH = 100
-const MIN_HEIGHT = 50
+const MIN_WIDTH = 200
+const MIN_HEIGHT = 120
 const INITIAL_WIDTH = 200
 const INITIAL_HEIGHT = 100
 const DIAMOND_WIDTH = 100
@@ -286,6 +295,24 @@ export default {
       default: false
     },
 
+    initialFilename: {
+      type: String,
+      required: false,
+      default: ''
+    },
+
+    initialFolder: {
+      type: String,
+      required: false,
+      default: ''
+    },
+
+    initialTool: {
+      type: String,
+      required: false,
+      default: ''
+    },
+
     initialX: {
       type: Number,
       required: true
@@ -326,6 +353,10 @@ export default {
     showControls: false,
     contentEditable: false,
 
+    filename: '',
+    folder: '',
+    tool: '',
+
     cursorOffset: {
       x: 0,
       y: 0
@@ -353,6 +384,9 @@ export default {
     this.height = this.type !== 'box' ? DIAMOND_HEIGHT : Math.max(MIN_HEIGHT, this.initialHeight)
     this.touchPoint = this.initialTouchPoint
     this.contentEditable = this.isNew
+    this.filename = this.initialFilename
+    this.folder = this.initialFolder
+    this.tool = this.initialTool
     this.showControls = this.isNew
   },
 
@@ -521,7 +555,10 @@ export default {
         height: this.height,
         text: this.text,
         touchPoint: this.touchPoint,
-        type: this.type
+        type: this.type,
+        filename: this.filename,
+        folder: this.folder,
+        tool: this.tool
       }
     },
 
@@ -599,11 +636,26 @@ export default {
 <style>
 .foreign-div {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   height: 100%;
   text-align: center;
   overflow: hidden;
+  padding: 0px!important;
+}
+
+.foreign-div span {
+  padding: 15px 15px 0 15px;
+  flex: 1 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.foreign-div-form {
+  background-color: white;
+  width: 100%;
 }
 
 .draggable {

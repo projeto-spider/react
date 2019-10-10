@@ -41,6 +41,9 @@
         :id="node.id"
         :initial-text="node.text"
         :initial-type="node.type"
+        :initial-filename="node.filename || ''"
+        :initial-folder="node.folder || ''"
+        :initial-tool="node.tool || ''"
         :svg-width="width"
         :svg-height="height"
         :initial-x="node.x"
@@ -56,6 +59,7 @@
         @deleteNode="handleDeleteNode"
         @changeTouchPoint="handleChangeTouchPoint"
         @changeType="handleChangeType"
+        @updatedForm="handleUpdatedForm"
         @click.native="handleStepClick()"
       />
     </svg>
@@ -220,6 +224,10 @@ export default {
       this.handleUpdatePosition(id)
     },
 
+    handleUpdatedForm (id) {
+      this.handleUpdatePosition(id)
+    },
+
     handleStepClick (stepId) {
       if (!this.nextEdgeFromId || !this.nextEdgeToId) {
         return
@@ -251,6 +259,9 @@ export default {
       const type = 'box'
       const width = 200
       const height = 100
+      const filename = ''
+      const folder = ''
+      const tool = ''
 
       const x = Math.abs(this.camera.x) + e.pageX - (width * 0.5)
       const y = Math.abs(this.camera.y) + e.pageY - (height * 0.5)
@@ -263,7 +274,10 @@ export default {
         y,
         width,
         height,
-        isNew
+        isNew,
+        filename,
+        folder,
+        tool
       })
 
       // Wait for ref to be generated
