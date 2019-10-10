@@ -3,217 +3,61 @@
     <a-layout-sider style="background-color: unset" :width="360">
       <VSiderListCrud
         v-if="currentProject"
-        :open-module-id="openModule && openModule.id"
-        :read-only="true"
-        @moduleOpen="onModuleOpen"
-        @moduleDeleted="onModuleDelete"
+        item-label="Module"
+        :items="modules"
+        :open-item-id="openModule && openModule.id"
+        read-only
+        @open="onModuleOpen"
+        @create="onCreateModule"
+        @update="onUpdateModule"
+        @delete="onDeleteModule"
       />
     </a-layout-sider>
 
     <a-layout>
       <a-layout-content>
-        <a-row style="overflow-x: auto; display: flex; height: 100%; margin-left: 10px">
-          <a-col v-if="false" :span="openModule ? 12 : 24">
+        <a-row>
+          <a-col :span="openModule ? 12 : 24">
             <div v-if="!openModule" style="text-align: center">
               <h3>Open a module</h3>
             </div>
-            <div v-else-if="false">
-              <a-button
-                type="primary"
-                style="margin: 0 auto 15px; width: 400px; display: block"
-                @click="addGoal()"
-              >
-                Create Goal
-              </a-button>
 
-              <Draggable
-                v-model="goals"
-                @change="onChangeOrder"
-              >
-                <transition-group name="goal-list">
-                  <div
-                    v-for="goal in goals"
-                    :key="goal.id"
-                    class="ant-card ant-card-bordered ant-card-hoverable"
-                    style="max-width: 400px; margin: 15px auto"
-                  >
-                    <div class="ant-card-body">
-                      <div class="ant-card-meta">
-                        <div class="ant-card-meta-detail">
-                          <div class="ant-card-meta-description">
-                            <a-textarea
-                              placeholder="Write your goal"
-                              :autosize="{ minRows: 1, maxRows: 5 }"
-                              v-model="goal.title"
-                              @change="() => onChangeTitle(goal)"
-                            />
-
-                            <br><br>
-
-                            <a-select
-                              mode="multiple"
-                              placeholder="Personas"
-                              :defaultValue="goal.personas ? goal.personas.map(persona => persona.id) : []"
-                              style="width: 100%"
-                              @select="personaId => onSelectPersona(goal, personaId)"
-                              @deselect="personaId => onDeselectPersona(goal, personaId)"
-                            >
-                              <a-select-option v-for="persona in personas" :key="persona.id">
-                                {{ persona.name }}
-                              </a-select-option>
-                            </a-select>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <ul class="ant-card-actions">
-                      <li style="width: 33.3333%;">
-                        <span :class="{ 'invalid-order': itemsWithWrongPosition.includes(goal) }">
-                          <a-tooltip>
-                            <template v-if="itemsWithWrongPosition.includes(goal)" slot='title'>
-                              <span>Wrong priority.</span>
-                              <br>
-                              <span>High > Medium > Low.</span>
-                            </template>
-                            <a-select :defaultValue="goal.priority" style="width: 120px; text-aling: center" @change="value => onChangePriority(goal, value)">
-                              <a-select-option :value="0">Low</a-select-option>
-                              <a-select-option :value="1">Medium</a-select-option>
-                              <a-select-option :value="2">High</a-select-option>
-                            </a-select>
-                          </a-tooltip>
-                        </span>
-                      </li>
-
-                      <li style="width: 33.3333%;">
-                        <span>
-                          <a-select :defaultValue="goal.type" style="width: 120px; text-aling: center" @change="value => onChangeType(goal, value)">
-                            <a-select-option :value="0">Business</a-select-option>
-                            <a-select-option :value="1">Constraint</a-select-option>
-                          </a-select>
-                        </span>
-                      </li>
-
-                      <li style="width: 33.3333%;">
-                        <a-popconfirm
-                          title="Are you sure delete this entry?"
-                          @confirm="deleteGoal(goal)"
-                          okText="Yes"
-                          cancelText="No"
-                        >
-                          <a-button type="danger">Delete</a-button>
-                        </a-popconfirm>
-                      </li>
-                    </ul>
-
-                    <div class="fab-group">
-                      <a-button
-                        type="primary"
-                        shape="circle"
-                        icon="cluster"
-                        @click="journeyGoal = goal"
-                      />
-
-                      <a-button
-                        type="primary"
-                        shape="circle"
-                        icon="ordered-list"
-                        @click="doOpenGoal(goal)"
-                      />
-                    </div>
-                  </div>
-                </transition-group>
-              </Draggable>
+            <div v-else>
+              <VGoals
+                :goals="goals"
+                :personas="personas"
+                read-only
+                @create="onCreateGoal"
+                @changeTitle="onChangeGoalTitle"
+                @changePriority="onChangeGoalPriority"
+                @changeType="onGoalChangeType"
+                @delete="onDeleteGoal"
+                @open="onOpenGoal"
+                @changeOrder="onChangeGoalsOrder"
+                @personaSelected="onGoalPersonaSelected"
+                @personaDeselected="onGoalPersonaDeselected"
+                @openJourney="onOpenJourney"
+              />
             </div>
           </a-col>
 
-          <template v-if="openModule">
-            <a-col
-              v-for="(goal, i) in goals"
-              :key="i"
-              :span="11"
-            >
-              <div
-                class="ant-card ant-card-bordered ant-card-hoverable"
-                style="max-width: 400px; margin: 15px auto;"
-              >
-                <div class="ant-card-body">
-                  <div class="ant-card-meta">
-                    <div class="ant-card-meta-detail">
-                      <div class="ant-card-meta-description">
-                        <a-textarea
-                          placeholder="Write your goal"
-                          :autosize="{ minRows: 1, maxRows: 5 }"
-                          v-model="goal.title"
-                          disabled
-                          @change="() => onChangeTitle(goal)"
-                        />
-
-                        <br><br>
-
-                        <a-select
-                          mode="multiple"
-                          placeholder="Personas"
-                          :defaultValue="goal.personas ? goal.personas.map(persona => persona.id) : []"
-                          style="width: 100%"
-                          disabled
-                          @select="personaId => onSelectPersona(goal, personaId)"
-                          @deselect="personaId => onDeselectPersona(goal, personaId)"
-                        >
-                          <a-select-option v-for="persona in personas" :key="persona.id">
-                            {{ persona.name }}
-                          </a-select-option>
-                        </a-select>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <ul class="ant-card-actions">
-                  <li style="width: 50%;">
-                    <span :class="{ 'invalid-order': itemsWithWrongPosition.includes(goal) }">
-                      <a-tooltip>
-                        <template v-if="itemsWithWrongPosition.includes(goal)" slot='title'>
-                          <span>Wrong priority.</span>
-                          <br>
-                          <span>High > Medium > Low.</span>
-                        </template>
-                        <a-select :defaultValue="goal.priority" style="width: 120px; text-aling: center" @change="value => onChangePriority(goal, value)" disabled>
-                          <a-select-option :value="0">Low</a-select-option>
-                          <a-select-option :value="1">Medium</a-select-option>
-                          <a-select-option :value="2">High</a-select-option>
-                        </a-select>
-                      </a-tooltip>
-                    </span>
-                  </li>
-
-                  <li style="width: 50%;">
-                    <span>
-                      <a-select :defaultValue="goal.type" style="width: 120px; text-aling: center" @change="value => onChangeType(goal, value)" disabled>
-                        <a-select-option :value="0">Business</a-select-option>
-                        <a-select-option :value="1">Constraint</a-select-option>
-                      </a-select>
-                    </span>
-                  </li>
-                </ul>
-
-                <div class="fab-group" style="z-index: 100">
-                  <a-button
-                    type="primary"
-                    shape="circle"
-                    icon="cluster"
-                    @click="journeyGoal = goal"
-                  />
-                </div>
-              </div>
-
+          <a-col v-if="openModule" :span="12">
+            <div v-if="!openGoal" style="text-align: center">
+              <h3>Open a goal</h3>
+            </div>
+            <div v-else>
               <VBacklog
-                style="padding: 0 5px"
-                :goal="goal"
-                :read-only="true"
+                :goal="openGoal"
+                :stories="stories"
+                :scale="currentProject.scale"
+                read-only
+                @create="onCreateStory"
+                @update="onUpdateStory"
+                @delete="onDeleteStory"
+                @changeOrder="onChangeStoriesOrder"
               />
-            </a-col>
-          </template>
+            </div>
+          </a-col>
         </a-row>
       </a-layout-content>
     </a-layout>
@@ -236,6 +80,7 @@ import { mapGetters, mapState } from 'vuex'
 import pDebounce from 'p-debounce'
 import Draggable from 'vuedraggable'
 import VSiderListCrud from '@/components/VSiderListCrud'
+import VGoals from '@/components/VGoals'
 import Diagram from '@/components/Diagram'
 import VBacklog from '@/components/VBacklog'
 import { setTimeout } from 'timers'
@@ -243,10 +88,12 @@ import { setTimeout } from 'timers'
 export default {
   name: 'GoalSketch',
 
-  components: { Draggable, VSiderListCrud, VBacklog, Diagram },
+  components: { Draggable, VSiderListCrud, VGoals, VBacklog, Diagram },
 
   data: () => ({
+    modules: [],
     goals: [],
+    stories: [],
     openModule: false,
     openGoal: false,
     journeyGoal: false
@@ -277,11 +124,118 @@ export default {
       }
 
       return `/api/projects/${this.currentProject.id}/modules/${this.openModule.id}`
+    },
+
+    baseGoalUrl () {
+      if (!this.baseUrl || !this.openGoal) {
+        return false
+      }
+
+      const {id} = this.openGoal
+      return `${this.baseUrl}/goals/${id}`
+    },
+
+    baseUrlStories () {
+      if (!this.baseGoalUrl) {
+        return false
+      }
+
+      return `${this.baseGoalUrl}/stories`
+    },
+  },
+
+  created () {
+    if (!this.currentProject) {
+      return this.$router.push('/projects')
     }
+
+    const { id } = this.currentProject
+    const url = `/api/projects/${id}/modules/`
+
+    this.$axios.$get(url)
+      .then(modules => {
+        this.modules = modules
+      })
+      .catch(() => {
+        this.$message.error('Failed to load modules')
+      })
   },
 
   methods: {
-    addGoal () {
+    // Modules
+
+    onModuleOpen (mod) {
+      this.order = []
+      this.openModule = mod
+      this.openGoal = false
+      this.refreshGoals()
+    },
+
+    onCreateModule () {
+      const defaultName = 'Module'
+      const defaultLike = this.modules
+        .map(project => project.title)
+        .filter(title => title.indexOf(defaultName) === 0)
+        .map(title => title.split(' ').pop())
+        .map(numberString => Number(numberString))
+        .filter(x => x)
+        .sort()
+
+      const countDefaultLike = defaultLike.length
+      const nextNumber = countDefaultLike
+        ? defaultLike.pop() + 1
+        : 1
+
+      const title = `${defaultName} ${nextNumber}`
+
+      const { id } = this.currentProject
+      const url = `/api/projects/${id}/modules/`
+      this.$axios.$post(url, { title })
+        .then(mod => {
+          this.modules.push(mod)
+        })
+        .catch(() => {
+          this.$message.error('Failed to create module')
+        })
+    },
+
+    onUpdateModule (mod, title) {
+      const payload = { title }
+
+      const { id } = this.currentProject
+      const url = `/api/projects/${id}/modules/${mod.id}`
+
+      this.$axios.$put(url, payload)
+        .then(data => {
+          this.$message.success(`Module ${data.title} updated`)
+        })
+        .catch(() => {
+          this.$message.error('Failed to update module')
+        })
+    },
+
+    onDeleteModule(mod) {
+      const { id } = this.currentProject
+      const url = `/api/projects/${id}/modules/${mod.id}`
+
+      this.$axios.$delete(url)
+        .then(() => {
+          if (this.openModule && this.openModule.id === mod.id) {
+            this.openModule = false
+          }
+
+          this.$message.warn(`Deleted ${mod.title}`)
+          const index = this.modules.indexOf(mod)
+          this.modules.splice(index, 1)
+        })
+        .catch(() => {
+          this.$message.error('Failed to delete module')
+        })
+    },
+
+    // Goals
+
+    onCreateGoal() {
       const defaultData = {
         title: ''
       }
@@ -289,10 +243,56 @@ export default {
       this.$axios.$post(`${this.baseUrl}/goals`, defaultData)
         .then(goal => {
           this.goals.unshift(goal)
-          this.onChangeOrder()
+          this.updateGoalsOrder()
+        })
+        .catch(err => {
+          this.$message.error('Failed to create goal')
+        })
+    },
+
+    onChangeGoalTitle: pDebounce(function onChangeGoalTitle (goal) {
+      this.updateGoal(goal)
+    }, 500),
+
+    onChangeGoalPriority (goal, value) {
+      goal.priority = value
+      this.updateGoal(goal)
+    },
+
+    onGoalChangeType (goal, value) {
+      goal.type = value
+      this.updateGoal(goal)
+    },
+
+    onDeleteGoal(goal) {
+      if (!goal || !goal.id) {
+        return
+      }
+
+      this.$axios.$delete(`${this.baseUrl}/goals/${goal.id}`)
+        .then(() => {
+          const index = this.goals.indexOf(goal)
+          if (index !== -1) {
+            this.goals.splice(index, 1)
+            this.updateGoalsOrder()
+          }
         })
         .catch(() => {
-          this.$message.error('Failed to create goal')
+          this.$message.error('Failed to delete goal')
+        })
+    },
+
+    onGoalPersonaSelected (goal, personaId) {
+      return this.$axios.$post(`${this.baseUrl}/goals/${goal.id}/personas`, { personaId })
+        .catch(() => {
+          this.$message.error('Failed to add persona to goal')
+        })
+    },
+
+    onGoalPersonaDeselected (goal, personaId) {
+      return this.$axios.$delete(`${this.baseUrl}/goals/${goal.id}/personas/${personaId}`)
+        .catch(() => {
+          this.$message.error('Failed to delete persona goal')
         })
     },
 
@@ -309,36 +309,13 @@ export default {
         })
     },
 
-    deleteGoal (goal) {
-      if (!goal || !goal.id) {
-        return
-      }
+    onOpenGoal (goal) {
+      this.openGoal = false
 
-      this.$axios.$delete(`${this.baseUrl}/goals/${goal.id}`)
-        .then(() => {
-          const index = this.goals.indexOf(goal)
-          if (index !== -1) {
-            this.goals.splice(index, 1)
-            this.onChangeOrder()
-          }
-        })
-        .catch(() => {
-          this.$message.error('Failed to delete goal')
-        })
-    },
-
-    onChangeTitle: pDebounce(function onChangeTitle (goal, value) {
-      this.updateGoal(goal)
-    }, 500),
-
-    onChangePriority (goal, value) {
-      goal.priority = value
-      this.updateGoal(goal)
-    },
-
-    onChangeType (goal, value) {
-      goal.type = value
-      this.updateGoal(goal)
+      setTimeout(() => {
+        this.openGoal = goal
+        this.refreshStories()
+      }, 1)
     },
 
     refreshGoals () {
@@ -365,39 +342,23 @@ export default {
         })
     },
 
-    onChangeOrder () {
-      const goals = this.goals.map(({id}) => id)
-      return this.$axios.$put(this.baseUrl, { goals })
+    updateGoalsOrder () {
+      const order = this.goals.map(({id}) => id)
+      return this.onChangeGoalsOrder(order)
+    },
+
+    onChangeGoalsOrder (order) {
+      return this.$axios.$put(this.baseUrl, { goals: order })
         .then(mod => {
           Object.assign(this.openModule, mod)
         })
-    },
-
-    onModuleOpen (mod) {
-      this.order = []
-      this.openModule = mod
-      this.openGoal = false
-      this.refreshGoals()
-    },
-
-    onModuleDelete (mod) {
-      if (this.openModule && this.openModule.id === mod.id) {
-        this.openModule = false
-      }
-    },
-
-    onSelectPersona (goal, personaId) {
-      return this.$axios.$post(`${this.baseUrl}/goals/${goal.id}/personas`, { personaId })
         .catch(() => {
-          this.$message.error('Failed to add persona to goal')
+          this.$message.error('Failed to save goals order')
         })
     },
 
-    onDeselectPersona (goal, personaId) {
-      return this.$axios.$delete(`${this.baseUrl}/goals/${goal.id}/personas/${personaId}`)
-        .catch(() => {
-          this.$message.error('Failed to delete persona goal')
-        })
+    onOpenJourney (goal) {
+      this.journeyGoal = goal
     },
 
     onChangeJourney (journey) {
@@ -416,16 +377,85 @@ export default {
         })
     },
 
-    doOpenGoal (goal) {
-      this.openGoal = false
+    // Backlog
 
-      setTimeout(() => this.openGoal = goal, 1)
-    }
-  },
+    refreshStories() {
+      const goal = this.openGoal
+      const order = goal.stories
 
-  created () {
-    if (!this.currentProject) {
-      return this.$router.push('/projects')
+      this.$axios.$get(this.baseUrlStories)
+        .then(stories => {
+          const leftOutStories = this.stories.filter(story =>
+            !order.includes(story.id)
+          )
+
+          for (let story of leftOutStories) {
+            this.deleteStory(story)
+          }
+
+          this.stories = order
+            .map(id => stories.find(story => story.id === id))
+            .filter(x => x)
+        })
+    },
+
+    onCreateStory (index = 0) {
+      const defaultData = {
+        title: '',
+        priority: '',
+        businessRules: [],
+        acceptanceScenarios: []
+      }
+
+      this.$axios.$post(this.baseUrlStories, defaultData)
+        .then(story => {
+          this.stories.splice(index, 0, story)
+          this.onChangeStoriesOrder()
+        })
+        .catch(() => {
+          this.$message.error('Failed to create story')
+        })
+
+    },
+
+    onUpdateStory (story) {
+      const url = `${this.baseUrlStories}/${story.id}`
+      this.$axios.$put(url, story)
+        .then(updated => {
+          const original = this.stories.find(some => some.id === story.id)
+
+          if (original) {
+            Object.assign(original, updated)
+          }
+        })
+        .catch(() => {
+          this.$message.error('Failed to update story')
+        })
+    },
+
+    onDeleteStory (story) {
+      const url = `${this.baseUrlStories}/${story.id}`
+      this.$axios.$delete(url)
+        .then(() => {
+          const index = this.stories.findIndex(({id}) => id === story.id)
+
+          if (index === -1) {
+            return
+          }
+
+          this.stories.splice(index, 1)
+          this.onChangeStoriesOrder()
+        })
+        .catch(() => {
+          this.$message.error('Failed to delete story')
+        })
+    },
+
+    onChangeStoriesOrder(order = this.stories.map(story => story.id)) {
+      return this.$axios.$put(this.baseGoalUrl, { stories: order })
+        .then(goal => {
+          // TODO
+        })
     }
   }
 }
@@ -440,6 +470,7 @@ export default {
   position: absolute;
   top: -13px;
   right: -16px;
+  z-index: 100;
 }
 
 .fab-group .ant-btn {

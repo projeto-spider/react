@@ -1,6 +1,7 @@
 <template>
   <div>
     <a-button
+      v-if="!readOnly"
       type="primary"
       style="margin: 0 auto 15px; width: 400px; display: block"
       @click="$emit('create')"
@@ -8,9 +9,16 @@
       Create Goal
     </a-button>
 
-    <Draggable
+    <component
+      :is="readOnly ? 'div' : 'Draggable'"
       :list="goals"
-      @change="$emit('changeOrder', goals.map(goal => goal.id))"
+      @change="
+        if (readOnly) {
+          return
+        }
+
+        $emit('changeOrder', goals.map(goal => goal.id))
+      "
     >
       <transition-group name="goal-list">
         <div
@@ -27,6 +35,7 @@
                     placeholder="Write your goal"
                     :autosize="{ minRows: 1, maxRows: 5 }"
                     v-model="goal.title"
+                    :disabled="readOnly"
                     @change="() => $emit('changeTitle', goal)"
                   />
 
@@ -37,6 +46,7 @@
                     placeholder="Personas"
                     :defaultValue="goal.personas ? goal.personas.map(persona => persona.id) : []"
                     style="width: 100%"
+                    :disabled="readOnly"
                     @select="personaId => $emit('personaSelected', goal, personaId)"
                     @deselect="personaId => $emit('personaDeselected', goal, personaId)"
                   >
@@ -50,7 +60,7 @@
           </div>
 
           <ul class="ant-card-actions">
-            <li style="width: 33.3333%;">
+            <li :style="`width: ${readOnly ? '50%' : '33.3333%'};`">
               <span :class="{ 'invalid-order': itemsWithWrongPosition.includes(goal) }">
                 <a-tooltip>
                   <template v-if="itemsWithWrongPosition.includes(goal)" slot='title'>
@@ -61,6 +71,7 @@
                   <a-select
                     :defaultValue="goal.priority"
                     style="width: 120px; text-aling: center"
+                    :disabled="readOnly"
                     @change="value => $emit('changePriority', goal, value)"
                   >
                     <a-select-option :value="0">Low</a-select-option>
@@ -71,11 +82,12 @@
               </span>
             </li>
 
-            <li style="width: 33.3333%;">
+            <li :style="`width: ${readOnly ? '50%' : '33.3333%'};`">
               <span>
                 <a-select
                   :defaultValue="goal.type"
                   style="width: 120px; text-aling: center"
+                  :disabled="readOnly"
                   @change="type => $emit('changeType', goal, type)"
                 >
                   <a-select-option :value="0">Business</a-select-option>
@@ -84,7 +96,7 @@
               </span>
             </li>
 
-            <li style="width: 33.3333%;">
+            <li v-if="!readOnly" style="width: 33.3333%;">
               <a-popconfirm
                 title="Are you sure delete this entry?"
                 @confirm="$emit('delete', goal)"
@@ -113,7 +125,7 @@
           </div>
         </div>
       </transition-group>
-    </Draggable>
+    </component>
   </div>
 </template>
 
@@ -129,7 +141,8 @@ export default {
 
   props: {
     goals: Array,
-    personas: Array
+    personas: Array,
+    readOnly: Boolean
   },
 
   computed: {
