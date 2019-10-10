@@ -28,6 +28,10 @@
 
         <div class="ant-collapse-content ant-collapse-content-active" v-if="openTabs[i]">
           <div class="ant-collapse-content-box">
+            <div v-if="item.isGoal" style="margin-bottom: 10px;">
+              This inspection is reflects the <strong>Goal</strong> itself, it's <strong>Journey</strong> and it's <strong>User Stories</strong>.
+            </div>
+
             <a-row
               v-for="(criterion, j) in item.criteria"
               :key="j"
@@ -131,9 +135,10 @@ export default {
         },
         ...this.goals[mod.id].map(goal => ({
           title: `Module :: ${mod.title} :: Goal :: ${goal.title}`,
+          isGoal: true,
           criteria: criteria.map(criterion =>
-              this.inspectionFor(`goal:${goal.id}:${criterion}`, criterion)
-            )
+            this.inspectionFor(`goal:${goal.id}:${criterion}`, criterion)
+          )
         }))
       ])
         .reduce((acc, x) => acc.concat(x), [])
