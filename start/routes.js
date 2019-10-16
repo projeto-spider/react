@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 /*
 |--------------------------------------------------------------------------
@@ -23,6 +23,18 @@ Route.group(() => {
   Route.resource('projects', 'ProjectController')
     .apiOnly()
     .middleware('auth')
+  Route.get(
+    '/projects/:projects_id/members',
+    'ProjectController.listMembers'
+  ).middleware('auth')
+  Route.post(
+    '/projects/:projects_id/members',
+    'ProjectController.addMember'
+  ).middleware('auth')
+  Route.delete(
+    '/projects/:projects_id/members/:id',
+    'ProjectController.removeMember'
+  ).middleware('auth')
   // Project Personas Resource
   Route.resource('projects.personas', 'PersonaController')
     .apiOnly()

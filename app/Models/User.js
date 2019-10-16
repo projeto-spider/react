@@ -35,7 +35,11 @@ class User extends Model {
   }
 
   projects () {
-    return this.hasMany('App/Models/Project', 'id', 'ownerId')
+    return this.belongsToMany(
+      'App/Models/Project',
+      'userId',
+      'projectId'
+    ).pivotTable('user_projects')
   }
 }
 

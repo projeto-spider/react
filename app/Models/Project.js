@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
 const Model = use('Model')
@@ -36,8 +36,12 @@ class Project extends Model {
     return JSON.stringify(obj)
   }
 
-  owner () {
-    return this.belongsTo('App/Models/User', 'ownerId')
+  members () {
+    return this.belongsToMany(
+      'App/Models/User',
+      'projectId',
+      'userId'
+    ).pivotTable('user_projects')
   }
 
   personas () {

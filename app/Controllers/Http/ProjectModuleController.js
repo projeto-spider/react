@@ -6,7 +6,7 @@ class ProjectModuleController {
   async index ({ auth, request }) {
     const project = await auth.user
       .projects()
-      .where('id', request.params.projects_id)
+      .where('projects.id', request.params.projects_id)
       .first()
 
     return await project.modules().fetch()
@@ -15,7 +15,7 @@ class ProjectModuleController {
   async show ({ auth, request, response }) {
     const project = await auth.user
       .projects()
-      .where('id', request.params.projects_id)
+      .where('projects.id', request.params.projects_id)
       .first()
 
     if (!project) {
@@ -41,7 +41,7 @@ class ProjectModuleController {
   async store ({ auth, request, response }) {
     const project = await auth.user
       .projects()
-      .where('id', request.params.projects_id)
+      .where('projects.id', request.params.projects_id)
       .first()
 
     if (!project) {
@@ -60,7 +60,7 @@ class ProjectModuleController {
   async update ({ auth, request, response }) {
     const project = await auth.user
       .projects()
-      .where('id', request.params.projects_id)
+      .where('projects.id', request.params.projects_id)
       .first()
 
     if (!project) {
@@ -90,7 +90,7 @@ class ProjectModuleController {
   async destroy ({ auth, request, response }) {
     const project = await auth.user
       .projects()
-      .where('id', request.params.projects_id)
+      .where('projects.id', request.params.projects_id)
       .first()
 
     if (!project) {

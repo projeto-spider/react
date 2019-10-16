@@ -6,7 +6,7 @@ class StoryController {
   async index ({ auth, request, response }) {
     const project = await auth.user
       .projects()
-      .where('id', request.params.projects_id)
+      .where('projects.id', request.params.projects_id)
       .first()
 
     if (!project) {
@@ -45,7 +45,7 @@ class StoryController {
   async show ({ auth, request, response }) {
     const project = await auth.user
       .projects()
-      .where('id', request.params.projects_id)
+      .where('projects.id', request.params.projects_id)
       .first()
 
     if (!project) {
@@ -93,7 +93,7 @@ class StoryController {
   async store ({ auth, request, response }) {
     const project = await auth.user
       .projects()
-      .where('id', request.params.projects_id)
+      .where('projects.id', request.params.projects_id)
       .first()
 
     if (!project) {
@@ -134,7 +134,7 @@ class StoryController {
   async update ({ auth, request, response }) {
     const project = await auth.user
       .projects()
-      .where('id', request.params.projects_id)
+      .where('projects.id', request.params.projects_id)
       .first()
 
     if (!project) {
@@ -186,7 +186,7 @@ class StoryController {
   async destroy ({ auth, request, response }) {
     const project = await auth.user
       .projects()
-      .where('id', request.params.projects_id)
+      .where('projects.id', request.params.projects_id)
       .first()
 
     if (!project) {
