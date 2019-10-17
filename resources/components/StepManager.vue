@@ -1,9 +1,20 @@
 <template>
   <div style="position: fixed; bottom: 15px; right: 15px">
     <a-button-group>
-      <a-button type="primary" icon="menu-unfold" @click="modalVisible = true"/>
-      <a-button disabled style="cursor: default; color: black">{{ currentStepName[0] }} - {{ currentStepName[1] }}</a-button>
-      <a-button @click="nextStep" type="primary" :disabled="!canContinue" icon="caret-right" />
+      <a-button
+        type="primary"
+        icon="menu-unfold"
+        @click="modalVisible = true"
+      />
+      <a-button disabled style="cursor: default; color: black">
+        {{ currentStepName[0] }} - {{ currentStepName[1] }}
+      </a-button>
+      <a-button
+        type="primary"
+        :disabled="!canContinue"
+        icon="caret-right"
+        @click="nextStep"
+      />
     </a-button-group>
 
     <div
@@ -11,26 +22,55 @@
       class="ant-modal-mask"
       style="background-color: rgba(0, 0, 0, 0.75)"
       @click="modalVisible = false"
-    ></div>
+    />
 
-    <div class="ant-modal-wrap ant-modal-progress" v-show="modalVisible" @click="modalVisible = false">
-      <a-steps progressDot :current="ceremoniesCount" class="animated fadeInUp" style="animation-delay: .2s">
-        <a-step v-for="(ceremony, i) in ceremonies" :key="i" :title="ceremony.name" />
+    <div
+      v-show="modalVisible"
+      class="ant-modal-wrap ant-modal-progress"
+      @click="modalVisible = false"
+    >
+      <a-steps
+        progress-dot
+        :current="ceremoniesCount"
+        class="animated fadeInUp"
+        style="animation-delay: .2s"
+      >
+        <a-step
+          v-for="(ceremony, i) in ceremonies"
+          :key="i"
+          :title="ceremony.name"
+        />
       </a-steps>
 
       <div style="margin: 50px auto 0">
-        <a-steps v-if="openCeremony" direction="vertical" :current="ceremoniesPartCount" class="animated fadeInUp" style="animation-delay: .3s">
-          <a-step v-for="(step, i) in openCeremony.parts" :key="i" :title="step" />
+        <a-steps
+          v-if="openCeremony"
+          direction="vertical"
+          :current="ceremoniesPartCount"
+          class="animated fadeInUp"
+          style="animation-delay: .3s"
+        >
+          <a-step
+            v-for="(step, i) in openCeremony.parts"
+            :key="i"
+            :title="step"
+          />
         </a-steps>
       </div>
 
-      <a-button type="primary" class="btn-continue" @click="modalVisible = false">Hide</a-button>
+      <a-button
+        type="primary"
+        class="btn-continue"
+        @click="modalVisible = false"
+      >
+        Hide
+      </a-button>
     </div>
   </div>
 </template>
 
 <script>
-import {mapGetters, mapMutations} from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 import { ceremonies } from '@/react'
 
 export default {
@@ -49,35 +89,37 @@ export default {
       'canContinue'
     ]),
 
-    openCeremony () {
-      return this.ceremonies.find(ceremony => ceremony.name === this.currentCeremony.name)
+    openCeremony() {
+      return this.ceremonies.find(
+        ceremony => ceremony.name === this.currentCeremony.name
+      )
     },
 
-    ceremoniesCount () {
+    ceremoniesCount() {
       const currentCeremonyIndex = this.ceremonies.indexOf(this.openCeremony)
       return currentCeremonyIndex
     },
 
-    ceremoniesPartCount () {
-      const currentPartIndex = this.openCeremony.parts.indexOf(this.currentStepName[1])
+    ceremoniesPartCount() {
+      const currentPartIndex = this.openCeremony.parts.indexOf(
+        this.currentStepName[1]
+      )
       return currentPartIndex
     }
   },
 
-  mounted () {
+  watch: {
+    currentStepName() {
+      this.modalVisible = true
+    }
+  },
+
+  mounted() {
     this.openCeremonyIndex = ceremonies.indexOf(this.currentCeremony)
   },
 
   methods: {
-    ...mapMutations('project', [
-      'nextStep'
-    ])
-  },
-
-  watch: {
-    currentStepName () {
-      this.modalVisible = true
-    }
+    ...mapMutations('project', ['nextStep'])
   }
 }
 </script>
@@ -106,23 +148,23 @@ export default {
 
 @keyframes fadeInUp {
   from {
-    transform: translate3d(0,40px,0)
+    transform: translate3d(0, 40px, 0);
   }
 
   to {
-    transform: translate3d(0,0,0);
-    opacity: 1
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
   }
 }
 
 @-webkit-keyframes fadeInUp {
   from {
-    transform: translate3d(0,40px,0)
+    transform: translate3d(0, 40px, 0);
   }
 
   to {
-    transform: translate3d(0,0,0);
-    opacity: 1
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
   }
 }
 
@@ -132,7 +174,7 @@ export default {
 }
 
 .animatedFadeInUp {
-  opacity: 0
+  opacity: 0;
 }
 
 .fadeInUp {

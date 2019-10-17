@@ -1,5 +1,13 @@
 <template>
-  <div :style="{ background: '#fff', padding: '24px', minHeight: '280px', margin: '0 auto', maxWidth: '640px' }">
+  <div
+    :style="{
+      background: '#fff',
+      padding: '24px',
+      minHeight: '280px',
+      margin: '0 auto',
+      maxWidth: '640px'
+    }"
+  >
     <a-form
       id="auth-form"
       :form="form"
@@ -14,27 +22,23 @@
           ]"
           placeholder="email"
         >
-          <a-icon
-            slot="prefix"
-            type="user"
-            style="color: rgba(0,0,0,.25)"
-          />
+          <a-icon slot="prefix" type="user" style="color: rgba(0,0,0,.25)" />
         </a-input>
       </a-form-item>
       <a-form-item>
         <a-input
           v-decorator="[
             'password',
-            { rules: [{ required: true, message: 'Please input your Password!' }] }
+            {
+              rules: [
+                { required: true, message: 'Please input your Password!' }
+              ]
+            }
           ]"
           type="password"
           placeholder="Password"
         >
-          <a-icon
-            slot="prefix"
-            type="lock"
-            style="color: rgba(0,0,0,.25)"
-          />
+          <a-icon slot="prefix" type="lock" style="color: rgba(0,0,0,.25)" />
         </a-input>
       </a-form-item>
       <a-form-item>
@@ -43,26 +47,20 @@
             'remember',
             {
               valuePropName: 'checked',
-              initialValue: true,
+              initialValue: true
             }
           ]"
         >
           Remember me
         </a-checkbox>
-        <a
-          class="login-form-forgot"
-          href=""
-        >
+        <a class="login-form-forgot" href="">
           Forgot password
         </a>
-        <a-button
-          type="primary"
-          html-type="submit"
-          class="login-form-button"
-        >
+        <a-button type="primary" html-type="submit" class="login-form-button">
           Log in
         </a-button>
-        Or <nuxt-link to="/register">
+        Or
+        <nuxt-link to="/register">
           register now!
         </nuxt-link>
       </a-form-item>
@@ -78,25 +76,21 @@ export default {
 
   middleware: 'notAuthenticated',
 
-  beforeCreate () {
+  computed: {},
+
+  beforeCreate() {
     this.form = this.$form.createForm(this)
   },
 
-  computed: {
-
-  },
-
-  mounted () {
+  mounted() {
     const email = localStorage.getItem('lastEmail') || ''
     this.form.setFieldsValue({ email })
   },
 
   methods: {
-    ...mapActions('auth', [
-      'login'
-    ]),
+    ...mapActions('auth', ['login']),
 
-    handleSubmit (e) {
+    handleSubmit(e) {
       e.preventDefault()
 
       this.form.validateFields((err, credentials) => {
@@ -107,7 +101,7 @@ export default {
         if (!err) {
           const { email, password } = credentials
 
-          this.login(credentials)
+          this.login({ email, password })
             .then(() => {
               this.$router.push('/projects')
             })

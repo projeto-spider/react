@@ -6,11 +6,11 @@
       </a-button>
     </p>
 
-    <a-card style="max-width: 640px; margin: 0 auto;" class="ant-card-no-padding">
-      <a-list
-        itemLayout="horizontal"
-        :dataSource="interfaces"
-      >
+    <a-card
+      style="max-width: 640px; margin: 0 auto;"
+      class="ant-card-no-padding"
+    >
+      <a-list item-layout="horizontal" :data-source="interfaces">
         <a-list-item
           slot="renderItem"
           slot-scope="interfac"
@@ -21,9 +21,9 @@
             v-if="!readOnly"
             slot="actions"
             title="Are you sure delete this card?"
+            ok-text="Yes"
+            cancel-text="No"
             @confirm="deleteInterface(interfac)"
-            okText="Yes"
-            cancelText="No"
           >
             <a href="#">Delete</a>
           </a-popconfirm>
@@ -32,20 +32,21 @@
 
           <a-list-item-meta>
             <template slot="title">
-              <form
-                v-if="editing === interfac"
-                @submit.prevent="openInterface"
-              >
+              <form v-if="editing === interfac" @submit.prevent="openInterface">
                 <a-input
+                  v-model="interfac.title"
                   size="small"
                   placeholder="Title"
-                  v-model="interfac.title"
-                  @blur="closeEditing()"
                   autofocus
+                  @blur="closeEditing()"
                 />
               </form>
 
-              <span v-else style="mouse: pointer" @click="openNameInput(interfac)">
+              <span
+                v-else
+                style="mouse: pointer"
+                @click="openNameInput(interfac)"
+              >
                 {{ interfac.title }}
               </span>
             </template>
@@ -80,21 +81,20 @@ export default {
   }),
 
   computed: {
-    ...mapGetters('project', [
-      'currentProject'
-    ])
+    ...mapGetters('project', ['currentProject'])
   },
 
-  created () {
+  created() {
     this.loadInterfaces()
   },
 
   methods: {
-    loadInterfaces () {
+    loadInterfaces() {
       const { id } = this.currentProject
       const url = `/api/projects/${id}/interfaces/`
 
-      this.$axios.$get(url)
+      this.$axios
+        .$get(url)
         .then(interfaces => {
           this.interfaces = interfaces
           this.$emit('updateInterfaces', interfaces)
@@ -104,12 +104,12 @@ export default {
         })
     },
 
-    openNameInput (mod) {
+    openNameInput(mod) {
       this.closeEditing()
       this.editing = mod
     },
 
-    createInterface () {
+    createInterface() {
       const defaultName = 'Interface'
       const defaultLike = this.interfaces
         .map(card => card.title)
@@ -120,15 +120,14 @@ export default {
         .sort()
 
       const countDefaultLike = defaultLike.length
-      const nextNumber = countDefaultLike
-        ? defaultLike.pop() + 1
-        : 1
+      const nextNumber = countDefaultLike ? defaultLike.pop() + 1 : 1
 
       const title = `${defaultName} ${nextNumber}`
 
       const { id } = this.currentProject
       const url = `/api/projects/${id}/interfaces/`
-      this.$axios.$post(url, { title })
+      this.$axios
+        .$post(url, { title })
         .then(mod => {
           this.interfaces.push(mod)
           this.$emit('updateInterfaces', this.interfaces)
@@ -138,30 +137,32 @@ export default {
         })
     },
 
-    openInterface () {
-      const { title } = this.editing
-      const payload = { title }
+    // openInterface() {
+    //   const { title } = this.editing
+    //   const payload = { title }
 
-      const { id } = this.currentProject
-      const url = `/api/projects/${id}/interfaces/${this.editing.id}`
-      this.$axios.$put(url, payload)
-        .then(data => {
-          this.$message.success(`Class ${data.title} updated`)
-        })
-        .catch(() => {
-          this.$message.error('Failed to update module')
-        })
-      this.editing = false
-    },
+    //   const { id } = this.currentProject
+    //   const url = `/api/projects/${id}/interfaces/${this.editing.id}`
+    //   this.$axios
+    //     .$put(url, payload)
+    //     .then(data => {
+    //       this.$message.success(`Class ${data.title} updated`)
+    //     })
+    //     .catch(() => {
+    //       this.$message.error('Failed to update module')
+    //     })
+    //   this.editing = false
+    // },
 
-    deleteInterface (mod) {
+    deleteInterface(mod) {
       if (this.editing === mod) {
         this.editing = false
       }
 
       const { id } = this.currentProject
       const url = `/api/projects/${id}/interfaces/${mod.id}`
-      this.$axios.$delete(url)
+      this.$axios
+        .$delete(url)
         .then(() => {
           this.$emit('interfaceDeleted', mod)
           this.$message.warn(`Deleted ${mod.title}`)
@@ -174,7 +175,7 @@ export default {
         })
     },
 
-    closeEditing () {
+    closeEditing() {
       if (this.editing) {
         this.openInterface()
       }
@@ -182,7 +183,7 @@ export default {
       this.editing = false
     },
 
-    openInterface (mod) {
+    openInterface(mod) {
       this.$emit('interfaceOpen', mod)
     }
   }

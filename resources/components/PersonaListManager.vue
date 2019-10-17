@@ -14,22 +14,18 @@
                 <a-popconfirm
                   slot="actions"
                   title="Are you sure delete this entry?"
+                  ok-text="Yes"
+                  cancel-text="No"
                   @confirm="deletePersona(persona)"
-                  okText="Yes"
-                  cancelText="No"
                 >
-                  <a-button
-                    shape="circle"
-                    icon="delete"
-                    size="small"
-                  />
+                  <a-button shape="circle" icon="delete" size="small" />
                 </a-popconfirm>
 
                 <a-button
-                  @click="openPersona(persona)"
                   shape="circle"
                   icon="edit"
                   size="small"
+                  @click="openPersona(persona)"
                 />
               </div>
             </div>
@@ -38,23 +34,20 @@
       </div>
     </div>
 
-    <a-button
-      @click="addPersona()"
-      type="dashed"
-      block
-      :disabled="disabled"
-    >
+    <a-button type="dashed" block :disabled="disabled" @click="addPersona()">
       Add
     </a-button>
 
     <a-modal
-      centered
       v-model="modalOpen"
-      @ok="closeModal"
+      centered
       :width="960"
-      :afterClose="closeModal"
+      :after-close="closeModal"
+      @ok="closeModal"
     >
-      <div class="ant-table ant-table-scroll-position-left ant-table-default ant-table-bordered">
+      <div
+        class="ant-table ant-table-scroll-position-left ant-table-default ant-table-bordered"
+      >
         <div class="ant-table-content">
           <div class="ant-table-body">
             <table v-if="editingPersona" style="width: 100%">
@@ -64,7 +57,10 @@
                     <span class="ant-table-row-indent indent-level-0">
                       <p>
                         <strong data-v-step="personas-1">Name</strong>
-                        <a-input v-model="editingPersona.name" :auto-focus="true" />
+                        <a-input
+                          v-model="editingPersona.name"
+                          :auto-focus="true"
+                        />
                       </p>
 
                       <p>
@@ -75,7 +71,10 @@
                   </td>
 
                   <td style="width: 50%">
-                    <span class="ant-table-row-indent indent-level-0" data-v-step="personas-3">
+                    <span
+                      class="ant-table-row-indent indent-level-0"
+                      data-v-step="personas-3"
+                    >
                       <strong>Profile / Behaviors</strong>
                       <ListManager v-model="editingPersona.data.profile" />
                     </span>
@@ -84,21 +83,29 @@
 
                 <tr class="ant-table-row ant-table-row-level-0">
                   <td style="width: 50%">
-                    <span class="ant-table-row-indent indent-level-0" data-v-step="personas-4">
+                    <span
+                      class="ant-table-row-indent indent-level-0"
+                      data-v-step="personas-4"
+                    >
                       <strong>Expectations</strong>
                       <ListManager v-model="editingPersona.data.expectations" />
                     </span>
                   </td>
 
                   <td style="width: 50%">
-                    <span class="ant-table-row-indent indent-level-0" data-v-step="personas-5">
+                    <span
+                      class="ant-table-row-indent indent-level-0"
+                      data-v-step="personas-5"
+                    >
                       <strong>Goals</strong>
 
                       <a-list
                         bordered
-                        :dataSource="editingPersona.goals || []"
+                        :data-source="editingPersona.goals || []"
                       >
-                        <a-list-item slot="renderItem" slot-scope="item">{{ item.title }}</a-list-item>
+                        <a-list-item slot="renderItem" slot-scope="item">{{
+                          item.title
+                        }}</a-list-item>
                       </a-list>
                     </span>
                   </td>
@@ -108,7 +115,7 @@
           </div>
         </div>
 
-        <v-tour name="personasTour" :steps="$options.tour.steps"></v-tour>
+        <v-tour name="personasTour" :steps="$options.tour.steps" />
       </div>
 
       <template slot="footer">
@@ -125,7 +132,6 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations } from 'vuex'
 import ListManager from '~/components/ListManager.vue'
 import pDebounce from 'p-debounce'
 import clone from 'deep-clone'
@@ -143,13 +149,25 @@ export default {
       type: Boolean,
       default: false
     },
-    personas: [Promise, Array],
-    personaAddedHandler: Function,
-    personaEditedHandler: Function,
-    personaDeletedHandler: Function,
+    personas: {
+      type: [Promise, Array],
+      required: true
+    },
+    personaAddedHandler: {
+      type: Function,
+      required: true
+    },
+    personaEditedHandler: {
+      type: Function,
+      required: true
+    },
+    personaDeletedHandler: {
+      type: Function,
+      required: true
+    }
   },
 
-  data () {
+  data() {
     return {
       model: [],
       modalOpen: false,
@@ -157,22 +175,39 @@ export default {
     }
   },
 
-  async created () {
-    const personas = Promise.resolve(this.personas)
-      .then(result =>
-        Array.isArray(result) ? clone(result) : []
-      )
+  watch: {
+    editingPersona: {
+      deep: true,
+
+      handler: pDebounce(function editingPersonaWatcher() {
+        this.updatePersona(this.editingPersona)
+      }, 500)
+    },
+
+    model: {
+      deep: true,
+
+      handler() {
+        this.$emit('personasChanged', this.model)
+      }
+    }
+  },
+
+  async created() {
+    const personas = Promise.resolve(this.personas).then(result =>
+      Array.isArray(result) ? clone(result) : []
+    )
 
     this.model = await personas
   },
 
   methods: {
-    closeModal () {
+    closeModal() {
       this.modalOpen = false
       this.editingPersona = false
     },
 
-    addPersona () {
+    addPersona() {
       const defaultData = {
         name: 'Unnamed Persona',
         role: 'Persona Role'
@@ -188,26 +223,25 @@ export default {
         })
     },
 
-    openPersona (persona) {
+    openPersona(persona) {
       this.editingPersona = persona
       this.modalOpen = true
     },
 
-    updatePersona (persona) {
+    updatePersona(persona) {
       if (!persona || !persona.id) {
         return
       }
 
-      const payload = {...persona}
+      const payload = { ...persona }
       payload.goals = undefined
 
-      this.personaEditedHandler(persona, payload)
-        .catch(() => {
-          this.$message.error('Failed to update persona')
-        })
+      this.personaEditedHandler(persona, payload).catch(() => {
+        this.$message.error('Failed to update persona')
+      })
     },
 
-    deletePersona (persona) {
+    deletePersona(persona) {
       this.personaDeletedHandler(persona)
         .then(() => {
           const index = this.model.indexOf(persona)
@@ -218,24 +252,6 @@ export default {
         .catch(() => {
           this.$message.error('Failed to delete persona')
         })
-    }
-  },
-
-  watch: {
-    editingPersona: {
-      deep: true,
-
-      handler: pDebounce(function editingPersonaWatcher () {
-        this.updatePersona(this.editingPersona)
-      }, 500)
-    },
-
-    model: {
-      deep: true,
-
-      handler () {
-        this.$emit('personasChanged', this.model)
-      }
     }
   }
 }

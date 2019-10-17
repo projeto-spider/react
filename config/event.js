@@ -1,7 +1,6 @@
 'use strict'
 
 module.exports = {
-
   /*
   |--------------------------------------------------------------------------
   | WildCard
@@ -33,5 +32,4 @@ module.exports = {
   |
   */
   maxListeners: 10
-
 }

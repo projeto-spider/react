@@ -4,27 +4,27 @@
 const Model = use('Model')
 
 class Goal extends Model {
-  getJourney (json) {
+  getJourney(json) {
     return JSON.parse(json)
   }
 
-  setJourney (obj) {
+  setJourney(obj) {
     return JSON.stringify(obj)
   }
 
-  getStories (json) {
+  getStories(json) {
     return JSON.parse(json)
   }
 
-  setStories (obj) {
+  setStories(obj) {
     return JSON.stringify(obj)
   }
 
-  owner () {
+  owner() {
     return this.belongsTo('App/Models/ProjectModule', 'moduleId')
   }
 
-  personas () {
+  personas() {
     return this.belongsToMany(
       'App/Models/Persona',
       'goalId',
@@ -32,7 +32,7 @@ class Goal extends Model {
     ).pivotTable('goal_personas')
   }
 
-  stories () {
+  stories() {
     return this.hasMany('App/Models/Story', 'id', 'goalId')
   }
 }

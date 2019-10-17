@@ -1,8 +1,5 @@
 <template>
-  <a-layout
-    id="header"
-    class="layout"
-  >
+  <a-layout id="header" class="layout">
     <a-layout-header
       class="ant-layout-header-auth"
       :class="{ 'ant-layout-header-logged-in': isLoggedIn }"
@@ -10,7 +7,10 @@
       <a-menu
         :theme="isLoggedIn ? 'dark' : 'light'"
         mode="horizontal"
-        :style="{ lineHeight: '64px', 'background-color': 'rgba(0, 0, 0, 0) !important' }"
+        :style="{
+          lineHeight: '64px',
+          'background-color': 'rgba(0, 0, 0, 0) !important'
+        }"
         @click="clickMenuItem"
       >
         <template v-if="showMenu">
@@ -18,27 +18,45 @@
             Canvas
           </a-menu-item>
 
-          <a-menu-item key="goal-sketch" :disabled="!insideFake && currentStep < 2">
+          <a-menu-item
+            key="goal-sketch"
+            :disabled="!insideFake && currentStep < 2"
+          >
             Goal Sketch
           </a-menu-item>
 
-          <a-menu-item key="backlog-page" :disabled="!insideFake && currentStep < 2">
+          <a-menu-item
+            key="backlog-page"
+            :disabled="!insideFake && currentStep < 2"
+          >
             Backlog
           </a-menu-item>
 
-          <a-menu-item key="overall-model" :disabled="!insideFake && currentStep < 2">
+          <a-menu-item
+            key="overall-model"
+            :disabled="!insideFake && currentStep < 2"
+          >
             Overall Model
           </a-menu-item>
 
-          <a-menu-item key="interfaces" :disabled="insideFake && currentStep < 2">
+          <a-menu-item
+            key="interfaces"
+            :disabled="insideFake && currentStep < 2"
+          >
             Interfaces
           </a-menu-item>
 
-          <a-menu-item key="inspection" :disabled="!insideFake && currentStep < 2">
+          <a-menu-item
+            key="inspection"
+            :disabled="!insideFake && currentStep < 2"
+          >
             Inspection
           </a-menu-item>
 
-          <a-menu-item key="inspection-backlog" :disabled="!insideFake && currentStep < 2">
+          <a-menu-item
+            key="inspection-backlog"
+            :disabled="!insideFake && currentStep < 2"
+          >
             Inspection Backlog
           </a-menu-item>
         </template>
@@ -86,7 +104,7 @@
     <a-layout-content style="padding: 0 10px">
       <div style="margin: 16px 0" />
       <nuxt />
-      <StepManager v-if="isProjectSelected"></StepManager>
+      <StepManager v-if="isProjectSelected" />
     </a-layout-content>
 
     <a-layout-footer style="text-align: center">
@@ -102,27 +120,22 @@ import StepManager from '@/components/StepManager'
 export default {
   components: { StepManager },
 
-  data () {
+  data() {
     return {
       collapsed: false
     }
   },
 
   computed: {
-    ...mapGetters('auth', [
-      'isLoggedIn'
-    ]),
+    ...mapGetters('auth', ['isLoggedIn']),
 
-    ...mapGetters('project', [
-      'isProjectSelected',
-      'currentStep'
-    ]),
+    ...mapGetters('project', ['isProjectSelected', 'currentStep']),
 
-    insideFake () {
+    insideFake() {
       return this.$route.fullPath.includes('/fake')
     },
 
-    showMenu () {
+    showMenu() {
       if (this.insideFake) {
         return true
       }
@@ -132,7 +145,7 @@ export default {
   },
 
   methods: {
-    clickMenuItem ({key}) {
+    clickMenuItem({ key }) {
       const special = ['login', 'register', 'projects', 'logout']
 
       if (special.includes(key) && this.insideFake) {
@@ -146,7 +159,8 @@ export default {
 </script>
 
 <style>
-html, body {
+html,
+body {
   background-color: #f0f2f5 !important;
 }
 
@@ -160,7 +174,7 @@ html, body {
   background-position: 50% 50%;
   background-repeat: no-repeat;
   background-size: 0% 100%;
-  transition: background-size .5s, color .5s;
+  transition: background-size 0.5s, color 0.5s;
 }
 
 .ant-layout-header.ant-layout-header-auth.ant-layout-header-logged-in {

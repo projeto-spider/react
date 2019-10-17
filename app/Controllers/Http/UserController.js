@@ -2,12 +2,11 @@
 const User = use('App/Models/User')
 
 class UserController {
-  async store ({ request, response }) {
+  async store({ request, response }) {
     const data = request.all()
     const { email } = data
 
-    const emailExists = await User
-      .query()
+    const emailExists = await User.query()
       .where('email', email)
       .first()
 
@@ -22,12 +21,12 @@ class UserController {
     return user
   }
 
-  async login ({ auth, request }) {
+  async login({ auth, request }) {
     const { email, password } = request.all()
     return await auth.attempt(email, password)
   }
 
-  me ({ auth, params }) {
+  me({ auth }) {
     return auth.user
   }
 }

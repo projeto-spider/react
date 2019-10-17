@@ -37,8 +37,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
-import pDebounce from 'p-debounce'
+import { mapGetters } from 'vuex'
 import VSiderListCrud from '@/components/VSiderListCrud'
 import VCrcCardForm from '@/components/VCrcCardForm'
 
@@ -65,11 +64,9 @@ export default {
   }),
 
   computed: {
-    ...mapGetters('project', [
-      'currentProject'
-    ]),
+    ...mapGetters('project', ['currentProject']),
 
-    baseUrl () {
+    baseUrl() {
       if (!this.currentProject || !this.openCrcCard) {
         return false
       }
@@ -78,7 +75,7 @@ export default {
     }
   },
 
-  created () {
+  created() {
     if (!this.currentProject) {
       return this.$router.push('/projects')
     }
@@ -88,11 +85,12 @@ export default {
   },
 
   methods: {
-    loadModules () {
+    loadModules() {
       const { id } = this.currentProject
       const url = `/api/projects/${id}/modules/`
 
-      this.$axios.$get(url)
+      this.$axios
+        .$get(url)
         .then(modules => {
           this.modules = modules
         })
@@ -101,11 +99,12 @@ export default {
         })
     },
 
-    loadCrcCards () {
+    loadCrcCards() {
       const { id } = this.currentProject
       const url = `/api/projects/${id}/crc-cards/`
 
-      this.$axios.$get(url)
+      this.$axios
+        .$get(url)
         .then(crcCards => {
           this.crcCards = crcCards
         })
@@ -114,7 +113,7 @@ export default {
         })
     },
 
-    onCreateCrcCard () {
+    onCreateCrcCard() {
       const defaultName = 'Class'
       const defaultLike = this.crcCards
         .map(card => card.title)
@@ -125,15 +124,14 @@ export default {
         .sort()
 
       const countDefaultLike = defaultLike.length
-      const nextNumber = countDefaultLike
-        ? defaultLike.pop() + 1
-        : 1
+      const nextNumber = countDefaultLike ? defaultLike.pop() + 1 : 1
 
       const title = `${defaultName} ${nextNumber}`
 
       const { id } = this.currentProject
       const url = `/api/projects/${id}/crc-cards/`
-      this.$axios.$post(url, { title })
+      this.$axios
+        .$post(url, { title })
         .then(mod => {
           this.crcCards.push(mod)
         })
@@ -142,7 +140,7 @@ export default {
         })
     },
 
-    onOpenCrcCard (crcCard) {
+    onOpenCrcCard(crcCard) {
       this.openCrcCard = false
 
       setTimeout(() => {
@@ -150,7 +148,7 @@ export default {
       }, 100)
     },
 
-    onUpdateCrcCard (crcCard) {
+    onUpdateCrcCard(crcCard) {
       const payload = {
         properties: crcCard.properties.split('\n'),
         actions: crcCard.actions.split('\n'),
@@ -159,7 +157,8 @@ export default {
         title: crcCard.title
       }
 
-      this.$axios.$put(`${this.baseUrl}/crc-cards/${this.openCrcCard.id}`, payload)
+      this.$axios
+        .$put(`${this.baseUrl}/crc-cards/${this.openCrcCard.id}`, payload)
         .then(updated => {
           Object.assign(this.openCrcCard, updated)
         })
@@ -168,11 +167,12 @@ export default {
         })
     },
 
-    onDeleteCrcCard (crcCard) {
+    onDeleteCrcCard(crcCard) {
       const { id } = this.currentProject
       const url = `/api/projects/${id}/crc-cards/${crcCard.id}`
 
-      this.$axios.$delete(url)
+      this.$axios
+        .$delete(url)
         .then(() => {
           this.$message.warn(`Deleted ${crcCard.title}`)
           const index = this.crcCards.indexOf(crcCard)
@@ -186,6 +186,4 @@ export default {
 }
 </script>
 
-<style>
-</style>
-
+<style></style>

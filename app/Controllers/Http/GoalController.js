@@ -3,7 +3,7 @@
 const Goal = use('App/Models/Goal')
 
 class GoalController {
-  async index ({ auth, request, response }) {
+  async index({ auth, request, response }) {
     const project = await auth.user
       .projects()
       .where('projects.id', request.params.projects_id)
@@ -32,7 +32,7 @@ class GoalController {
       .fetch()
   }
 
-  async show ({ auth, request, response }) {
+  async show({ auth, request, response }) {
     const project = await auth.user
       .projects()
       .where('projects.id', request.params.projects_id)
@@ -70,7 +70,7 @@ class GoalController {
     return goal
   }
 
-  async store ({ auth, request, response }) {
+  async store({ auth, request, response }) {
     const project = await auth.user
       .projects()
       .where('projects.id', request.params.projects_id)
@@ -100,7 +100,7 @@ class GoalController {
     return await Goal.findOrFail(id)
   }
 
-  async update ({ auth, request, response }) {
+  async update({ auth, request, response }) {
     const project = await auth.user
       .projects()
       .where('projects.id', request.params.projects_id)
@@ -141,7 +141,7 @@ class GoalController {
     return goal
   }
 
-  async destroy ({ auth, request, response }) {
+  async destroy({ auth, request, response }) {
     const project = await auth.user
       .projects()
       .where('projects.id', request.params.projects_id)
@@ -178,7 +178,7 @@ class GoalController {
     await goal.delete()
   }
 
-  async addPersona ({ auth, request, response }) {
+  async addPersona({ auth, request, response }) {
     const project = await auth.user
       .projects()
       .where('projects.id', request.params.projects_id)
@@ -217,7 +217,7 @@ class GoalController {
     return goal.personas().attach([personaId])
   }
 
-  async removePersona ({ auth, request, response }) {
+  async removePersona({ auth, request, response }) {
     const project = await auth.user
       .projects()
       .where('projects.id', request.params.projects_id)

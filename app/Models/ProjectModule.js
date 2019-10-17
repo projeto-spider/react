@@ -4,19 +4,19 @@
 const Model = use('Model')
 
 class ProjectModule extends Model {
-  getGoals (json) {
+  getGoals(json) {
     return JSON.parse(json)
   }
 
-  setGoals (obj) {
+  setGoals(obj) {
     return JSON.stringify(obj)
   }
 
-  owner () {
+  owner() {
     return this.belongsTo('App/Models/Project', 'projectId')
   }
 
-  goals () {
+  goals() {
     return this.hasMany('App/Models/Goal', 'id', 'moduleId')
   }
 }

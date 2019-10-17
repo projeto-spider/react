@@ -4,7 +4,7 @@
 const Schema = use('Schema')
 
 class ProjectModuleSchema extends Schema {
-  up () {
+  up() {
     this.create('project_modules', table => {
       table.increments()
       table.integer('projectId').unsigned()
@@ -18,7 +18,7 @@ class ProjectModuleSchema extends Schema {
     })
   }
 
-  down () {
+  down() {
     this.drop('project_modules')
   }
 }

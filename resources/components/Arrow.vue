@@ -18,8 +18,22 @@
       </marker>
     </defs>
 
-    <path v-if="d" :d="d" stroke="red" stroke-width="10" fill="none" style="opacity: 0"/>
-    <path v-if="d" :d="d" stroke="#8c8c8c" stroke-width="3" fill="none" marker-end="url(#arrow)" />
+    <path
+      v-if="d"
+      :d="d"
+      stroke="red"
+      stroke-width="10"
+      fill="none"
+      style="opacity: 0"
+    />
+    <path
+      v-if="d"
+      :d="d"
+      stroke="#8c8c8c"
+      stroke-width="3"
+      fill="none"
+      marker-end="url(#arrow)"
+    />
   </svg>
 </template>
 
@@ -84,19 +98,17 @@ export default {
   }),
 
   computed: {
-    fromPoints () {
+    fromPoints() {
       return calculateNodePoints(this.from)
     },
 
-    toPoints () {
+    toPoints() {
       return calculateNodePoints(this.to)
     },
 
-    d () {
+    d() {
       const allPairs = this.fromPoints
-        .map(fromPoint =>
-          this.toPoints.map(toPoint => [fromPoint, toPoint])
-        )
+        .map(fromPoint => this.toPoints.map(toPoint => [fromPoint, toPoint]))
         .reduce((acc, xs) => acc.concat(xs), [])
 
       const mapByDistance = allPairs.map(pair => ({
@@ -117,7 +129,7 @@ export default {
   }
 }
 
-function calculateNodePoints ({ x, y, width, height }) {
+function calculateNodePoints({ x, y, width, height }) {
   const halfWidth = width * 0.5
   const halfHeight = height * 0.5
 
@@ -129,9 +141,7 @@ function calculateNodePoints ({ x, y, width, height }) {
   return [top, bottom, left, right]
 }
 
-function pointsDistance ([x1, y1], [x2, y2]) {
-  return Math.sqrt(
-    Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2)
-  )
+function pointsDistance([x1, y1], [x2, y2]) {
+  return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2))
 }
 </script>

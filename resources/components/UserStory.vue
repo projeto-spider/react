@@ -1,8 +1,5 @@
 <template>
-  <a-alert
-    :type="story.isSystem ? 'info': 'warning'"
-    class="user-story"
-  >
+  <a-alert :type="story.isSystem ? 'info' : 'warning'" class="user-story">
     <template slot="message">
       US-{{ String(story.id).padStart(2, '0') }}
 
@@ -24,53 +21,44 @@
           v-if="!readOnly"
           size="small"
           :icon="story.isSystem ? 'laptop' : 'user'"
-          @click="
-            model.isSystem = !model.isSystem,
-            update()
-          "
+          @click=";(model.isSystem = !model.isSystem), update()"
         />
         <a-popconfirm
           v-if="!readOnly"
           title="Are you sure delete this story?"
-          okText="Yes"
-          cancelText="No"
+          ok-text="Yes"
+          cancel-text="No"
           placement="bottom"
           @confirm="$emit('delete')"
         >
-          <a-button
-            type="danger"
-            size="small"
-            icon="delete"
-          />
+          <a-button type="danger" size="small" icon="delete" />
         </a-popconfirm>
       </a-button-group>
 
       <div style="float: right">
         <a-select
+          v-model="model.priority"
           style="min-width: 64px; text-aling: center; margin-right: 3px"
           :class="{ 'invalid-order': wrongPosition }"
           size="small"
-          :defaultValue="model.priority"
-          v-model="model.priority"
+          :default-value="model.priority"
           :disabled="readOnly"
           @change="update"
         >
-          <a-select-option
-            v-for="(item, i) in scale"
-            :key="i"
-            :value="item"
-          >{{ item }}</a-select-option>
+          <a-select-option v-for="(item, i) in scale" :key="i" :value="item">
+            {{ item }}
+          </a-select-option>
         </a-select>
       </div>
     </template>
 
     <template slot="description">
       <a-textarea
+        v-model="model.title"
         :disabled="readOnly"
         placeholder="As a < type of user >, I want < some goal > so that < some reason >."
         :autosize="{ minSize: 2 }"
         class="user-story-text-area"
-        v-model="model.title"
         @input="update"
       />
 
@@ -81,7 +69,7 @@
             v-model="model.businessRules"
             add-text="Add Business Rule"
             placeholder="Only do < action > when < condition >"
-            className="user-story-text-area"
+            class-name="user-story-text-area"
             :disabled="readOnly"
             @input="update"
           />
@@ -92,10 +80,12 @@
           <StringArrayModel
             v-model="model.acceptanceScenarios"
             add-text="Add Acceptance Scenario"
-            :placeholder="`GIVEN < state >
+            :placeholder="
+              `GIVEN < state >
 WHEN < condition >
-THEN < expectation >`"
-            className="user-story-text-area"
+THEN < expectation >`
+            "
+            class-name="user-story-text-area"
             :disabled="readOnly"
             @input="update"
           />
@@ -143,7 +133,7 @@ export default {
     model: {}
   }),
 
-  created () {
+  created() {
     const model = JSON.parse(JSON.stringify(this.story))
 
     if (!this.scale.includes(model.priority)) {
@@ -154,7 +144,7 @@ export default {
   },
 
   methods: {
-    update: pDebounce(function update () {
+    update: pDebounce(function update() {
       this.$emit('update', this.model)
     }, 500)
   }
@@ -174,6 +164,6 @@ export default {
 }
 
 .invalid-order .ant-select-selection {
-  border-color: red
+  border-color: red;
 }
 </style>

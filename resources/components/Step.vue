@@ -1,9 +1,5 @@
 <template>
-  <svg
-    :width="svgWidth"
-    :height="svgHeight"
-    style="outline: none"
-  >
+  <svg :width="svgWidth" :height="svgHeight" style="outline: none">
     <g ref="inside">
       <svg
         :x="x"
@@ -25,23 +21,48 @@
             ry="3"
             fill="white"
             stroke="#d9d9d9"
-          ></rect>
+          />
 
-          <foreignObject ref="foreign" x="0" y="0" :width="width" :height="height">
+          <foreignObject
+            ref="foreign"
+            x="0"
+            y="0"
+            :width="width"
+            :height="height"
+          >
             <div
               ref="textDiv"
               xmlns="http://www.w3.org/1999/xhtml"
               class="foreign-div ant-alert ant-alert-info ant-alert-no-icon ant-alert-with-description"
             >
-              <span ref="editableSpan" :contenteditable="contentEditable" class="node-text ant-alert-description" v-html="text"></span>
+              <!-- eslint-disable vue/no-v-html -->
+              <span
+                ref="editableSpan"
+                :contenteditable="contentEditable"
+                class="node-text ant-alert-description"
+                v-html="text"
+              />
+              <!-- eslint-enable vue/no-v-html -->
 
-              <div
-                v-if="touchPoint"
-                class="foreign-div-form"
-              >
-                <a-input size="small" placeholder="File name" v-model="filename" @change="$emit('updatedForm', id)" />
-                <a-input size="small" placeholder="File location" v-model="folder" @change="$emit('updatedForm', id)" />
-                <a-input size="small" placeholder="Tool (optional)" v-model="tool" @change="$emit('updatedForm', id)" />
+              <div v-if="touchPoint" class="foreign-div-form">
+                <a-input
+                  v-model="filename"
+                  size="small"
+                  placeholder="File name"
+                  @change="$emit('updatedForm', id)"
+                />
+                <a-input
+                  v-model="folder"
+                  size="small"
+                  placeholder="File location"
+                  @change="$emit('updatedForm', id)"
+                />
+                <a-input
+                  v-model="tool"
+                  size="small"
+                  placeholder="Tool (optional)"
+                  @change="$emit('updatedForm', id)"
+                />
               </div>
             </div>
           </foreignObject>
@@ -57,38 +78,62 @@
             rx="6"
             ry="6"
             fill="red"
-          ></ellipse>
+          />
         </template>
 
         <template v-else-if="type === 'and' || type === 'or'">
           <polygon
-            :points="`${width / 2},0 0,${height / 2} ${width / 2},${height} ${width},${height / 2}`"
+            :points="
+              `${width / 2},0 0,${height / 2} ${width /
+                2},${height} ${width},${height / 2}`
+            "
             style="fill:#f6ffed;stroke:#b7eb8f;stroke-width:1"
           />
-          <text x="50%" :y="(height / 2) + 6" fill="#52c41a" style="font-size: 64px;" dominant-baseline="middle" text-anchor="middle">
-            {{ type === 'and' ? '×' : '+'}}
+          <text
+            x="50%"
+            :y="height / 2 + 6"
+            fill="#52c41a"
+            style="font-size: 64px;"
+            dominant-baseline="middle"
+            text-anchor="middle"
+          >
+            {{ type === 'and' ? '×' : '+' }}
           </text>
         </template>
 
         <template v-else-if="type === 'start'">
-          <circle cx="50" cy="50" r="20" stroke="black" stroke-width="2" fill="white" />
+          <circle
+            cx="50"
+            cy="50"
+            r="20"
+            stroke="black"
+            stroke-width="2"
+            fill="white"
+          />
         </template>
 
         <template v-else-if="type === 'end'">
-          <circle cx="50" cy="50" r="20" stroke="black" stroke-width="10" fill="white" />
+          <circle
+            cx="50"
+            cy="50"
+            r="20"
+            stroke="black"
+            stroke-width="10"
+            fill="white"
+          />
         </template>
       </svg>
     </g>
 
     <g v-if="showControls">
-      <svg :x="x + (width / 2) - 44" :y="y - 30" :width="width">
+      <svg :x="x + width / 2 - 44" :y="y - 30" :width="width">
         <g>
           <svg
             style="cursor: pointer"
             :x="0 + (type !== 'box' ? 16 : 0)"
             @mousedown="askToDelete"
           >
-            <IconTrash style="fill: rgb(140, 140, 140)"/>
+            <IconTrash style="fill: rgb(140, 140, 140)" />
           </svg>
 
           <svg
@@ -96,45 +141,45 @@
             :x="32 + (type !== 'box' ? 16 : 0)"
             @click="startLinkMode"
           >
-            <IconArrow style="fill: rgb(140, 140, 140)"/>
+            <IconArrow style="fill: rgb(140, 140, 140)" />
           </svg>
 
           <svg
+            v-if="type === 'box'"
             style="cursor: pointer"
             :x="64"
             @click="toggleTouchPoint"
-            v-if="type === 'box'"
           >
-            <IconChecked v-if="touchPoint" style="fill: rgb(140, 140, 140)"/>
-            <IconUnchecked v-else style="fill: rgb(140, 140, 140)"/>
+            <IconChecked v-if="touchPoint" style="fill: rgb(140, 140, 140)" />
+            <IconUnchecked v-else style="fill: rgb(140, 140, 140)" />
           </svg>
         </g>
       </svg>
 
-      <svg :x="x + (width / 2) - 44" :y="y + height + 15" :width="width">
+      <svg :x="x + width / 2 - 44" :y="y + height + 15" :width="width">
         <g>
-          <svg
-            style="cursor: pointer;"
-            :x="0"
-            @click="changeType('box')"
-          >
-            <IconLetter :style="`fill: ${type === 'box' ? '#1890ff' : 'rgb(140, 140, 140)'}`" />
+          <svg style="cursor: pointer;" :x="0" @click="changeType('box')">
+            <IconLetter
+              :style="
+                `fill: ${type === 'box' ? '#1890ff' : 'rgb(140, 140, 140)'}`
+              "
+            />
           </svg>
 
-          <svg
-            style="cursor: pointer"
-            :x="32"
-            @click="changeType('and')"
-          >
-            <IconCross :style="`fill: ${type === 'and' ? '#1890ff' : 'rgb(140, 140, 140)'}`" />
+          <svg style="cursor: pointer" :x="32" @click="changeType('and')">
+            <IconCross
+              :style="
+                `fill: ${type === 'and' ? '#1890ff' : 'rgb(140, 140, 140)'}`
+              "
+            />
           </svg>
 
-          <svg
-            style="cursor: pointer"
-            :x="64"
-            @click="changeType('or')"
-          >
-            <IconAdd :style="`fill: ${type === 'or' ? '#1890ff' : 'rgb(140, 140, 140)'}`" />
+          <svg style="cursor: pointer" :x="64" @click="changeType('or')">
+            <IconAdd
+              :style="
+                `fill: ${type === 'or' ? '#1890ff' : 'rgb(140, 140, 140)'}`
+              "
+            />
           </svg>
 
           <svg
@@ -143,7 +188,11 @@
             :y="32"
             @click="changeType('start')"
           >
-            <IconStart :style="`fill: ${type === 'start' ? '#1890ff' : 'rgb(140, 140, 140)'}`" />
+            <IconStart
+              :style="
+                `fill: ${type === 'start' ? '#1890ff' : 'rgb(140, 140, 140)'}`
+              "
+            />
           </svg>
 
           <svg
@@ -152,7 +201,11 @@
             :y="32"
             @click="changeType('end')"
           >
-            <IconEnd :style="`fill: ${type === 'end' ? '#1890ff' : 'rgb(140, 140, 140)'}`" />
+            <IconEnd
+              :style="
+                `fill: ${type === 'end' ? '#1890ff' : 'rgb(140, 140, 140)'}`
+              "
+            />
           </svg>
         </g>
       </svg>
@@ -170,7 +223,7 @@
           fill="#c6bde4"
           style="cursor: nw-resize"
           @mousedown="startResize({ fixBottom: true, fixRight: true })"
-        ></ellipse>
+        />
 
         <ellipse
           :x="x"
@@ -184,7 +237,7 @@
           fill="#c6bde4"
           style="cursor: ne-resize"
           @mousedown="startResize({ fixBottom: true, fixLeft: true })"
-        ></ellipse>
+        />
 
         <ellipse
           :x="x"
@@ -198,7 +251,7 @@
           fill="#c6bde4"
           style="cursor: sw-resize"
           @mousedown="startResize({ fixTop: true, fixRight: true })"
-        ></ellipse>
+        />
 
         <ellipse
           :x="x"
@@ -212,14 +265,14 @@
           fill="#c6bde4"
           style="cursor: se-resize"
           @mousedown="startResize({ fixTop: true, fixLeft: true })"
-        ></ellipse>
+        />
       </template>
     </g>
   </svg>
 </template>
 
 <script>
-import IconPencil from '@/components/icons/pencil'
+// import IconPencil from '@/components/icons/pencil'
 import IconCross from '@/components/icons/cross'
 import IconArrow from '@/components/icons/arrow'
 import IconTrash from '@/components/icons/trash'
@@ -241,7 +294,7 @@ export default {
   name: 'Step',
 
   components: {
-    IconPencil,
+    // IconPencil,
     IconCross,
     IconArrow,
     IconTrash,
@@ -375,13 +428,19 @@ export default {
     }
   }),
 
-  created () {
+  created() {
     this.text = this.initialText
     this.type = this.initialType
     this.x = this.initialX
     this.y = this.initialY
-    this.width = this.type !== 'box' ? DIAMOND_WIDTH : Math.max(MIN_WIDTH, this.initialWidth)
-    this.height = this.type !== 'box' ? DIAMOND_HEIGHT : Math.max(MIN_HEIGHT, this.initialHeight)
+    this.width =
+      this.type !== 'box'
+        ? DIAMOND_WIDTH
+        : Math.max(MIN_WIDTH, this.initialWidth)
+    this.height =
+      this.type !== 'box'
+        ? DIAMOND_HEIGHT
+        : Math.max(MIN_HEIGHT, this.initialHeight)
     this.touchPoint = this.initialTouchPoint
     this.contentEditable = this.isNew
     this.filename = this.initialFilename
@@ -390,7 +449,7 @@ export default {
     this.showControls = this.isNew
   },
 
-  mounted () {
+  mounted() {
     this.tryToHighlightEditableSpan()
 
     if (this.isNew) {
@@ -398,12 +457,12 @@ export default {
     }
   },
 
-  beforeDestroy () {
+  beforeDestroy() {
     document.removeEventListener('mousedown', this.handleClickOutside)
   },
 
   methods: {
-    mouseDownDragging (e) {
+    mouseDownDragging(e) {
       this.displayControls()
 
       if (!this.draggable || this.contentEditable) {
@@ -420,7 +479,7 @@ export default {
       document.addEventListener('mouseup', this.mouseUpDragging)
     },
 
-    mouseMoveDragging (e) {
+    mouseMoveDragging(e) {
       const x = e.pageX
       const y = e.pageY
 
@@ -430,7 +489,7 @@ export default {
       this.$emit('updatePosition', this.id)
     },
 
-    mouseUpDragging () {
+    mouseUpDragging() {
       this.dragStart.x = null
       this.dragStart.y = null
       this.dragging = false
@@ -439,13 +498,14 @@ export default {
       document.removeEventListener('mouseup', this.mouseUpDragging)
     },
 
-    displayControls () {
+    displayControls() {
       this.showControls = true
       document.body.addEventListener('mousedown', this.handleClickOutside)
     },
 
-    handleClickOutside (e) {
-      const clickedInside = e.target.contains(this.$el) || this.$el.contains(e.target)
+    handleClickOutside(e) {
+      const clickedInside =
+        e.target.contains(this.$el) || this.$el.contains(e.target)
       if (clickedInside) {
         return
       }
@@ -459,13 +519,18 @@ export default {
       document.body.removeEventListener('click', this.handleClickOutside)
     },
 
-    resize () {
+    resize() {
       const textWidth = this.$refs.text.getComputedTextLength()
       const blockWidth = textWidth + 20
       this.blockWidth = blockWidth
     },
 
-    startResize ({ fixTop = false, fixBottom = false, fixRight = false, fixLeft = false }) {
+    startResize({
+      fixTop = false,
+      fixBottom = false,
+      fixRight = false,
+      fixLeft = false
+    }) {
       this.fixedPositions.top = fixTop && this.y
       this.fixedPositions.bottom = fixBottom && this.y + this.height
       this.fixedPositions.right = fixRight && this.x + this.width
@@ -476,9 +541,9 @@ export default {
       document.addEventListener('mouseup', this.mouseUpResizing)
     },
 
-    mouseMoveResize (e) {
-      const x = e.pageX + (-this.camera.x)
-      const y = e.pageY + (-this.camera.y)
+    mouseMoveResize(e) {
+      const x = e.pageX + -this.camera.x
+      const y = e.pageY + -this.camera.y
 
       if (this.fixedPositions.top) {
         this.height = Math.max(MIN_HEIGHT, y - this.fixedPositions.top)
@@ -507,14 +572,14 @@ export default {
       })
     },
 
-    mouseUpResizing () {
+    mouseUpResizing() {
       this.resizing = false
 
       document.removeEventListener('mousemove', this.mouseMoveResize)
       document.removeEventListener('mouseup', this.mouseUpResizing)
     },
 
-    toggleContentEditable (e) {
+    toggleContentEditable(e) {
       e.preventDefault()
       e.stopPropagation()
 
@@ -539,7 +604,7 @@ export default {
       setTimeout(() => this.tryToHighlightEditableSpan(), 1)
     },
 
-    toggleTouchPoint (e) {
+    toggleTouchPoint() {
       this.touchPoint = !this.touchPoint
       this.$emit('changeTouchPoint', {
         id: this.id,
@@ -547,7 +612,7 @@ export default {
       })
     },
 
-    getInfo () {
+    getInfo() {
       return {
         x: this.x,
         y: this.y,
@@ -562,15 +627,19 @@ export default {
       }
     },
 
-    startLinkMode () {
+    startLinkMode() {
       if (this.contentEditable) {
         return
       }
       this.$emit('createLink', this.id, this.getInfo())
     },
 
-    tryToHighlightEditableSpan () {
-      if (this.contentEditable && this.$refs.editableSpan && this.$refs.editableSpan.focus) {
+    tryToHighlightEditableSpan() {
+      if (
+        this.contentEditable &&
+        this.$refs.editableSpan &&
+        this.$refs.editableSpan.focus
+      ) {
         this.$refs.editableSpan.focus()
 
         let range, selection
@@ -588,17 +657,17 @@ export default {
       }
     },
 
-    askToDelete () {
+    askToDelete() {
       this.$confirm({
         title: 'Do you want to delete this node?',
         onOk: () => {
           this.$emit('deleteNode', this.id)
         },
-        onCancel () {}
+        onCancel() {}
       })
     },
 
-    changeType (type) {
+    changeType(type) {
       if (type === this.type) {
         return
       }
@@ -642,7 +711,7 @@ export default {
   height: 100%;
   text-align: center;
   overflow: hidden;
-  padding: 0px!important;
+  padding: 0px !important;
 }
 
 .foreign-div span {
@@ -668,7 +737,7 @@ export default {
 }
 
 .content-editable {
-  cursor: text!important;
+  cursor: text !important;
 }
 
 .node-text {

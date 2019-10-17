@@ -1,15 +1,13 @@
 <template>
   <a-card :bordered="false" style="width: 100%" :title="projectName">
-    <a-button
-      slot="extra"
-      type="primary"
-      @click="$tours.canvasTour.start()"
-    >
+    <a-button slot="extra" type="primary" @click="$tours.canvasTour.start()">
       <a-icon type="info-circle" />
       Tutorial
     </a-button>
 
-    <div class="ant-table ant-table-scroll-position-left ant-table-default ant-table-bordered">
+    <div
+      class="ant-table ant-table-scroll-position-left ant-table-default ant-table-bordered"
+    >
       <div class="ant-table-content">
         <div class="ant-table-body">
           <table v-if="model" style="width: 100%">
@@ -55,7 +53,9 @@
                   <span class="ant-table-row-indent indent-level-0">
                     <strong>
                       <span>Personas</span>
-                      <span v-if="!enablePersonas" style="color: red">(Complete the other fields)</span>
+                      <span v-if="!enablePersonas" style="color: red"
+                        >(Complete the other fields)</span
+                      >
                     </strong>
 
                     <PersonaListManager
@@ -75,12 +75,11 @@
       </div>
     </div>
 
-    <v-tour name="canvasTour" :steps="$options.tour.steps"></v-tour>
+    <v-tour name="canvasTour" :steps="$options.tour.steps" />
   </a-card>
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
 import clone from 'deep-clone'
 import ListManager from '~/components/ListManager.vue'
 import PersonaListManager from '~/components/PersonaListManager.vue'
@@ -91,19 +90,40 @@ export default {
 
   tour,
 
-  props: {
-    projectName: String,
-    canvas: [Object, Boolean],
-    personas: [Promise, Array],
-    enablePersonas: Boolean,
-    personaAddedHandler: Function,
-    personaEditedHandler: Function,
-    personaDeletedHandler: Function,
-  },
-
   components: { ListManager, PersonaListManager },
 
-  data () {
+  props: {
+    projectName: {
+      type: String,
+      required: true
+    },
+    canvas: {
+      type: [Object, Boolean],
+      required: true
+    },
+    personas: {
+      type: [Promise, Array],
+      required: true
+    },
+    enablePersonas: {
+      type: Boolean,
+      required: true
+    },
+    personaAddedHandler: {
+      type: Function,
+      required: true
+    },
+    personaEditedHandler: {
+      type: Function,
+      required: true
+    },
+    personaDeletedHandler: {
+      type: Function,
+      required: true
+    }
+  },
+
+  data() {
     return {
       model: this.canvas ? clone(this.canvas) : {}
     }
@@ -112,11 +132,10 @@ export default {
   watch: {
     model: {
       deep: true,
-      handler () {
+      handler() {
         this.$emit('canvasChanged', this.model)
       }
     }
   }
 }
 </script>
-

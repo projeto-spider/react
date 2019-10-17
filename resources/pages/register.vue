@@ -1,5 +1,13 @@
 <template>
-  <div :style="{ background: '#fff', padding: '24px', minHeight: '280px', margin: '0 auto', maxWidth: '640px' }">
+  <div
+    :style="{
+      background: '#fff',
+      padding: '24px',
+      minHeight: '280px',
+      margin: '0 auto',
+      maxWidth: '640px'
+    }"
+  >
     <a-form
       id="auth-form"
       :form="form"
@@ -10,15 +18,15 @@
         <a-input
           v-decorator="[
             'name',
-            { rules: [{ required: true, message: 'Please input your display name!' }] }
+            {
+              rules: [
+                { required: true, message: 'Please input your display name!' }
+              ]
+            }
           ]"
           placeholder="Display name"
         >
-          <a-icon
-            slot="prefix"
-            type="user"
-            style="color: rgba(0,0,0,.25)"
-          />
+          <a-icon slot="prefix" type="user" style="color: rgba(0,0,0,.25)" />
         </a-input>
       </a-form-item>
       <a-form-item>
@@ -26,21 +34,22 @@
           v-decorator="[
             'email',
             {
-              rules: [{
-                type: 'email', message: 'The input is not valid E-mail!',
-              }, {
-                required: true, message: 'Please input your E-mail!',
-              }]
+              rules: [
+                {
+                  type: 'email',
+                  message: 'The input is not valid E-mail!'
+                },
+                {
+                  required: true,
+                  message: 'Please input your E-mail!'
+                }
+              ]
             }
           ]"
           type="email"
           placeholder="Email"
         >
-          <a-icon
-            slot="prefix"
-            type="lock"
-            style="color: rgba(0,0,0,.25)"
-          />
+          <a-icon slot="prefix" type="lock" style="color: rgba(0,0,0,.25)" />
         </a-input>
       </a-form-item>
       <a-form-item>
@@ -48,21 +57,21 @@
           v-decorator="[
             'password',
             {
-              rules: [{
-                required: true, message: 'Please input your password!',
-              }, {
-                validator: validateToNextPassword,
-              }],
+              rules: [
+                {
+                  required: true,
+                  message: 'Please input your password!'
+                },
+                {
+                  validator: validateToNextPassword
+                }
+              ]
             }
           ]"
           type="password"
           placeholder="Password"
         >
-          <a-icon
-            slot="prefix"
-            type="lock"
-            style="color: rgba(0,0,0,.25)"
-          />
+          <a-icon slot="prefix" type="lock" style="color: rgba(0,0,0,.25)" />
         </a-input>
       </a-form-item>
       <a-form-item>
@@ -70,22 +79,22 @@
           v-decorator="[
             'passwordConfirm',
             {
-              rules: [{
-                required: true, message: 'Please confirm your password!',
-              }, {
-                validator: compareToFirstPassword,
-              }],
+              rules: [
+                {
+                  required: true,
+                  message: 'Please confirm your password!'
+                },
+                {
+                  validator: compareToFirstPassword
+                }
+              ]
             }
           ]"
           type="password"
           placeholder="Password confirmation"
           @blur="handleConfirmBlur"
         >
-          <a-icon
-            slot="prefix"
-            type="lock"
-            style="color: rgba(0,0,0,.25)"
-          />
+          <a-icon slot="prefix" type="lock" style="color: rgba(0,0,0,.25)" />
         </a-input>
       </a-form-item>
       <a-form-item>
@@ -96,7 +105,8 @@
         >
           Register
         </a-button>
-        Or <nuxt-link to="/login">
+        Or
+        <nuxt-link to="/login">
           login now!
         </nuxt-link>
       </a-form-item>
@@ -114,21 +124,19 @@ export default {
     confirmDirty: false
   }),
 
-  beforeCreate () {
+  beforeCreate() {
     this.form = this.$form.createForm(this)
   },
 
   methods: {
-    ...mapActions('auth', [
-      'register'
-    ]),
+    ...mapActions('auth', ['register']),
 
-    handleSubmit (e) {
+    handleSubmit(e) {
       e.preventDefault()
       this.form.validateFieldsAndScroll((err, data) => {
         if (!err) {
           this.register(data)
-            .then(user => {
+            .then(() => {
               this.$router.push('/')
             })
             .catch(err => {
@@ -138,12 +146,12 @@ export default {
       })
     },
 
-    handleConfirmBlur  (e) {
+    handleConfirmBlur(e) {
       const value = e.target.value
       this.confirmDirty = this.confirmDirty || !!value
     },
 
-    compareToFirstPassword  (rule, value, callback) {
+    compareToFirstPassword(rule, value, callback) {
       const form = this.form
       if (value && value !== form.getFieldValue('password')) {
         // eslint-disable-next-line
@@ -153,7 +161,7 @@ export default {
       }
     },
 
-    validateToNextPassword  (rule, value, callback) {
+    validateToNextPassword(rule, value, callback) {
       const form = this.form
       if (value && this.confirmDirty) {
         form.validateFields(['passwordConfirm'], { force: true })

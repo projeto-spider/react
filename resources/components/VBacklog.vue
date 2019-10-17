@@ -32,7 +32,6 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
 import Draggable from 'vuedraggable'
 import UserStory from '@/components/UserStory'
 
@@ -50,9 +49,15 @@ export default {
       required: true
     },
 
-    stories: Array,
+    stories: {
+      type: Array,
+      required: true
+    },
 
-    scale: Array,
+    scale: {
+      type: Array,
+      required: true
+    },
 
     readOnly: {
       type: Boolean,
@@ -61,7 +66,7 @@ export default {
   },
 
   computed: {
-    storiesWithWrongPosition () {
+    storiesWithWrongPosition() {
       const scale = this.scale || []
 
       return this.stories.filter((story, i, stories) => {
@@ -72,17 +77,15 @@ export default {
         const priority = scale.indexOf(story.priority)
 
         const priorities = stories.map(story => scale.indexOf(story.priority))
-        const before = priorities
-          .slice(0, i)
-          .filter(x => x !== -1)
-        const after = priorities
-          .slice(i + 1)
-          .filter(x => x !== -1)
+        const before = priorities.slice(0, i).filter(x => x !== -1)
+        const after = priorities.slice(i + 1).filter(x => x !== -1)
 
-        return !before.every(otherPriority => priority <= otherPriority) ||
+        return (
+          !before.every(otherPriority => priority <= otherPriority) ||
           !after.every(otherPriority => priority >= otherPriority)
+        )
       })
     }
-  },
+  }
 }
 </script>

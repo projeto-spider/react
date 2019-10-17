@@ -32,25 +32,36 @@
               <div class="ant-card-meta-detail">
                 <div class="ant-card-meta-description">
                   <a-textarea
+                    v-model="goal.title"
                     placeholder="Write your goal"
                     :autosize="{ minRows: 1, maxRows: 5 }"
-                    v-model="goal.title"
                     :disabled="readOnly"
                     @change="() => $emit('changeTitle', goal)"
                   />
 
-                  <br><br>
+                  <br /><br />
 
                   <a-select
                     mode="multiple"
                     placeholder="Personas"
-                    :defaultValue="goal.personas ? goal.personas.map(persona => persona.id) : []"
+                    :default-value="
+                      goal.personas
+                        ? goal.personas.map(persona => persona.id)
+                        : []
+                    "
                     style="width: 100%"
                     :disabled="readOnly"
-                    @select="personaId => $emit('personaSelected', goal, personaId)"
-                    @deselect="personaId => $emit('personaDeselected', goal, personaId)"
+                    @select="
+                      personaId => $emit('personaSelected', goal, personaId)
+                    "
+                    @deselect="
+                      personaId => $emit('personaDeselected', goal, personaId)
+                    "
                   >
-                    <a-select-option v-for="persona in personas" :key="persona.id">
+                    <a-select-option
+                      v-for="persona in personas"
+                      :key="persona.id"
+                    >
                       {{ persona.name }}
                     </a-select-option>
                   </a-select>
@@ -61,15 +72,22 @@
 
           <ul class="ant-card-actions">
             <li :style="`width: ${readOnly ? '50%' : '33.3333%'};`">
-              <span :class="{ 'invalid-order': itemsWithWrongPosition.includes(goal) }">
+              <span
+                :class="{
+                  'invalid-order': itemsWithWrongPosition.includes(goal)
+                }"
+              >
                 <a-tooltip>
-                  <template v-if="itemsWithWrongPosition.includes(goal)" slot='title'>
+                  <template
+                    v-if="itemsWithWrongPosition.includes(goal)"
+                    slot="title"
+                  >
                     <span>Wrong priority.</span>
-                    <br>
+                    <br />
                     <span>High > Medium > Low.</span>
                   </template>
                   <a-select
-                    :defaultValue="goal.priority"
+                    :default-value="goal.priority"
                     style="width: 120px; text-aling: center"
                     :disabled="readOnly"
                     @change="value => $emit('changePriority', goal, value)"
@@ -85,7 +103,7 @@
             <li :style="`width: ${readOnly ? '50%' : '33.3333%'};`">
               <span>
                 <a-select
-                  :defaultValue="goal.type"
+                  :default-value="goal.type"
                   style="width: 120px; text-aling: center"
                   :disabled="readOnly"
                   @change="type => $emit('changeType', goal, type)"
@@ -99,11 +117,13 @@
             <li v-if="!readOnly" style="width: 33.3333%;">
               <a-popconfirm
                 title="Are you sure delete this entry?"
+                ok-text="Yes"
+                cancel-text="No"
                 @confirm="$emit('delete', goal)"
-                okText="Yes"
-                cancelText="No"
               >
-                <a-button type="danger">Delete</a-button>
+                <a-button type="danger">
+                  Delete
+                </a-button>
               </a-popconfirm>
             </li>
           </ul>
@@ -140,25 +160,31 @@ export default {
   },
 
   props: {
-    goals: Array,
-    personas: Array,
+    goals: {
+      type: Array,
+      required: true
+    },
+    personas: {
+      type: Array,
+      required: true
+    },
     readOnly: Boolean
   },
 
   computed: {
-    itemsWithWrongPosition () {
+    itemsWithWrongPosition() {
       return this.goals.filter((goal, i, goals) => {
         const before = goals.slice(0, i)
         const after = goals.slice(i + 1)
 
-        return !before.every(other => goal.priority <= other.priority) ||
+        return (
+          !before.every(other => goal.priority <= other.priority) ||
           !after.every(other => goal.priority >= other.priority)
+        )
       })
-    },
+    }
   }
 }
 </script>
 
-<style>
-
-</style>
+<style></style>

@@ -4,12 +4,13 @@ const User = use('App/Models/User')
 const Project = use('App/Models/Project')
 
 class ProjectController {
-  async index ({ auth }) {
+  async index({ auth }) {
     return await auth.user.projects().fetch()
   }
 
-  async show ({ auth, request, response }) {
-    const project = await auth.user.projects()
+  async show({ auth, request, response }) {
+    const project = await auth.user
+      .projects()
       .where('projects.id', request.params.id)
       .first()
 
@@ -22,7 +23,7 @@ class ProjectController {
     return project
   }
 
-  async store ({ auth, request }) {
+  async store({ auth, request }) {
     const data = request.all()
 
     const project = await Project.create(data)
@@ -33,8 +34,9 @@ class ProjectController {
     return project
   }
 
-  async update ({ auth, request, response }) {
-    const project = await auth.user.projects()
+  async update({ auth, request, response }) {
+    const project = await auth.user
+      .projects()
       .where('projects.id', request.params.id)
       .first()
 
@@ -51,8 +53,9 @@ class ProjectController {
     return project
   }
 
-  async destroy ({ auth, request, response }) {
-    const project = await auth.user.projects()
+  async destroy({ auth, request, response }) {
+    const project = await auth.user
+      .projects()
       .where('projects.id', request.params.id)
       .first()
 
@@ -65,7 +68,7 @@ class ProjectController {
     await project.delete()
   }
 
-  async listMembers ({ auth, request, response }) {
+  async listMembers({ auth, request, response }) {
     const project = await auth.user
       .projects()
       .where('projects.id', request.params.projects_id)
@@ -80,7 +83,7 @@ class ProjectController {
     return project.members().fetch()
   }
 
-  async addMember ({ auth, request, response }) {
+  async addMember({ auth, request, response }) {
     const project = await auth.user
       .projects()
       .where('projects.id', request.params.projects_id)
@@ -94,8 +97,7 @@ class ProjectController {
 
     const { id } = request.all()
 
-    const user = await User
-      .query()
+    const user = await User.query()
       .where('id', id)
       .first()
 
@@ -108,7 +110,7 @@ class ProjectController {
     return project.members().attach([user.id])
   }
 
-  async removeMember ({ auth, request, response }) {
+  async removeMember({ auth, request, response }) {
     const project = await auth.user
       .projects()
       .where('projects.id', request.params.projects_id)
@@ -120,8 +122,7 @@ class ProjectController {
       })
     }
 
-    const user = await User
-      .query()
+    const user = await User.query()
       .where('id', request.params.id)
       .first()
 

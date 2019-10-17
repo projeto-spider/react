@@ -8,7 +8,7 @@ import { mapActions } from 'vuex'
 export default {
   name: 'LogoutPage',
 
-  created () {
+  created() {
     this.logout()
     this.$router.push('/projects')
   },

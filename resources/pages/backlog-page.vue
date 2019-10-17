@@ -63,14 +63,26 @@
     </a-layout>
 
     <div v-if="journeyGoal" class="diagram-modal">
-      <a-button type="danger" shape="circle" icon="close" class="close-modal" @click="journeyGoal = false"></a-button>
+      <a-button
+        type="danger"
+        shape="circle"
+        icon="close"
+        class="close-modal"
+        @click="journeyGoal = false"
+      />
 
       <Diagram
-        :initial-nodes="journeyGoal.journey && journeyGoal.journey.nodes || []"
-        :initial-edges="journeyGoal.journey && journeyGoal.journey.edges || []"
+        :initial-nodes="
+          (journeyGoal.journey && journeyGoal.journey.nodes) || []
+        "
+        :initial-edges="
+          (journeyGoal.journey && journeyGoal.journey.edges) || []
+        "
         @changeNetwork="onChangeJourney"
       />
-      <template slot="footer">&nbsp;</template>
+      <template slot="footer">
+        &nbsp;
+      </template>
     </div>
   </a-layout>
 </template>
@@ -78,7 +90,6 @@
 <script>
 import { mapGetters, mapState } from 'vuex'
 import pDebounce from 'p-debounce'
-import Draggable from 'vuedraggable'
 import VSiderListCrud from '@/components/VSiderListCrud'
 import VGoals from '@/components/VGoals'
 import Diagram from '@/components/Diagram'
@@ -88,7 +99,7 @@ import { setTimeout } from 'timers'
 export default {
   name: 'GoalSketch',
 
-  components: { Draggable, VSiderListCrud, VGoals, VBacklog, Diagram },
+  components: { VSiderListCrud, VGoals, VBacklog, Diagram },
 
   data: () => ({
     modules: [],
@@ -100,25 +111,25 @@ export default {
   }),
 
   computed: {
-    ...mapGetters('project', [
-      'currentProject'
-    ]),
+    ...mapGetters('project', ['currentProject']),
 
     ...mapState('project', {
-      personas: state => state.personas ? state.personas : []
+      personas: state => (state.personas ? state.personas : [])
     }),
 
-    itemsWithWrongPosition () {
+    itemsWithWrongPosition() {
       return this.goals.filter((goal, i, goals) => {
         const before = goals.slice(0, i)
         const after = goals.slice(i + 1)
 
-        return !before.every(other => goal.priority <= other.priority) ||
+        return (
+          !before.every(other => goal.priority <= other.priority) ||
           !after.every(other => goal.priority >= other.priority)
+        )
       })
     },
 
-    baseUrl () {
+    baseUrl() {
       if (!this.currentProject || !this.openModule) {
         return false
       }
@@ -126,25 +137,25 @@ export default {
       return `/api/projects/${this.currentProject.id}/modules/${this.openModule.id}`
     },
 
-    baseGoalUrl () {
+    baseGoalUrl() {
       if (!this.baseUrl || !this.openGoal) {
         return false
       }
 
-      const {id} = this.openGoal
+      const { id } = this.openGoal
       return `${this.baseUrl}/goals/${id}`
     },
 
-    baseUrlStories () {
+    baseUrlStories() {
       if (!this.baseGoalUrl) {
         return false
       }
 
       return `${this.baseGoalUrl}/stories`
-    },
+    }
   },
 
-  created () {
+  created() {
     if (!this.currentProject) {
       return this.$router.push('/projects')
     }
@@ -152,7 +163,8 @@ export default {
     const { id } = this.currentProject
     const url = `/api/projects/${id}/modules/`
 
-    this.$axios.$get(url)
+    this.$axios
+      .$get(url)
       .then(modules => {
         this.modules = modules
       })
@@ -164,14 +176,14 @@ export default {
   methods: {
     // Modules
 
-    onModuleOpen (mod) {
+    onModuleOpen(mod) {
       this.order = []
       this.openModule = mod
       this.openGoal = false
       this.refreshGoals()
     },
 
-    onCreateModule () {
+    onCreateModule() {
       const defaultName = 'Module'
       const defaultLike = this.modules
         .map(project => project.title)
@@ -182,15 +194,14 @@ export default {
         .sort()
 
       const countDefaultLike = defaultLike.length
-      const nextNumber = countDefaultLike
-        ? defaultLike.pop() + 1
-        : 1
+      const nextNumber = countDefaultLike ? defaultLike.pop() + 1 : 1
 
       const title = `${defaultName} ${nextNumber}`
 
       const { id } = this.currentProject
       const url = `/api/projects/${id}/modules/`
-      this.$axios.$post(url, { title })
+      this.$axios
+        .$post(url, { title })
         .then(mod => {
           this.modules.push(mod)
         })
@@ -199,13 +210,14 @@ export default {
         })
     },
 
-    onUpdateModule (mod, title) {
+    onUpdateModule(mod, title) {
       const payload = { title }
 
       const { id } = this.currentProject
       const url = `/api/projects/${id}/modules/${mod.id}`
 
-      this.$axios.$put(url, payload)
+      this.$axios
+        .$put(url, payload)
         .then(data => {
           this.$message.success(`Module ${data.title} updated`)
         })
@@ -218,7 +230,8 @@ export default {
       const { id } = this.currentProject
       const url = `/api/projects/${id}/modules/${mod.id}`
 
-      this.$axios.$delete(url)
+      this.$axios
+        .$delete(url)
         .then(() => {
           if (this.openModule && this.openModule.id === mod.id) {
             this.openModule = false
@@ -240,26 +253,27 @@ export default {
         title: ''
       }
 
-      this.$axios.$post(`${this.baseUrl}/goals`, defaultData)
+      this.$axios
+        .$post(`${this.baseUrl}/goals`, defaultData)
         .then(goal => {
           this.goals.unshift(goal)
           this.updateGoalsOrder()
         })
-        .catch(err => {
+        .catch(() => {
           this.$message.error('Failed to create goal')
         })
     },
 
-    onChangeGoalTitle: pDebounce(function onChangeGoalTitle (goal) {
+    onChangeGoalTitle: pDebounce(function onChangeGoalTitle(goal) {
       this.updateGoal(goal)
     }, 500),
 
-    onChangeGoalPriority (goal, value) {
+    onChangeGoalPriority(goal, value) {
       goal.priority = value
       this.updateGoal(goal)
     },
 
-    onGoalChangeType (goal, value) {
+    onGoalChangeType(goal, value) {
       goal.type = value
       this.updateGoal(goal)
     },
@@ -269,7 +283,8 @@ export default {
         return
       }
 
-      this.$axios.$delete(`${this.baseUrl}/goals/${goal.id}`)
+      this.$axios
+        .$delete(`${this.baseUrl}/goals/${goal.id}`)
         .then(() => {
           const index = this.goals.indexOf(goal)
           if (index !== -1) {
@@ -282,34 +297,37 @@ export default {
         })
     },
 
-    onGoalPersonaSelected (goal, personaId) {
-      return this.$axios.$post(`${this.baseUrl}/goals/${goal.id}/personas`, { personaId })
+    onGoalPersonaSelected(goal, personaId) {
+      return this.$axios
+        .$post(`${this.baseUrl}/goals/${goal.id}/personas`, { personaId })
         .catch(() => {
           this.$message.error('Failed to add persona to goal')
         })
     },
 
-    onGoalPersonaDeselected (goal, personaId) {
-      return this.$axios.$delete(`${this.baseUrl}/goals/${goal.id}/personas/${personaId}`)
+    onGoalPersonaDeselected(goal, personaId) {
+      return this.$axios
+        .$delete(`${this.baseUrl}/goals/${goal.id}/personas/${personaId}`)
         .catch(() => {
           this.$message.error('Failed to delete persona goal')
         })
     },
 
-    updateGoal (goal) {
+    updateGoal(goal) {
       if (!goal || !goal.id) {
         return
       }
 
-      const payload = {...goal}
+      const payload = { ...goal }
       payload.personas = undefined
-      this.$axios.$put(`${this.baseUrl}/goals/${goal.id}`, payload)
+      this.$axios
+        .$put(`${this.baseUrl}/goals/${goal.id}`, payload)
         .catch(() => {
           this.$message.error('Failed to update goal')
         })
     },
 
-    onOpenGoal (goal) {
+    onOpenGoal(goal) {
       this.openGoal = false
 
       setTimeout(() => {
@@ -318,15 +336,16 @@ export default {
       }, 1)
     },
 
-    refreshGoals () {
+    refreshGoals() {
       this.order = this.openModule.goals
 
-      return this.$axios.$get(`${this.baseUrl}/goals`)
+      return this.$axios
+        .$get(`${this.baseUrl}/goals`)
         .then(goals => {
           this.goals = goals
 
-          const leftOutGoals = this.goals.filter(goal =>
-            !this.order.includes(goal.id)
+          const leftOutGoals = this.goals.filter(
+            goal => !this.order.includes(goal.id)
           )
 
           for (let goal of leftOutGoals) {
@@ -342,13 +361,14 @@ export default {
         })
     },
 
-    updateGoalsOrder () {
-      const order = this.goals.map(({id}) => id)
+    updateGoalsOrder() {
+      const order = this.goals.map(({ id }) => id)
       return this.onChangeGoalsOrder(order)
     },
 
-    onChangeGoalsOrder (order) {
-      return this.$axios.$put(this.baseUrl, { goals: order })
+    onChangeGoalsOrder(order) {
+      return this.$axios
+        .$put(this.baseUrl, { goals: order })
         .then(mod => {
           Object.assign(this.openModule, mod)
         })
@@ -357,18 +377,23 @@ export default {
         })
     },
 
-    onOpenJourney (goal) {
+    onOpenJourney(goal) {
       this.journeyGoal = goal
     },
 
-    onChangeJourney (journey) {
+    onChangeJourney(journey) {
       if (!this.journeyGoal) {
         return
       }
 
       const goal = this.journeyGoal
 
-      this.$axios.$put(`${this.baseUrl}/goals/${this.journeyGoal.id}`, { journey }, { progress: false })
+      this.$axios
+        .$put(
+          `${this.baseUrl}/goals/${this.journeyGoal.id}`,
+          { journey },
+          { progress: false }
+        )
         .then(({ journey }) => {
           goal.journey = journey
         })
@@ -383,23 +408,22 @@ export default {
       const goal = this.openGoal
       const order = goal.stories
 
-      this.$axios.$get(this.baseUrlStories)
-        .then(stories => {
-          const leftOutStories = this.stories.filter(story =>
-            !order.includes(story.id)
-          )
+      this.$axios.$get(this.baseUrlStories).then(stories => {
+        const leftOutStories = this.stories.filter(
+          story => !order.includes(story.id)
+        )
 
-          for (let story of leftOutStories) {
-            this.deleteStory(story)
-          }
+        for (let story of leftOutStories) {
+          this.deleteStory(story)
+        }
 
-          this.stories = order
-            .map(id => stories.find(story => story.id === id))
-            .filter(x => x)
-        })
+        this.stories = order
+          .map(id => stories.find(story => story.id === id))
+          .filter(x => x)
+      })
     },
 
-    onCreateStory (index = 0) {
+    onCreateStory(index = 0) {
       const defaultData = {
         title: '',
         priority: '',
@@ -407,7 +431,8 @@ export default {
         acceptanceScenarios: []
       }
 
-      this.$axios.$post(this.baseUrlStories, defaultData)
+      this.$axios
+        .$post(this.baseUrlStories, defaultData)
         .then(story => {
           this.stories.splice(index, 0, story)
           this.onChangeStoriesOrder()
@@ -415,12 +440,12 @@ export default {
         .catch(() => {
           this.$message.error('Failed to create story')
         })
-
     },
 
-    onUpdateStory (story) {
+    onUpdateStory(story) {
       const url = `${this.baseUrlStories}/${story.id}`
-      this.$axios.$put(url, story)
+      this.$axios
+        .$put(url, story)
         .then(updated => {
           const original = this.stories.find(some => some.id === story.id)
 
@@ -433,11 +458,12 @@ export default {
         })
     },
 
-    onDeleteStory (story) {
+    onDeleteStory(story) {
       const url = `${this.baseUrlStories}/${story.id}`
-      this.$axios.$delete(url)
+      this.$axios
+        .$delete(url)
         .then(() => {
-          const index = this.stories.findIndex(({id}) => id === story.id)
+          const index = this.stories.findIndex(({ id }) => id === story.id)
 
           if (index === -1) {
             return
@@ -452,10 +478,9 @@ export default {
     },
 
     onChangeStoriesOrder(order = this.stories.map(story => story.id)) {
-      return this.$axios.$put(this.baseGoalUrl, { stories: order })
-        .then(goal => {
-          // TODO
-        })
+      return this.$axios.$put(this.baseGoalUrl, { stories: order }).then(() => {
+        // TODO
+      })
     }
   }
 }
@@ -463,7 +488,7 @@ export default {
 
 <style>
 .invalid-order .ant-select-selection {
-  border-color: red
+  border-color: red;
 }
 
 .fab-group {
@@ -494,4 +519,3 @@ export default {
   z-index: 100;
 }
 </style>
-

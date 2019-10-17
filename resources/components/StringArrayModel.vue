@@ -1,9 +1,6 @@
 <template>
   <div>
-    <div
-      v-for="(item, index) in items"
-      :key="index"
-    >
+    <div v-for="(item, index) in items" :key="index">
       <a-icon
         v-if="!disabled"
         class="dynamic-delete-button"
@@ -12,11 +9,11 @@
         @click="remove(index)"
       />
       <a-textarea
+        v-model="items[index]"
         :autosize="{ minSize: 1 }"
         :placeholder="placeholder"
         style="width: 90%; margin-right: 8px; margin-bottom: 5px;"
         :class="className"
-        v-model="items[index]"
         :disabled="disabled"
       />
     </div>
@@ -46,7 +43,8 @@ export default {
 
     placeholder: {
       type: String,
-      required: false
+      required: false,
+      default: ''
     },
 
     addText: {
@@ -70,7 +68,16 @@ export default {
     items: []
   }),
 
-  created () {
+  watch: {
+    items: {
+      deep: true,
+      handler: pDebounce(function emit(value) {
+        this.$emit('input', value)
+      }, 500)
+    }
+  },
+
+  created() {
     // clone
     this.items = this.value.concat()
 
@@ -80,22 +87,12 @@ export default {
   },
 
   methods: {
-    remove (index) {
+    remove(index) {
       this.items.splice(index, 1)
-    }
-  },
-
-  watch: {
-    items: {
-      deep: true,
-      handler: pDebounce(function emit (value) {
-        this.$emit('input', value)
-      }, 500)
     }
   }
 }
 </script>
-
 
 <style>
 .dynamic-delete-button {
@@ -103,7 +100,7 @@ export default {
   float: right;
   font-size: 24px;
   color: #999;
-  transition: all .3s;
+  transition: all 0.3s;
 }
 .dynamic-delete-button:hover {
   color: #777;

@@ -1,6 +1,13 @@
 <template>
   <div id="app" ref="parent" @wheel="onWheel">
-    <svg class="main-svg" :width="width" :height="height" :style="`transform: scale(${zoom}) translate(${camera.x}px, ${camera.y}px)`">
+    <svg
+      class="main-svg"
+      :width="width"
+      :height="height"
+      :style="
+        `transform: scale(${zoom}) translate(${camera.x}px, ${camera.y}px)`
+      "
+    >
       <rect
         x="0"
         y="0"
@@ -13,12 +20,12 @@
         @mouseup="onGrabOut"
         @click="stopLinkMode"
         @dblclick="handleDoubleRectClick"
-      ></rect>
+      />
 
       <Arrow
         v-for="edge in edges"
-        :key="`edge:${edge.id}`"
         :id="edge.id"
+        :key="`edge:${edge.id}`"
         :svg-width="width"
         :svg-height="height"
         :from="positions[edge.from]"
@@ -31,14 +38,14 @@
         :svg-width="width"
         :svg-height="height"
         :from="nextEdgeFrom"
-        :to="nextEdgeTo || {...mousePosition, width: 1, height: 1}"
+        :to="nextEdgeTo || { ...mousePosition, width: 1, height: 1 }"
         @click.native="stopLinkMode"
       />
       <Step
         v-for="node in nodes"
+        :id="node.id"
         :key="`node:${node.id}`"
         :ref="`node:${node.id}`"
-        :id="node.id"
         :initial-text="node.text"
         :initial-type="node.type"
         :initial-filename="node.filename || ''"
@@ -105,35 +112,8 @@ export default {
     grabbing: false
   }),
 
-  created () {
-    for (let node of this.initialNodes) {
-      this.nodes.push(Object.assign({}, node))
-    }
-  },
-
-  mounted () {
-    document.body.classList.add('full-width-modal-open')
-    this.handleResize()
-
-    for (let node of this.nodes) {
-      this.handleUpdatePosition(node.id)
-    }
-
-    for (let edge of this.initialEdges) {
-      this.edges.push(Object.assign({}, edge))
-    }
-
-    window.addEventListener('resize', this.handleResize)
-  },
-
-  beforeDestroy () {
-    document.body.classList.remove('full-width-modal-open')
-    window.removeEventListener('resize', this.handleResize)
-    window.removeEventListener('mousemove', this.onMouseMove)
-  },
-
   computed: {
-    nextEdgeToId () {
+    nextEdgeToId() {
       if (!this.mousePosition) {
         return false
       }
@@ -153,17 +133,60 @@ export default {
       return found && found.id
     },
 
-    nextEdgeTo () {
+    nextEdgeTo() {
       return this.nextEdgeToId && this.positions[this.nextEdgeToId]
     }
   },
 
+  watch: {
+    nodes: {
+      deep: true,
+      handler() {
+        this.emitChangeNetwork()
+      }
+    },
+
+    edges: {
+      deep: true,
+      handler() {
+        this.emitChangeNetwork()
+      }
+    }
+  },
+
+  created() {
+    for (let node of this.initialNodes) {
+      this.nodes.push(Object.assign({}, node))
+    }
+  },
+
+  mounted() {
+    document.body.classList.add('full-width-modal-open')
+    this.handleResize()
+
+    for (let node of this.nodes) {
+      this.handleUpdatePosition(node.id)
+    }
+
+    for (let edge of this.initialEdges) {
+      this.edges.push(Object.assign({}, edge))
+    }
+
+    window.addEventListener('resize', this.handleResize)
+  },
+
+  beforeDestroy() {
+    document.body.classList.remove('full-width-modal-open')
+    window.removeEventListener('resize', this.handleResize)
+    window.removeEventListener('mousemove', this.onMouseMove)
+  },
+
   methods: {
-    handleResize () {
+    handleResize() {
       this.updateCamera()
     },
 
-    onGrab (e) {
+    onGrab(e) {
       const x = e.pageX
       const y = e.pageY
 
@@ -174,12 +197,12 @@ export default {
       window.addEventListener('mousemove', this.onMouseMove)
     },
 
-    onGrabOut () {
+    onGrabOut() {
       window.removeEventListener('mousemove', this.onMouseMove)
       this.grabbing = false
     },
 
-    onGrabMove (e) {
+    onGrabMove(e) {
       const deltaX = e.pageX - this.grabbing.x
       const deltaY = e.pageY - this.grabbing.y
       this.updateCamera(deltaX, deltaY)
@@ -187,48 +210,56 @@ export default {
       this.grabbing.y = e.pageY
     },
 
-    updateCamera (deltaX = 0, deltaY = 0) {
+    updateCamera(deltaX = 0, deltaY = 0) {
       const { width, height } = document.body.getBoundingClientRect()
       const visibleWidth = this.width - width
       const visibleHeight = this.height - height
-      this.camera.x = Math.max(-visibleWidth, Math.min(0, this.camera.x + deltaX))
-      this.camera.y = Math.max(-visibleHeight, Math.min(0, this.camera.y + deltaY))
+      this.camera.x = Math.max(
+        -visibleWidth,
+        Math.min(0, this.camera.x + deltaX)
+      )
+      this.camera.y = Math.max(
+        -visibleHeight,
+        Math.min(0, this.camera.y + deltaY)
+      )
     },
 
-    handleStepResize ({ id }) {
+    handleStepResize({ id }) {
       this.handleUpdatePosition(id)
     },
 
-    handleChangeText ({ id }) {
+    handleChangeText({ id }) {
       this.handleUpdatePosition(id)
     },
 
-    handleUpdatePosition (id) {
+    handleUpdatePosition(id) {
       const ref = this.$refs[`node:${id}`][0]
-      this.positions = Object.assign({}, this.positions, { [id]: ref.getInfo() })
+      this.positions = Object.assign({}, this.positions, {
+        [id]: ref.getInfo()
+      })
       this.emitChangeNetwork()
     },
 
-    handleDeleteNode (id) {
+    handleDeleteNode(id) {
       this.edges = this.edges.filter(edge => edge.from !== id && edge.to !== id)
       this.nodes = this.nodes.filter(node => node.id !== id)
       this.positions[id] = undefined
       this.emitChangeNetwork()
     },
 
-    handleChangeTouchPoint ({id}) {
+    handleChangeTouchPoint({ id }) {
       this.handleUpdatePosition(id)
     },
 
-    handleChangeType ({ id, type }) {
+    handleChangeType({ id }) {
       this.handleUpdatePosition(id)
     },
 
-    handleUpdatedForm (id) {
+    handleUpdatedForm(id) {
       this.handleUpdatePosition(id)
     },
 
-    handleStepClick (stepId) {
+    handleStepClick() {
       if (!this.nextEdgeFromId || !this.nextEdgeToId) {
         return
       }
@@ -248,12 +279,12 @@ export default {
       this.nextEdgeFrom = {}
     },
 
-    stopLinkMode (e) {
+    stopLinkMode() {
       this.nextEdgeFrom = false
       this.nextEdgeFromId = false
     },
 
-    handleDoubleRectClick (e) {
+    handleDoubleRectClick(e) {
       const highestId = Math.max(...this.nodes.map(({ id }) => id))
       const id = this.nodes.length ? highestId + 1 : 1
       const type = 'box'
@@ -263,8 +294,8 @@ export default {
       const folder = ''
       const tool = ''
 
-      const x = Math.abs(this.camera.x) + e.pageX - (width * 0.5)
-      const y = Math.abs(this.camera.y) + e.pageY - (height * 0.5)
+      const x = Math.abs(this.camera.x) + e.pageX - width * 0.5
+      const y = Math.abs(this.camera.y) + e.pageY - height * 0.5
       const isNew = true
 
       this.nodes.push({
@@ -286,14 +317,14 @@ export default {
       })
     },
 
-    handleCreateLink (id, from) {
+    handleCreateLink(id, from) {
       this.nextEdgeFromId = id
       this.nextEdgeFrom = from
 
       window.addEventListener('mousemove', this.onMouseMove)
     },
 
-    onMouseMove (e) {
+    onMouseMove(e) {
       if (this.grabbing) {
         return this.onGrabMove(e)
       }
@@ -303,16 +334,16 @@ export default {
       }
 
       this.mousePosition = {
-        x: e.pageX + (-this.camera.x),
-        y: e.pageY + (-this.camera.y)
+        x: e.pageX + -this.camera.x,
+        y: e.pageY + -this.camera.y
       }
     },
 
-    handleArrowClick (id) {
+    handleArrowClick(id) {
       this.edges = this.edges.filter(edge => edge.id !== id)
     },
 
-    onWheel (e) {
+    onWheel(e) {
       if (!e.ctrlKey) {
         return
       }
@@ -325,7 +356,7 @@ export default {
       this.handleResize()
     },
 
-    emitChangeNetwork: pDebounce(function emitChangeNetwork () {
+    emitChangeNetwork: pDebounce(function emitChangeNetwork() {
       const nodes = this.nodes.map(node => ({
         id: node.id,
         x: node.x,
@@ -348,26 +379,10 @@ export default {
         edges
       })
     }, 500)
-  },
-
-  watch: {
-    nodes: {
-      deep: true,
-      handler () {
-        this.emitChangeNetwork()
-      }
-    },
-
-    edges: {
-      deep: true,
-      handler () {
-        this.emitChangeNetwork()
-      }
-    }
   }
 }
 
-function isPointInside (rect, [x, y]) {
+function isPointInside(rect, [x, y]) {
   const top = rect.y
   const bottom = top + rect.height
   const left = rect.x

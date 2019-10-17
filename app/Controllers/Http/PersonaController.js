@@ -3,7 +3,7 @@
 const Persona = use('App/Models/Persona')
 
 class PersonaController {
-  async index ({ auth, request }) {
+  async index({ auth, request }) {
     const project = await auth.user
       .projects()
       .where('projects.id', request.params.projects_id)
@@ -15,7 +15,7 @@ class PersonaController {
       .fetch()
   }
 
-  async show ({ auth, request, response }) {
+  async show({ auth, request, response }) {
     const project = await auth.user
       .projects()
       .where('projects.id', request.params.projects_id)
@@ -42,7 +42,7 @@ class PersonaController {
     return persona
   }
 
-  async store ({ auth, request, response }) {
+  async store({ auth, request, response }) {
     const project = await auth.user
       .projects()
       .where('projects.id', request.params.projects_id)
@@ -61,7 +61,7 @@ class PersonaController {
     return await Persona.findOrFail(id)
   }
 
-  async update ({ auth, request, response }) {
+  async update({ auth, request, response }) {
     const project = await auth.user
       .projects()
       .where('projects.id', request.params.projects_id)
@@ -91,7 +91,7 @@ class PersonaController {
     return persona
   }
 
-  async destroy ({ auth, request, response }) {
+  async destroy({ auth, request, response }) {
     const project = await auth.user
       .projects()
       .where('projects.id', request.params.projects_id)

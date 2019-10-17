@@ -1,10 +1,7 @@
 <template>
   <div>
-    <a-list
-      itemLayout="horizontal"
-      :dataSource="items"
-    >
-      <a-list-item slot="renderItem" slot-scope="{item, criterion}, index">
+    <a-list item-layout="horizontal" :data-source="items">
+      <a-list-item slot="renderItem" slot-scope="{ item, criterion }">
         <a-list-item-meta>
           <div slot="description">
             <a-card :title="item.title" style="max-width: 90%">
@@ -30,7 +27,10 @@ export default {
   name: 'VInspectionBacklogItems',
 
   props: {
-    items: Array
+    items: {
+      type: Array,
+      required: true
+    }
   }
 }
 </script>

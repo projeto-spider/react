@@ -15,15 +15,13 @@
 <script>
 import VCanvas from '~/components/VCanvas.vue'
 import { mapGetters, mapActions, mapMutations } from 'vuex'
-import ListManager from '~/components/ListManager.vue'
-import PersonaListManager from '~/components/PersonaListManager.vue'
 
 export default {
   name: 'CanvasPage',
 
-  components: { VCanvas, ListManager, PersonaListManager },
+  components: { VCanvas },
 
-  data () {
+  data() {
     return {
       canvas: false,
       personas: [],
@@ -32,21 +30,18 @@ export default {
   },
 
   computed: {
-    ...mapGetters('project', [
-      'currentProject',
-      'currentStep',
-      'canvasReady'
-    ])
+    ...mapGetters('project', ['currentProject', 'currentStep', 'canvasReady'])
   },
 
-  created () {
+  created() {
     if (!this.currentProject) {
       return this.$router.push('/projects')
     }
 
     this.readCanvasFromProject()
 
-    this.personasPromise = this.$axios.$get(`/api/projects/${this.currentProject.id}/personas`)
+    this.personasPromise = this.$axios
+      .$get(`/api/projects/${this.currentProject.id}/personas`)
       .then(personas => {
         this.personas = personas
         return personas
@@ -58,15 +53,11 @@ export default {
   },
 
   methods: {
-    ...mapActions('project', [
-      'updateProjectCanvas'
-    ]),
+    ...mapActions('project', ['updateProjectCanvas']),
 
-    ...mapMutations('project', [
-      'updatePersonas'
-    ]),
+    ...mapMutations('project', ['updatePersonas']),
 
-    readCanvasFromProject () {
+    readCanvasFromProject() {
       const canvas = this.currentProject.canvas || {
         problems: [],
         solutions: [],
@@ -84,20 +75,28 @@ export default {
       }
     },
 
-    onCanvasChanged (canvas) {
+    onCanvasChanged(canvas) {
       this.updateProjectCanvas(canvas)
     },
 
-    addPersona (persona) {
-      return this.$axios.$post(`/api/projects/${this.currentProject.id}/personas`, persona)
+    addPersona(persona) {
+      return this.$axios.$post(
+        `/api/projects/${this.currentProject.id}/personas`,
+        persona
+      )
     },
 
-    editPersona (persona, payload) {
-      return this.$axios.$put(`/api/projects/${this.currentProject.id}/personas/${persona.id}`, payload)
+    editPersona(persona, payload) {
+      return this.$axios.$put(
+        `/api/projects/${this.currentProject.id}/personas/${persona.id}`,
+        payload
+      )
     },
 
-    deletePersona (persona) {
-      return this.$axios.$delete(`/api/projects/${this.currentProject.id}/personas/${persona.id}`)
+    deletePersona(persona) {
+      return this.$axios.$delete(
+        `/api/projects/${this.currentProject.id}/personas/${persona.id}`
+      )
     },
 
     onPersonasChanged(personas) {
@@ -107,4 +106,3 @@ export default {
   }
 }
 </script>
-

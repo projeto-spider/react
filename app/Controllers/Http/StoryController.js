@@ -3,7 +3,7 @@
 const Story = use('App/Models/Story')
 
 class StoryController {
-  async index ({ auth, request, response }) {
+  async index({ auth, request, response }) {
     const project = await auth.user
       .projects()
       .where('projects.id', request.params.projects_id)
@@ -37,12 +37,10 @@ class StoryController {
       })
     }
 
-    return await goal
-      .stories()
-      .fetch()
+    return await goal.stories().fetch()
   }
 
-  async show ({ auth, request, response }) {
+  async show({ auth, request, response }) {
     const project = await auth.user
       .projects()
       .where('projects.id', request.params.projects_id)
@@ -90,7 +88,7 @@ class StoryController {
     return goal
   }
 
-  async store ({ auth, request, response }) {
+  async store({ auth, request, response }) {
     const project = await auth.user
       .projects()
       .where('projects.id', request.params.projects_id)
@@ -131,7 +129,7 @@ class StoryController {
     return await Story.findOrFail(id)
   }
 
-  async update ({ auth, request, response }) {
+  async update({ auth, request, response }) {
     const project = await auth.user
       .projects()
       .where('projects.id', request.params.projects_id)
@@ -183,7 +181,7 @@ class StoryController {
     return story
   }
 
-  async destroy ({ auth, request, response }) {
+  async destroy({ auth, request, response }) {
     const project = await auth.user
       .projects()
       .where('projects.id', request.params.projects_id)

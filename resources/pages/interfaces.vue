@@ -21,37 +21,59 @@
             <div v-else>
               <a-card style="margin: 0 15px">
                 <template slot="title">
-                  <a-input size="large" v-model="openInterface.title" @change="updateInterface" />
+                  <a-input
+                    v-model="openInterface.title"
+                    size="large"
+                    @change="updateInterface"
+                  />
                 </template>
 
                 <a-card-grid style="width:100%;textAlign:'center'">
                   <p>
                     <strong>Input</strong>
-                    <a-textarea :autosize="{ minRows: 2, maxRows: 6 }" v-model="openInterface.input" @change="updateInterface" />
+                    <a-textarea
+                      v-model="openInterface.input"
+                      :autosize="{ minRows: 2, maxRows: 6 }"
+                      @change="updateInterface"
+                    />
                   </p>
 
                   <p>
                     <strong>Output</strong>
-                    <a-textarea :autosize="{ minRows: 2, maxRows: 6 }" v-model="openInterface.output" @change="updateInterface" />
+                    <a-textarea
+                      v-model="openInterface.output"
+                      :autosize="{ minRows: 2, maxRows: 6 }"
+                      @change="updateInterface"
+                    />
                   </p>
 
                   <p>
                     <strong>Supplier Component</strong>
-                    <a-textarea :autosize="{ minRows: 2, maxRows: 6 }" v-model="openInterface.supplier" @change="updateInterface" />
+                    <a-textarea
+                      v-model="openInterface.supplier"
+                      :autosize="{ minRows: 2, maxRows: 6 }"
+                      @change="updateInterface"
+                    />
                   </p>
                 </a-card-grid>
 
                 <a-card-grid style="width:100%;textAlign:'center'">
                   <strong>Type</strong>
 
-                  <div style="float: right"><a-switch v-model="openInterface.internal" @change="updateInterface" /></div>
-
-                  <p>
-                    {{ openInterface.internal ? 'Internal' : 'External' }} Interface
-                  </p>
+                  <div style="float: right">
+                    <a-switch
+                      v-model="openInterface.internal"
+                      @change="updateInterface"
+                    />
+                  </div>
                 </a-card-grid>
               </a-card>
             </div>
+
+            <p>
+              {{ openInterface.internal ? 'Internal' : 'External' }}
+              Interface
+            </p>
           </a-col>
         </a-row>
       </a-layout-content>
@@ -62,9 +84,7 @@
 <script>
 import { mapGetters, mapState } from 'vuex'
 import pDebounce from 'p-debounce'
-import Draggable from 'vuedraggable'
 import InterfacesList from '@/components/InterfacesList'
-import Diagram from '@/components/Diagram'
 import { setTimeout } from 'timers'
 
 const defaultModel = () => ({
@@ -77,7 +97,7 @@ const defaultModel = () => ({
 export default {
   name: 'OverallModel',
 
-  components: { Draggable, InterfacesList, Diagram },
+  components: { InterfacesList },
 
   data: () => ({
     modules: [],
@@ -90,39 +110,39 @@ export default {
   }),
 
   computed: {
-    ...mapGetters('project', [
-      'currentProject'
-    ]),
+    ...mapGetters('project', ['currentProject']),
 
     ...mapState('project', {
-      personas: state => state.personas ? state.personas : []
+      personas: state => (state.personas ? state.personas : [])
     }),
 
-    moduleNames () {
+    moduleNames() {
       return this.modules.map(mod => ({
         value: mod.title,
         label: mod.title
       }))
     },
 
-    interfacesNames () {
+    interfacesNames() {
       return this.interfaces.map(mod => ({
         value: mod.title,
         label: mod.title
       }))
     },
 
-    itemsWithWrongPosition () {
+    itemsWithWrongPosition() {
       return this.goals.filter((goal, i, goals) => {
         const before = goals.slice(0, i)
         const after = goals.slice(i + 1)
 
-        return !before.every(other => goal.priority <= other.priority) ||
+        return (
+          !before.every(other => goal.priority <= other.priority) ||
           !after.every(other => goal.priority >= other.priority)
+        )
       })
     },
 
-    baseUrl () {
+    baseUrl() {
       if (!this.currentProject || !this.openInterface) {
         return false
       }
@@ -131,12 +151,21 @@ export default {
     }
   },
 
+  created() {
+    if (!this.currentProject) {
+      return this.$router.push('/projects')
+    }
+
+    this.loadModules()
+  },
+
   methods: {
-    loadModules () {
+    loadModules() {
       const { id } = this.currentProject
       const url = `/api/projects/${id}/modules/`
 
-      this.$axios.$get(url)
+      this.$axios
+        .$get(url)
         .then(modules => {
           this.modules = modules
         })
@@ -145,12 +174,13 @@ export default {
         })
     },
 
-    addGoal () {
+    addGoal() {
       const defaultData = {
         title: ''
       }
 
-      this.$axios.$post(`${this.baseUrl}/goals`, defaultData)
+      this.$axios
+        .$post(`${this.baseUrl}/goals`, defaultData)
         .then(goal => {
           this.goals.unshift(goal)
           this.onChangeOrder()
@@ -160,7 +190,7 @@ export default {
         })
     },
 
-    updateInterface: pDebounce(function updateInterface () {
+    updateInterface: pDebounce(function updateInterface() {
       if (!this.openInterface) {
         return
       }
@@ -171,7 +201,8 @@ export default {
         ...interfac
       }
 
-      this.$axios.$put(`${this.baseUrl}/interfaces/${interfac.id}`, payload)
+      this.$axios
+        .$put(`${this.baseUrl}/interfaces/${interfac.id}`, payload)
         .then(updated => {
           Object.assign(this.openInterface, updated)
         })
@@ -180,12 +211,13 @@ export default {
         })
     }, 500),
 
-    deleteGoal (goal) {
+    deleteGoal(goal) {
       if (!goal || !goal.id) {
         return
       }
 
-      this.$axios.$delete(`${this.baseUrl}/goals/${goal.id}`)
+      this.$axios
+        .$delete(`${this.baseUrl}/goals/${goal.id}`)
         .then(() => {
           const index = this.goals.indexOf(goal)
           if (index !== -1) {
@@ -198,33 +230,32 @@ export default {
         })
     },
 
-    onChangeTitle: pDebounce(function onChangeTitle (goal, value) {
+    onChangeTitle: pDebounce(function onChangeTitle(goal) {
       this.updateGoal(goal)
     }, 500),
 
-    onChangePriority (goal, value) {
+    onChangePriority(goal, value) {
       goal.priority = value
       this.updateGoal(goal)
     },
 
-    onChangeType (goal, value) {
+    onChangeType(goal, value) {
       goal.type = value
       this.updateGoal(goal)
     },
 
-    onChangeOrder () {
-      const goals = this.goals.map(({id}) => id)
-      return this.$axios.$put(this.baseUrl, { goals })
-        .then(mod => {
-          Object.assign(this.openInterface, mod)
-        })
+    onChangeOrder() {
+      const goals = this.goals.map(({ id }) => id)
+      return this.$axios.$put(this.baseUrl, { goals }).then(mod => {
+        Object.assign(this.openInterface, mod)
+      })
     },
 
-    onUpdateInterfaces (interfaces) {
+    onUpdateInterfaces(interfaces) {
       this.interfaces = interfaces
     },
 
-    onInterfaceOpen (interfac) {
+    onInterfaceOpen(interfac) {
       this.order = []
       this.openInterface = false
 
@@ -239,7 +270,7 @@ export default {
       }, 100)
     },
 
-    fixRefs () {
+    fixRefs() {
       this.model.relations = this.model.relations.filter(relationName =>
         this.interfaces.some(other => other.title === relationName)
       )
@@ -248,7 +279,7 @@ export default {
       )
     },
 
-    onInterfaceDelete (mod) {
+    onInterfaceDelete(mod) {
       if (this.openInterface && this.openInterface.id === mod.id) {
         this.openInterface = false
       } else if (this.openInterface) {
@@ -262,28 +293,35 @@ export default {
       }
     },
 
-    onSelectPersona (goal, personaId) {
-      return this.$axios.$post(`${this.baseUrl}/goals/${goal.id}/personas`, { personaId })
+    onSelectPersona(goal, personaId) {
+      return this.$axios
+        .$post(`${this.baseUrl}/goals/${goal.id}/personas`, { personaId })
         .catch(() => {
           this.$message.error('Failed to add persona to goal')
         })
     },
 
-    onDeselectPersona (goal, personaId) {
-      return this.$axios.$delete(`${this.baseUrl}/goals/${goal.id}/personas/${personaId}`)
+    onDeselectPersona(goal, personaId) {
+      return this.$axios
+        .$delete(`${this.baseUrl}/goals/${goal.id}/personas/${personaId}`)
         .catch(() => {
           this.$message.error('Failed to delete persona goal')
         })
     },
 
-    onChangeJourney (journey) {
+    onChangeJourney(journey) {
       if (!this.journeyGoal) {
         return
       }
 
       const goal = this.journeyGoal
 
-      this.$axios.$put(`${this.baseUrl}/goals/${this.journeyGoal.id}`, { journey }, { progress: false })
+      this.$axios
+        .$put(
+          `${this.baseUrl}/goals/${this.journeyGoal.id}`,
+          { journey },
+          { progress: false }
+        )
         .then(({ journey }) => {
           goal.journey = journey
         })
@@ -292,26 +330,18 @@ export default {
         })
     },
 
-    doOpenGoal (goal) {
+    doOpenGoal(goal) {
       this.openGoal = false
 
-      setTimeout(() => this.openGoal = goal, 1)
+      setTimeout(() => (this.openGoal = goal), 1)
     }
-  },
-
-  created () {
-    if (!this.currentProject) {
-      return this.$router.push('/projects')
-    }
-
-    this.loadModules()
   }
 }
 </script>
 
 <style>
 .invalid-order .ant-select-selection {
-  border-color: red
+  border-color: red;
 }
 
 .fab-group {
@@ -341,4 +371,3 @@ export default {
   z-index: 100;
 }
 </style>
-

@@ -4,19 +4,19 @@
 const Model = use('Model')
 
 class Persona extends Model {
-  getData (json) {
+  getData(json) {
     return JSON.parse(json)
   }
 
-  setData (obj) {
+  setData(obj) {
     return JSON.stringify(obj)
   }
 
-  owner () {
+  owner() {
     return this.belongsTo('App/Models/Project', 'projectId')
   }
 
-  goals () {
+  goals() {
     return this.belongsToMany(
       'App/Models/Goal',
       'personaId',

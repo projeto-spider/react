@@ -5,40 +5,38 @@
   >
     <div class="ant-spin-nested-loading">
       <div class="ant-spin-container">
-        <div v-for="(item, i) in items" class="ant-list-item">
+        <div v-for="(item, i) in items" :key="i" class="ant-list-item">
           <div class="ant-list-item-content ant-list-item-content-single">
             <a-input
               v-if="editing === i"
-              v-model="editingText"
-              @keypress.enter="finishEditing(i, editingText)"
-              auto-focus
               ref="addInput"
+              v-model="editingText"
+              auto-focus
               placeholder="Enter to add. Leave blank to cancel"
+              @keypress.enter="finishEditing(i, editingText)"
             />
 
             <div v-else style="display: flex; width: 100%;">
-              <div @click="editItem(i)">{{ item }}</div>
+              <div @click="editItem(i)">
+                {{ item }}
+              </div>
 
               <div style="margin-left: auto">
                 <a-popconfirm
                   slot="actions"
                   title="Are you sure delete this entry?"
+                  ok-text="Yes"
+                  cancel-text="No"
                   @confirm="deleteItem(i)"
-                  okText="Yes"
-                  cancelText="No"
                 >
-                  <a-button
-                    shape="circle"
-                    icon="delete"
-                    size="small"
-                  />
+                  <a-button shape="circle" icon="delete" size="small" />
                 </a-popconfirm>
 
                 <a-button
-                  @click="editItem(i)"
                   shape="circle"
                   icon="edit"
                   size="small"
+                  @click="editItem(i)"
                 />
               </div>
             </div>
@@ -47,12 +45,7 @@
       </div>
     </div>
 
-    <a-button
-      v-if="showButton"
-      @click="add()"
-      type="dashed"
-      block
-    >
+    <a-button v-if="showButton" type="dashed" block @click="add()">
       Add
     </a-button>
   </div>
@@ -69,7 +62,7 @@ export default {
     }
   },
 
-  data () {
+  data() {
     return {
       items: Array.isArray(this.value) ? this.value.concat() : [],
       showButton: true,
@@ -79,10 +72,9 @@ export default {
   },
 
   methods: {
-    add (config = {}) {
-      const showButton = typeof config.showButton === undefined
-        ? false
-        : config.showButton
+    add(config = {}) {
+      const showButton =
+        typeof config.showButton === undefined ? false : config.showButton
 
       if (this.editing) {
         return
@@ -95,14 +87,15 @@ export default {
       this.updateItems()
     },
 
-    editItem (index) {
+    editItem(index) {
       this.editingText = this.items[index]
       this.editing = index
 
       setTimeout(() => {
-        const $input = this.$refs.addInput
-          && this.$refs.addInput[0]
-          && this.$refs.addInput[0].$el
+        const $input =
+          this.$refs.addInput &&
+          this.$refs.addInput[0] &&
+          this.$refs.addInput[0].$el
 
         if ($input && $input.focus) {
           $input.focus()
@@ -110,18 +103,18 @@ export default {
       }, 1)
     },
 
-    stopEditing () {
+    stopEditing() {
       this.showButton = true
       this.editing = false
       this.editingText = ''
       this.updateItems()
     },
 
-    updateItems () {
+    updateItems() {
       this.$emit('input', this.items)
     },
 
-    finishEditing (index, text) {
+    finishEditing(index, text) {
       if (this.items.length < index) {
         return
       }
@@ -144,7 +137,7 @@ export default {
       this.stopEditing()
     },
 
-    deleteItem (i) {
+    deleteItem(i) {
       this.items.splice(i, 1)
       this.updateItems()
     }

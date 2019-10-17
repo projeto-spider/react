@@ -1,42 +1,42 @@
-'use strict';
+'use strict'
 
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
 const Model = use('Model')
 
 class CrcCard extends Model {
-  getProperties (json) {
+  getProperties(json) {
     return JSON.parse(json)
   }
 
-  setProperties (obj) {
+  setProperties(obj) {
     return JSON.stringify(obj)
   }
 
-  getActions (json) {
+  getActions(json) {
     return JSON.parse(json)
   }
 
-  setActions (obj) {
+  setActions(obj) {
     return JSON.stringify(obj)
   }
 
-  getRelations (json) {
+  getRelations(json) {
     return JSON.parse(json)
   }
 
-  setRelations (obj) {
+  setRelations(obj) {
     return JSON.stringify(obj)
   }
 
-  getModules (json) {
+  getModules(json) {
     return JSON.parse(json)
   }
 
-  setModules (obj) {
+  setModules(obj) {
     return JSON.stringify(obj)
   }
 
-  owner () {
+  owner() {
     return this.belongsTo('App/Models/Project', 'projectId')
   }
 }

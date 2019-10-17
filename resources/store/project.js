@@ -9,20 +9,20 @@ export const state = () => ({
 })
 
 export const mutations = {
-  selectProject (state, project) {
+  selectProject(state, project) {
     state.selected = project
     state.step = recoverStepFor(project)
   },
 
-  updateCanvas (state, canvas) {
+  updateCanvas(state, canvas) {
     Vue.set(state.selected, 'canvas', copy(canvas))
   },
 
-  updatePersonas (state, personas) {
+  updatePersonas(state, personas) {
     state.personas = copy(personas)
   },
 
-  nextStep (state) {
+  nextStep(state) {
     const nextStep = Math.min(state.step + 1, react.steps.length)
     state.step = nextStep
     saveStepFor(state.selected, nextStep)
@@ -30,28 +30,28 @@ export const mutations = {
 }
 
 export const getters = {
-  isProjectSelected ({ selected }) {
+  isProjectSelected({ selected }) {
     return !!selected
   },
 
-  currentProject ({ selected }) {
+  currentProject({ selected }) {
     return selected
   },
 
-  currentStep ({ step }) {
+  currentStep({ step }) {
     return step
   },
 
-  currentStepName ({ step }) {
+  currentStepName({ step }) {
     return react.stepName(step)
   },
 
-  currentCeremony ({ step }) {
+  currentCeremony({ step }) {
     const [ceremonyName] = react.stepName(step)
     return ceremonies.find(ceremony => ceremony.name === ceremonyName)
   },
 
-  canContinue (state, getters) {
+  canContinue(state, getters) {
     const { step } = state
 
     if (step === 2) {
@@ -68,7 +68,7 @@ export const getters = {
     return false
   },
 
-  canvasReady ({ selected }) {
+  canvasReady({ selected }) {
     return ['problems', 'solutions', 'is', 'isnt', 'constraints'].every(
       prop => selected.canvas && selected.canvas[prop].length > 0
     )
@@ -76,7 +76,7 @@ export const getters = {
 }
 
 export const actions = {
-  updateProjectCanvas ({ state, commit }, canvas) {
+  updateProjectCanvas({ state, commit }, canvas) {
     const { id } = state.selected
     commit('updateCanvas', canvas)
 
@@ -84,7 +84,7 @@ export const actions = {
   }
 }
 
-function recoverStepFor (project) {
+function recoverStepFor(project) {
   const key = `react-project-${project.id}-step`
   const value = localStorage.getItem(key)
 
@@ -95,19 +95,19 @@ function recoverStepFor (project) {
   return Number(value)
 }
 
-function saveStepFor (project, step) {
+function saveStepFor(project, step) {
   const key = `react-project-${project.id}-step`
   localStorage.setItem(key, step)
 }
 
-function hasPersonas ({ personas }) {
+function hasPersonas({ personas }) {
   return personas.length
 }
 
-function goalReady (state) {
+function goalReady() {
   return false
 }
 
-function copy (data) {
+function copy(data) {
   return JSON.parse(JSON.stringify(data))
 }

@@ -4,39 +4,39 @@
 const Model = use('Model')
 
 class Project extends Model {
-  getScale (json) {
+  getScale(json) {
     return JSON.parse(json)
   }
 
-  setScale (obj) {
+  setScale(obj) {
     return JSON.stringify(obj)
   }
 
-  getCanvas (json) {
+  getCanvas(json) {
     return JSON.parse(json)
   }
 
-  setCriteria (obj) {
+  setCriteria(obj) {
     return JSON.stringify(obj)
   }
 
-  getCriteria (json) {
+  getCriteria(json) {
     return JSON.parse(json)
   }
 
-  setCanvas (obj) {
+  setCanvas(obj) {
     return JSON.stringify(obj)
   }
 
-  getInspection (json) {
+  getInspection(json) {
     return JSON.parse(json)
   }
 
-  setInspection (obj) {
+  setInspection(obj) {
     return JSON.stringify(obj)
   }
 
-  members () {
+  members() {
     return this.belongsToMany(
       'App/Models/User',
       'projectId',
@@ -44,19 +44,19 @@ class Project extends Model {
     ).pivotTable('user_projects')
   }
 
-  personas () {
+  personas() {
     return this.hasMany('App/Models/Persona', 'id', 'projectId')
   }
 
-  modules () {
+  modules() {
     return this.hasMany('App/Models/ProjectModule', 'id', 'projectId')
   }
 
-  crcCards () {
+  crcCards() {
     return this.hasMany('App/Models/CrcCard', 'id', 'projectId')
   }
 
-  interfaces () {
+  interfaces() {
     return this.hasMany('App/Models/Interface', 'id', 'projectId')
   }
 }

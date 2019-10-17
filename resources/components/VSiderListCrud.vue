@@ -6,11 +6,11 @@
       </a-button>
     </p>
 
-    <a-card style="max-width: 640px; margin: 0 auto;" class="ant-card-no-padding">
-      <a-list
-        itemLayout="horizontal"
-        :dataSource="items"
-      >
+    <a-card
+      style="max-width: 640px; margin: 0 auto;"
+      class="ant-card-no-padding"
+    >
+      <a-list item-layout="horizontal" :data-source="items">
         <a-list-item
           slot="renderItem"
           slot-scope="item"
@@ -18,17 +18,15 @@
           :class="{ 'list-item-selected': item.id === openItemId }"
         >
           <template v-if="!readOnly && !disableEdit">
-            <a slot="actions"
+            <a
               v-if="editing !== item"
+              slot="actions"
               @click="openNameInput(item)"
             >
               Edit
             </a>
 
-            <a slot="actions"
-              v-else
-              @click="emitUpdate()"
-            >
+            <a v-else slot="actions" @click="emitUpdate()">
               Update
             </a>
           </template>
@@ -37,15 +35,17 @@
             v-if="!readOnly"
             slot="actions"
             title="Are you sure delete this item?"
-            @confirm="() => {
-              if (editing === item) {
-                this.editing = false
-              }
+            ok-text="Yes"
+            cancel-text="No"
+            @confirm="
+              () => {
+                if (editing === item) {
+                  editing = false
+                }
 
-              $emit('delete', item)
-            }"
-            okText="Yes"
-            cancelText="No"
+                $emit('delete', item)
+              }
+            "
           >
             <a href="#">Delete</a>
           </a-popconfirm>
@@ -54,16 +54,13 @@
 
           <a-list-item-meta>
             <template slot="title">
-              <form
-                v-if="editing === item"
-                @submit.prevent="emitUpdate()"
-              >
+              <form v-if="editing === item" @submit.prevent="emitUpdate()">
                 <a-input
+                  v-model="item.title"
                   size="small"
                   placeholder="Title"
-                  v-model="item.title"
-                  @blur="closeEditing()"
                   autofocus
+                  @blur="closeEditing()"
                 />
               </form>
 
@@ -85,9 +82,15 @@ export default {
   name: 'VSiderListCrud',
 
   props: {
-    itemLabel: String,
+    itemLabel: {
+      type: String,
+      required: true
+    },
 
-    items: Array,
+    items: {
+      type: Array,
+      required: true
+    },
 
     openItemId: {
       type: [Number, Boolean],
@@ -111,26 +114,24 @@ export default {
   }),
 
   computed: {
-    ...mapGetters('project', [
-      'currentProject'
-    ])
+    ...mapGetters('project', ['currentProject'])
   },
 
   methods: {
-    openNameInput (item) {
+    openNameInput(item) {
       this.closeEditing()
       this.editingTitle = item.title
       this.editing = item
     },
 
-    emitUpdate (item) {
+    emitUpdate() {
       if (this.editing) {
         this.$emit('update', this.editing, this.editingTitle)
         this.closeEditing()
       }
     },
 
-    closeEditing () {
+    closeEditing() {
       this.editing = false
       this.editingTitle = ''
     }

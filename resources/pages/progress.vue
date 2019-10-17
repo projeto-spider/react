@@ -1,15 +1,22 @@
 <template>
   <div>
-    <a-button type="primary" @click="showModal">Open Modal</a-button>
+    <a-button type="primary" @click="showModal">
+      Open Modal
+    </a-button>
 
     <div
       v-show="visible"
       class="ant-modal-mask"
       style="background-color: rgba(0, 0, 0, 0.75)"
-    ></div>
+    />
 
-    <div class="ant-modal-wrap" v-show="visible">
-      <a-steps progressDot :current="3" class="animated fadeInUp" style="animation-delay: .2s">
+    <div v-show="visible" class="ant-modal-wrap">
+      <a-steps
+        progress-dot
+        :current="3"
+        class="animated fadeInUp"
+        style="animation-delay: .2s"
+      >
         <a-step title="Inception" />
         <a-step title="Story Discovery" />
         <a-step title="Refining" />
@@ -18,14 +25,21 @@
       </a-steps>
 
       <div style="margin: 50px auto 0">
-        <a-steps direction="vertical" :current="2" class="animated fadeInUp" style="animation-delay: .3s">
+        <a-steps
+          direction="vertical"
+          :current="2"
+          class="animated fadeInUp"
+          style="animation-delay: .3s"
+        >
           <a-step title="Functional Modeling" />
           <a-step title="Interface Modeling" />
           <a-step title="Operational Concepts Modeling" />
         </a-steps>
       </div>
 
-      <a-button type="primary" class="btn-continue" @click="handleContinue">Continue</a-button>
+      <a-button type="primary" class="btn-continue" @click="handleContinue">
+        Continue
+      </a-button>
     </div>
   </div>
 </template>
@@ -41,13 +55,13 @@ export default {
   },
 
   methods: {
-    showModal () {
+    showModal() {
       this.visible = true
     },
 
-    handleContinue (e) {
+    handleContinue() {
       this.visible = false
-    },
+    }
   }
 }
 </script>
@@ -76,23 +90,23 @@ export default {
 
 @keyframes fadeInUp {
   from {
-    transform: translate3d(0,40px,0)
+    transform: translate3d(0, 40px, 0);
   }
 
   to {
-    transform: translate3d(0,0,0);
-    opacity: 1
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
   }
 }
 
 @-webkit-keyframes fadeInUp {
   from {
-    transform: translate3d(0,40px,0)
+    transform: translate3d(0, 40px, 0);
   }
 
   to {
-    transform: translate3d(0,0,0);
-    opacity: 1
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
   }
 }
 
@@ -102,7 +116,7 @@ export default {
 }
 
 .animatedFadeInUp {
-  opacity: 0
+  opacity: 0;
 }
 
 .fadeInUp {

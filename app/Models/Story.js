@@ -4,23 +4,23 @@
 const Model = use('Model')
 
 class Story extends Model {
-  getBusinessRules (json) {
+  getBusinessRules(json) {
     return JSON.parse(json)
   }
 
-  setBusinessRules (obj) {
+  setBusinessRules(obj) {
     return JSON.stringify(obj)
   }
 
-  getAcceptanceScenarios (json) {
+  getAcceptanceScenarios(json) {
     return JSON.parse(json)
   }
 
-  setAcceptanceScenarios (obj) {
+  setAcceptanceScenarios(obj) {
     return JSON.stringify(obj)
   }
 
-  owner () {
+  owner() {
     return this.belongsTo('App/Models/Goal', 'goalId')
   }
 }

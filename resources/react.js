@@ -33,10 +33,10 @@ export const steps = ceremonies
   .map(ceremony => ceremony.parts.map(part => [ceremony.name, part]))
   .reduce((acc, xs) => acc.concat(xs), [])
 
-export function validStep (step) {
+export function validStep(step) {
   return !!steps[step]
 }
 
-export function stepName (step) {
+export function stepName(step) {
   return steps[step]
 }

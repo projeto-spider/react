@@ -14,35 +14,29 @@
 
 <script>
 import VCanvas from '~/components/VCanvas.vue'
-import { mapGetters, mapActions, mapMutations } from 'vuex'
-import ListManager from '~/components/ListManager.vue'
-import PersonaListManager from '~/components/PersonaListManager.vue'
+import { mapGetters } from 'vuex'
 
-const fakePersona = (rest) => ({
-  "id":1,
-  "projectId":1,
-  "name":"Unnamed Persona",
-  "role":"Persona Role",
-  "data":{
-    "profile":[
-      'Likes this'
-    ],
-    "expectations":[
-      'Expect this'
-    ],
-    "goals":[]
+const fakePersona = rest => ({
+  id: 1,
+  projectId: 1,
+  name: 'Unnamed Persona',
+  role: 'Persona Role',
+  data: {
+    profile: ['Likes this'],
+    expectations: ['Expect this'],
+    goals: []
   },
-  "created_at":"2019-10-10 05:30:58",
-  "updated_at":"2019-10-10 05:30:59",
+  created_at: '2019-10-10 05:30:58',
+  updated_at: '2019-10-10 05:30:59',
   ...rest
 })
 
 export default {
   name: 'CanvasPage',
 
-  components: { VCanvas, ListManager, PersonaListManager },
+  components: { VCanvas },
 
-  data () {
+  data() {
     return {
       canvas: false,
       personas: [],
@@ -51,31 +45,24 @@ export default {
   },
 
   computed: {
-    ...mapGetters('project', [
-      'currentProject',
-      'currentStep',
-      'canvasReady'
-    ])
+    ...mapGetters('project', ['currentProject', 'currentStep', 'canvasReady'])
   },
 
-  created () {
+  created() {
     this.readCanvasFromProject()
 
-    const personas = [
-      fakePersona()
-    ]
+    const personas = [fakePersona()]
 
-    this.personasPromise =
-      Promise.resolve(personas)
+    this.personasPromise = Promise.resolve(personas)
       // this.$axios.$get(`/api/projects/${this.currentProject.id}/personas`)
-        .then(personas => {
-          this.personas = personas
-          return personas
-        })
-        .catch(() => {
-          this.$message.error('Failed to load personas')
-          return []
-        })
+      .then(personas => {
+        this.personas = personas
+        return personas
+      })
+      .catch(() => {
+        this.$message.error('Failed to load personas')
+        return []
+      })
   },
 
   methods: {
@@ -87,50 +74,39 @@ export default {
     //   'updatePersonas'
     // ]),
 
-    readCanvasFromProject () {
+    readCanvasFromProject() {
       this.canvas = {
-        problems: [
-          'Example Problem'
-        ],
-        solutions: [
-          'Example Solution'
-        ],
-        is: [
-          'It is this'
-        ],
-        isnt: [
-          'It isnt this'
-        ],
-        constraints: [
-          'Should be like this'
-        ]
+        problems: ['Example Problem'],
+        solutions: ['Example Solution'],
+        is: ['It is this'],
+        isnt: ['It isnt this'],
+        constraints: ['Should be like this']
       }
     },
 
-    onCanvasChanged (canvas) {
+    onCanvasChanged() {
       // this.updateProjectCanvas(canvas)
     },
 
-    addPersona (persona) {
+    addPersona() {
       return Promise.resolve(fakePersona())
       // return this.$axios.$post(`/api/projects/${this.currentProject.id}/personas`, persona)
     },
 
-    editPersona (persona, payload) {
+    editPersona(persona, payload) {
       return Promise.resolve(Object.assign({}, persona, payload))
       // return this.$axios.$put(`/api/projects/${this.currentProject.id}/personas/${persona.id}`, payload)
     },
 
-    deletePersona (persona) {
+    deletePersona() {
       return Promise.resolve()
       // return this.$axios.$delete(`/api/projects/${this.currentProject.id}/personas/${persona.id}`)
     },
 
-    onPersonasChanged(personas) {
+    onPersonasChanged() {
       // this.updatePersonas(personas)
       // this.personas = personas
     }
   }
 }
 </script>
-

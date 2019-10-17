@@ -1,9 +1,9 @@
-'use strict';
+'use strict'
 
 const Interface = use('App/Models/Interface')
 
 class InterfaceController {
-  async index ({ auth, request }) {
+  async index({ auth, request }) {
     const project = await auth.user
       .projects()
       .where('projects.id', request.params.projects_id)
@@ -12,7 +12,7 @@ class InterfaceController {
     return await project.interfaces().fetch()
   }
 
-  async show ({ auth, request, response }) {
+  async show({ auth, request, response }) {
     const project = await auth.user
       .projects()
       .where('projects.id', request.params.projects_id)
@@ -38,7 +38,7 @@ class InterfaceController {
     return interfac
   }
 
-  async store ({ auth, request, response }) {
+  async store({ auth, request, response }) {
     const project = await auth.user
       .projects()
       .where('projects.id', request.params.projects_id)
@@ -57,7 +57,7 @@ class InterfaceController {
     return await Interface.findOrFail(id)
   }
 
-  async update ({ auth, request, response }) {
+  async update({ auth, request, response }) {
     const project = await auth.user
       .projects()
       .where('projects.id', request.params.projects_id)
@@ -87,7 +87,7 @@ class InterfaceController {
     return interfac
   }
 
-  async destroy ({ auth, request, response }) {
+  async destroy({ auth, request, response }) {
     const project = await auth.user
       .projects()
       .where('projects.id', request.params.projects_id)

@@ -1,9 +1,9 @@
-'use strict';
+'use strict'
 
 const CrcCard = use('App/Models/CrcCard')
 
 class CrcCardController {
-  async index ({ auth, request }) {
+  async index({ auth, request }) {
     const project = await auth.user
       .projects()
       .where('projects.id', request.params.projects_id)
@@ -12,7 +12,7 @@ class CrcCardController {
     return await project.crcCards().fetch()
   }
 
-  async show ({ auth, request, response }) {
+  async show({ auth, request, response }) {
     const project = await auth.user
       .projects()
       .where('projects.id', request.params.projects_id)
@@ -38,7 +38,7 @@ class CrcCardController {
     return crcCard
   }
 
-  async store ({ auth, request, response }) {
+  async store({ auth, request, response }) {
     const project = await auth.user
       .projects()
       .where('projects.id', request.params.projects_id)
@@ -57,7 +57,7 @@ class CrcCardController {
     return await CrcCard.findOrFail(id)
   }
 
-  async update ({ auth, request, response }) {
+  async update({ auth, request, response }) {
     const project = await auth.user
       .projects()
       .where('projects.id', request.params.projects_id)
@@ -87,7 +87,7 @@ class CrcCardController {
     return crcCard
   }
 
-  async destroy ({ auth, request, response }) {
+  async destroy({ auth, request, response }) {
     const project = await auth.user
       .projects()
       .where('projects.id', request.params.projects_id)

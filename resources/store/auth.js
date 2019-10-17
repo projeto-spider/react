@@ -4,28 +4,29 @@ export const state = () => ({
 })
 
 export const mutations = {
-  setUser (state, user) {
+  setUser(state, user) {
     state.user = user
   },
 
-  setToken (state, token) {
+  setToken(state, token) {
     state.token = token
   }
 }
 
 export const getters = {
-  isLoggedIn ({ token }) {
+  isLoggedIn({ token }) {
     return !!token
   },
 
-  currentUser ({ user }) {
+  currentUser({ user }) {
     return user
   }
 }
 
 export const actions = {
-  login ({ commit }, { email, password }) {
-    return this.$axios.$post('/api/login', { email, password })
+  login({ commit }, { email, password }) {
+    return this.$axios
+      .$post('/api/login', { email, password })
       .then(async ({ token }) => {
         this.$axios.setToken(token, 'Bearer')
         const user = await this.$axios.$get('/api/me')
@@ -34,14 +35,15 @@ export const actions = {
       })
   },
 
-  register ({ commit, dispatch }, { email, name, password }) {
-    return this.$axios.$post('/api/users', { email, name, password })
-      .then(user => {
+  register({ dispatch }, { email, name, password }) {
+    return this.$axios
+      .$post('/api/users', { email, name, password })
+      .then(() => {
         return dispatch('login', { email, password })
       })
   },
 
-  logout ({ commit }) {
+  logout({ commit }) {
     commit('setToken', false)
     commit('setUser', false)
   }
