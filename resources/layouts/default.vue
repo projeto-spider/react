@@ -59,6 +59,10 @@
           >
             Inspection Backlog
           </a-menu-item>
+
+          <a-menu-item key="members">
+            Members
+          </a-menu-item>
         </template>
 
         <template>
