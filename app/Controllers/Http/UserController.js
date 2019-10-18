@@ -2,6 +2,13 @@
 const User = use('App/Models/User')
 
 class UserController {
+  async index({ request }) {
+    const { email = '' } = request.get()
+    return User.query()
+      .where('email', 'like', `%${email}%`)
+      .paginate()
+  }
+
   async store({ request, response }) {
     const data = request.all()
     const { email } = data
