@@ -1,12 +1,15 @@
 <template>
   <a-layout>
     <a-layout-sider style="background-color: unset" :width="360">
-      <InterfacesList
+      <VSiderListCrud
         v-if="currentProject"
-        :open-interface-id="openInterface && openInterface.id"
-        @updateInterface="onUpdateInterfaces"
-        @interfaceOpen="onInterfaceOpen"
-        @interfaceDeleted="onInterfaceDelete"
+        item-label="Interface"
+        :items="interfaces"
+        :open-item-id="openInterface && openInterface.id"
+        :disable-edit="true"
+        @open="onOpenInterface"
+        @create="onCreateInterface"
+        @delete="onDeleteInterface"
       />
     </a-layout-sider>
 
@@ -19,60 +22,10 @@
             </div>
 
             <div v-else>
-              <a-card style="margin: 0 15px">
-                <template slot="title">
-                  <a-input
-                    v-model="openInterface.title"
-                    size="large"
-                    @change="updateInterface"
-                  />
-                </template>
-
-                <a-card-grid style="width:100%;textAlign:'center'">
-                  <p>
-                    <strong>Input</strong>
-                    <a-textarea
-                      v-model="openInterface.input"
-                      :autosize="{ minRows: 2, maxRows: 6 }"
-                      @change="updateInterface"
-                    />
-                  </p>
-
-                  <p>
-                    <strong>Output</strong>
-                    <a-textarea
-                      v-model="openInterface.output"
-                      :autosize="{ minRows: 2, maxRows: 6 }"
-                      @change="updateInterface"
-                    />
-                  </p>
-
-                  <p>
-                    <strong>Supplier Component</strong>
-                    <a-textarea
-                      v-model="openInterface.supplier"
-                      :autosize="{ minRows: 2, maxRows: 6 }"
-                      @change="updateInterface"
-                    />
-                  </p>
-                </a-card-grid>
-
-                <a-card-grid style="width:100%;textAlign:'center'">
-                  <strong>Type</strong>
-
-                  <div style="float: right">
-                    <a-switch
-                      v-model="openInterface.internal"
-                      @change="updateInterface"
-                    />
-                  </div>
-                </a-card-grid>
-
-                <a-card-grid style="width: 100%">
-                  {{ openInterface.internal ? 'Internal' : 'External' }}
-                  Interface
-                </a-card-grid>
-              </a-card>
+              <VInterfaceForm
+                :interface="openInterface"
+                @update="onUpdateInterface"
+              />
             </div>
           </a-col>
         </a-row>
@@ -82,245 +35,101 @@
 </template>
 
 <script>
-import pDebounce from 'p-debounce'
-import InterfacesList from '@/components/InterfacesList'
-import { setTimeout } from 'timers'
+import VSiderListCrud from '@/components/VSiderListCrud'
+import VInterfaceForm from '@/components/VInterfaceForm'
 
-const defaultModel = () => ({
-  properties: '',
-  actions: '',
-  relations: [],
-  modules: []
-})
-
-const fakeModule = rest => ({
+const exampleInterface = (title = 'My Interface') => ({
   id: 1,
-  projectId: 1,
-  title: 'Module 1',
-  goals: [2, 1],
-  created_at: '2019-10-10 00:11:36',
-  updated_at: '2019-10-10 02:31:06',
-  ...rest
+  input: 'My Input',
+  output: 'My Output',
+  title,
+  supplier: 'Supplier',
+  internal: false
 })
 
 export default {
-  name: 'OverallModel',
+  name: 'Interfaces',
 
-  components: { InterfacesList },
+  components: { VSiderListCrud, VInterfaceForm },
 
   data: () => ({
-    modules: [],
-    interfaces: [],
-    goals: [],
+    interfaces: [exampleInterface()],
     openInterface: false,
-    openGoal: false,
-    journeyGoal: false,
-    model: defaultModel(),
-    currentProject: {},
-    personas: []
+    currentProject: {}
   }),
 
-  computed: {
-    // ...mapGetters('project', [
-    //   'currentProject'
-    // ]),
-
-    // ...mapState('project', {
-    //   personas: state => state.personas ? state.personas : []
-    // }),
-
-    moduleNames() {
-      return this.modules.map(mod => ({
-        value: mod.title,
-        label: mod.title
-      }))
-    },
-
-    interfacesNames() {
-      return this.interfaces.map(mod => ({
-        value: mod.title,
-        label: mod.title
-      }))
-    },
-
-    itemsWithWrongPosition() {
-      return this.goals.filter((goal, i, goals) => {
-        const before = goals.slice(0, i)
-        const after = goals.slice(i + 1)
-
-        return (
-          !before.every(other => goal.priority <= other.priority) ||
-          !after.every(other => goal.priority >= other.priority)
-        )
-      })
-    },
-
-    baseUrl() {
-      if (!this.currentProject || !this.openInterface) {
-        return false
-      }
-
-      return `/api/projects/${this.currentProject.id}`
-    }
-  },
-
   created() {
-    // if (!this.currentProject) {
-    //   return this.$router.push('/projects')
-    // }
-
-    this.loadModules()
+    this.loadInterfaces()
   },
 
   methods: {
-    loadModules() {
-      // const { id } = this.currentProject
-      // const url = `/api/projects/${id}/modules/`
+    loadInterfaces() {},
 
-      // this.$axios.$get(url)
-      Promise.resolve([
-        fakeModule({ id: 1, title: 'Module A' }),
-        fakeModule({ id: 2, title: 'Module B' })
-      ])
-        .then(modules => {
-          this.modules = modules
-        })
-        .catch(() => {
-          this.$message.error('Failed to load modules')
-        })
-    },
-
-    updateInterface: pDebounce(function updateInterface() {
-      // if (!this.openInterface) {
-      //   return
-      // }
-      // const interfac = this.openInterface
-      // const payload = {
-      //   ...interfac
-      // }
-      // this.$axios.$put(`${this.baseUrl}/interfaces/${interfac.id}`, payload)
-      //   .then(updated => {
-      //     Object.assign(this.openInterface, updated)
-      //   })
-      //   .catch(() => {
-      //     this.$message.error('Failed to update Class')
-      //   })
-    }, 500),
-
-    // deleteGoal (goal) {
-    //   if (!goal || !goal.id) {
-    //     return
-    //   }
-
-    //   this.$axios.$delete(`${this.baseUrl}/goals/${goal.id}`)
-    //     .then(() => {
-    //       const index = this.goals.indexOf(goal)
-    //       if (index !== -1) {
-    //         this.goals.splice(index, 1)
-    //         this.onChangeOrder()
-    //       }
-    //     })
-    //     .catch(() => {
-    //       this.$message.error('Failed to delete goal')
-    //     })
-    // },
-
-    onChangeTitle: pDebounce(function onChangeTitle() {
-      // this.updateGoal(goal)
-    }, 500),
-
-    onChangePriority(goal, value) {
-      goal.priority = value
-      // this.updateGoal(goal)
-    },
-
-    onChangeType(goal, value) {
-      goal.type = value
-      // this.updateGoal(goal)
-    },
-
-    onChangeOrder() {
-      // const goals = this.goals.map(({id}) => id)
-      // return this.$axios.$put(this.baseUrl, { goals })
-      //   .then(mod => {
-      //     Object.assign(this.openInterface, mod)
-      //   })
-    },
-
-    onUpdateInterfaces(interfaces) {
-      this.interfaces = interfaces
-    },
-
-    onInterfaceOpen(interfac) {
+    onOpenInterface(interfac) {
       this.order = []
       this.openInterface = false
 
       setTimeout(() => {
         this.openInterface = interfac
-        this.model = defaultModel()
-        this.model.properties = interfac.properties.join('\n') || ''
-        this.model.actions = interfac.actions.join('\n') || ''
-        this.model.relations = interfac.relations
-        this.model.modules = interfac.modules
-        this.fixRefs()
       }, 100)
     },
 
-    fixRefs() {
-      this.model.relations = this.model.relations.filter(relationName =>
-        this.interfaces.some(other => other.title === relationName)
-      )
-      this.model.modules = this.model.modules.filter(moduleName =>
-        this.modules.some(other => other.title === moduleName)
-      )
+    onCreateInterface() {
+      const defaultName = 'Interface'
+      const defaultLike = this.interfaces
+        .map(card => card.title)
+        .filter(title => title.indexOf(defaultName) === 0)
+        .map(title => title.split(' ').pop())
+        .map(numberString => Number(numberString))
+        .filter(x => x)
+        .sort()
+
+      const countDefaultLike = defaultLike.length
+      const nextNumber = countDefaultLike ? defaultLike.pop() + 1 : 1
+
+      const title = `${defaultName} ${nextNumber}`
+
+      Promise.resolve(exampleInterface(title))
+        .then(mod => {
+          this.interfaces.push(mod)
+        })
+        .catch(() => {
+          this.$message.error('Failed to create interface')
+        })
     },
 
-    onInterfaceDelete(mod) {
-      if (this.openInterface && this.openInterface.id === mod.id) {
-        this.openInterface = false
-      } else if (this.openInterface) {
-        const card = this.openInterface
-        this.openInterface = false
-
-        setTimeout(() => {
-          this.fixRefs()
-          this.openInterface = card
-        }, 100)
+    onUpdateInterface(model) {
+      if (!this.openInterface) {
+        return
       }
+
+      const payload = {
+        ...model
+      }
+
+      Promise.resolve(payload)
+        .then(updated => {
+          Object.assign(this.openInterface, updated)
+        })
+        .catch(() => {
+          this.$message.error('Failed to update Class')
+        })
     },
 
-    onSelectPersona() {
-      // return this.$axios.$post(`${this.baseUrl}/goals/${goal.id}/personas`, { personaId })
-      //   .catch(() => {
-      //     this.$message.error('Failed to add persona to goal')
-      //   })
-    },
+    onDeleteInterface(mod) {
+      if (this.editing === mod) {
+        this.editing = false
+      }
 
-    onDeselectPersona() {
-      // return this.$axios.$delete(`${this.baseUrl}/goals/${goal.id}/personas/${personaId}`)
-      //   .catch(() => {
-      //     this.$message.error('Failed to delete persona goal')
-      //   })
-    },
-
-    onChangeJourney() {
-      // if (!this.journeyGoal) {
-      //   return
-      // }
-      // const goal = this.journeyGoal
-      // this.$axios.$put(`${this.baseUrl}/goals/${this.journeyGoal.id}`, { journey }, { progress: false })
-      //   .then(({ journey }) => {
-      //     goal.journey = journey
-      //   })
-      //   .catch(() => {
-      //     this.$message.error('Failed to update journey')
-      //   })
-    },
-
-    doOpenGoal(goal) {
-      this.openGoal = false
-
-      setTimeout(() => (this.openGoal = goal), 1)
+      Promise.resolve()
+        .then(() => {
+          this.$message.warn(`Deleted ${mod.title}`)
+          const index = this.interfaces.indexOf(mod)
+          this.interfaces.splice(index, 1)
+        })
+        .catch(() => {
+          this.$message.error('Failed to delete module')
+        })
     }
   }
 }
