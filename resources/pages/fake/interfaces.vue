@@ -67,13 +67,13 @@
                     />
                   </div>
                 </a-card-grid>
+
+                <a-card-grid style="width: 100%">
+                  {{ openInterface.internal ? 'Internal' : 'External' }}
+                  Interface
+                </a-card-grid>
               </a-card>
             </div>
-
-            <p>
-              {{ openInterface.internal ? 'Internal' : 'External' }}
-              Interface
-            </p>
           </a-col>
         </a-row>
       </a-layout-content>

@@ -41,7 +41,7 @@
 
           <a-menu-item
             key="interfaces"
-            :disabled="insideFake && currentStep < 2"
+            :disabled="!insideFake && currentStep < 2"
           >
             Interfaces
           </a-menu-item>
