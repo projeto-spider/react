@@ -1,18 +1,8 @@
-<p align="center"><img width="400" src="https://raw.githubusercontent.com/nuxt/adonuxt/master/resources/assets/img/logo.png"></p>
-
-# AdoNuxt
-
-> [AdonisJS](http://adonisjs.com/) + [Nuxt.js](https://nuxtjs.org) = :fire:
-
-## Installation
-
-This is a project template for [adonis-cli](https://github.com/adonisjs/adonis-cli).
-
-```bash
-adonis new --blueprint nuxt-community/adonuxt-template <project-name>
-```
-
-> Make sure to use a version of adonis-cli >= 2.1.8 (`adonis --version`).
+<h1 align="center">
+  <br>
+  Spider R.E.A.C.T.
+  <br>
+</h1>
 
 ## Usage
 
@@ -23,34 +13,17 @@ adonis new --blueprint nuxt-community/adonuxt-template <project-name>
 | npm start | Start AdonisJS server in production. |
 | npm lint | Lint your code with [ESLint](http://eslint.org) and [Standard](http://standardjs.com). |
 
-## Features
+<div>
+  <h2>
+    Team<a href="http://spider.ufpa.br/"><img src="http://i.imgur.com/ojl8970.png" alt="Projeto Spider logo" align="right" height="96"/></a>
+  </h2>
+</div>
 
-See [AdonisJS features](https://adonisjs.com/docs/about) and [Nuxt.js features](https://nuxtjs.org/guide/#features).
+![Lubien](https://avatars.githubusercontent.com/u/9121359?s=130) |
+---
+[Lubien](http://lubien.me)
 
-## AdonisJS Changes
+## Learn more
 
-- No more `public` directory, use `resources/static/` instead.
-- No more `resources/views` directory.
-
-## Nuxt.js Changes
-
-- The `nuxt.config.js` file is now in `config/nuxt.js`.
-- The Nuxt project directory is `resources`.
-
-## Live Demo
-
-[https://ado.nuxtjs.org](https://ado.nuxtjs.org)
-
-*This demo has been deployed to [now.sh](https://zeit.co/now/) with the single command: `now`*
-
-## Documentation
-
-- [AdonisJS](http://adonisjs.com/docs/)
-- [Nuxt.js](https://nuxtjs.org/guide/)
-- [Vue.js](http://vuejs.org/guide/)
-
-## Licenses
-
-- [AdonisJS license](https://github.com/adonisjs/adonis-framework/blob/develop/LICENSE.txt)
-- [NuxtJS license](https://github.com/nuxt/nuxt.js/blob/master/LICENSE.md)
-- [VueJS license](https://github.com/vuejs/vue/blob/master/LICENSE)
+  * Projeto Spider official website (in portuguese): http://spider.ufpa.br/
+  * [Vue.js](http://vuejs.org/guide/)
