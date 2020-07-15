@@ -19,7 +19,7 @@
   </h2>
 </div>
 
-![Lubien](https://avatars.githubusercontent.com/u/9121359?s=130) |
+![Lubien](https://avatars.githubusercontent.com/u/9121359?s=130)
 ---
 [Lubien](http://lubien.me)
 
