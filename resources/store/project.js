@@ -52,6 +52,7 @@ export const getters = {
   },
 
   canContinue(state, getters) {
+    return true
     const { step } = state
 
     if (step === 2) {
@@ -65,7 +66,8 @@ export const getters = {
     if (step === 0) {
       return getters.canvasReady
     }
-    return false
+
+    return true
   },
 
   canvasReady({ selected }) {

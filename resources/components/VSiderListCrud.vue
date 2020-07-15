@@ -126,6 +126,7 @@ export default {
 
     emitUpdate() {
       if (this.editing) {
+        this.editingTitle = this.editing.title;
         this.$emit('update', this.editing, this.editingTitle)
         this.closeEditing()
       }

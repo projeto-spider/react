@@ -69,9 +69,6 @@
                 Solution
                 <a-input v-model="criterion.solution" />
 
-                Assignee
-                <a-input disabled placeholder="TODO" />
-
                 Status
                 <a-select v-model="criterion.progress" style="width: 100%">
                   <a-select-option :value="0">

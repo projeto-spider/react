@@ -11,8 +11,6 @@
                 <p>Description: {{ criterion.description }}</p>
 
                 <p>Solution: {{ criterion.solution }}</p>
-
-                <p>Assignee: TODO</p>
               </div>
             </a-card>
           </div>
